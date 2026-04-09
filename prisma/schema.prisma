@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  url = env("DATABASE_URL")
+  provider = "sqlite"
+}
+
+enum LobsterKey {
+  RED
+  BLUE
+  GOLD
+}
+
+enum DeliverySide {
+  BUY
+  SELL
+}
+
+model Lobster {
+  id          String       @id @default(cuid())
+  key         LobsterKey   @unique
+  name        String
+  description String?
+  color       String?
+  isActive    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deliveries  Delivery[]
+  comments    Comment[]
+  logs        LogEntry[]
+}
+
+model Delivery {
+  id          String       @id @default(cuid())
+  lobsterId   String
+  lobster     Lobster      @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  symbol      String
+  side        DeliverySide
+  quantity    Float
+  price       Float
+  deliveredAt DateTime
+  note        String?
+  createdAt   DateTime     @default(now())
+
+  @@index([lobsterId, deliveredAt])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  lobsterId String
+  lobster   Lobster   @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  author    String
+  content   String
+  sentiment Int?
+  createdAt DateTime  @default(now())
+
+  @@index([lobsterId, createdAt])
+}
+
+model LogEntry {
+  id        String    @id @default(cuid())
+  lobsterId String
+  lobster   Lobster   @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
+  level     String    @default("INFO")
+  createdAt DateTime  @default(now())
+
+  @@index([lobsterId, createdAt])
+}
