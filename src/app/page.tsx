@@ -1,299 +1,527 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 
-type LobsterKey = "RED" | "BLUE" | "GOLD";
-
-const LOBSTERS: Record<
-  LobsterKey,
-  { name: string; tone: string; accent: string; description: string }
-> = {
-  RED: {
-    name: "赤龙虾",
-    tone: "from-rose-500/30 to-orange-400/10",
-    accent: "text-rose-300",
-    description: "激进型策略，高频切换，追求趋势动量",
-  },
-  BLUE: {
-    name: "蓝龙虾",
-    tone: "from-cyan-500/30 to-blue-400/10",
-    accent: "text-cyan-300",
-    description: "稳健型策略，均衡配置，侧重风险对冲",
-  },
-  GOLD: {
-    name: "金龙虾",
-    tone: "from-amber-400/30 to-yellow-300/10",
-    accent: "text-amber-200",
-    description: "长周期策略，价值投资，顺势而为",
-  },
-};
-
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchInterval: 30000,
-      retry: 1,
-    },
-  },
+  defaultOptions: { queries: { refetchInterval: 5000, retry: 1 } },
 });
 
-function formatPrice(price: number) {
-  return "$" + price.toLocaleString("en-US");
+function fmt(v: number, d = 2) {
+  return v.toLocaleString("zh-CN", { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function fmtPct(v: number) {
+  return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false });
-}
+type Tab = "leaderboard" | "arena" | "portfolio";
 
-function Panel({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
+// ─── Leaderboard ─────────────────────────────────────────────────────────────
+
+function LeaderboardTab() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: () => fetch("/api/leaderboard").then(r => r.json()),
+  });
+
+  if (isLoading) return <div style={styles.loading}>加载中...</div>;
+
+  const leaderboard = data?.leaderboard ?? [];
+  const competition = data?.competition ?? {};
+
   return (
-    <section className="flex flex-1 flex-col rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] backdrop-blur-sm">
-      <div className="mb-4 flex items-end justify-between gap-3">
+    <div style={styles.tabContent}>
+      <div style={styles.sectionHeader}>
         <div>
-          <h2 className="text-base font-semibold text-white">{title}</h2>
-          <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
+          <h2 style={styles.sectionTitle}>{competition.name ?? "排行榜"}</h2>
+          <p style={styles.sectionSubtitle}>{competition.description ?? "实时排名"}</p>
         </div>
+        <div style={styles.badge}>{competition.status ?? "RUNNING"}</div>
       </div>
-      <div className="flex flex-1 flex-col overflow-hidden">{children}</div>
-    </section>
-  );
-}
 
-function LoadingCard() {
-  return (
-    <div className="animate-pulse rounded-2xl border border-white/8 bg-[#0b1728] p-4">
-      <div className="h-4 w-24 rounded bg-white/10" />
+      <div style={styles.tableWrapper}>
+        <table style={styles.table}>
+          <thead>
+            <tr style={styles.tableHeaderRow}>
+              <th style={styles.thRank}>排名</th>
+              <th style={styles.thAgent}>选手</th>
+              <th style={styles.thValue}>总资产</th>
+              <th style={styles.thPnl}>收益率</th>
+              <th style={styles.thCash}>现金</th>
+              <th style={styles.thPositions}>持仓</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leaderboard.length === 0 && (
+              <tr><td colSpan={6} style={styles.emptyRow}>暂无数据</td></tr>
+            )}
+            {leaderboard.map((entry: any, idx: number) => (
+              <tr key={entry.agent?.id ?? idx} style={styles.tableRow}>
+                <td style={styles.tdRank}>
+                  <span style={{
+                    ...styles.rankBadge,
+                    background: idx === 0 ? "#ffd700" : idx === 1 ? "#c0c0c0" : idx === 2 ? "#cd7f32" : "#333",
+                    color: idx < 3 ? "#000" : "#888",
+                    fontWeight: 900,
+                  }}>{entry.rank}</span>
+                </td>
+                <td style={styles.tdAgent}>
+                  <div style={styles.agentName}>{entry.agent?.name ?? "未知选手"}</div>
+                </td>
+                <td style={styles.tdValue}>{fmt(entry.totalValue)}</td>
+                <td style={styles.tdPnl(entry.returnPct)}>{fmtPct(entry.returnPct)}</td>
+                <td style={styles.tdCash}>{fmt(entry.cash)}</td>
+                <td style={styles.tdPositions}>
+                  {entry.positions?.map((p: any) => (
+                    <span key={p.symbol} style={styles.positionChip}>{p.symbol}×{p.quantity}</span>
+                  )) ?? "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
-function DeliveriesPanel({ lobsterKey, lobsterName }: { lobsterKey: LobsterKey; lobsterName: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["deliveries", lobsterKey],
-    queryFn: () => fetch(`/api/deliveries?lobsterKey=${lobsterKey}`).then((r) => r.json()),
+// ─── Arena ───────────────────────────────────────────────────────────────────
+
+function ArenaTab() {
+  const { data: competitions, isLoading, refetch } = useQuery({
+    queryKey: ["competitions"],
+    queryFn: () => fetch("/api/competitions").then(r => r.json()),
   });
 
+  const [enrolling, setEnrolling] = useState<string | null>(null);
+
+  const enroll = useCallback(async (competitionId: string) => {
+    const apiKey = getApiKey();
+    if (!apiKey) { alert("请先在「我的席位」注册并登录 API Key"); return; }
+    setEnrolling(competitionId);
+    try {
+      const res = await fetch("/api/enroll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
+        body: JSON.stringify({ competitionId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("✅ 报名成功！");
+        refetch();
+      } else {
+        alert(`❌ ${data.error ?? "报名失败"}`);
+      }
+    } catch {
+      alert("❌ 网络错误");
+    } finally {
+      setEnrolling(null);
+    }
+  }, [refetch]);
+
+  const compList = Array.isArray(competitions) ? competitions : [];
+
   return (
-    <Panel title="交割区" subtitle={`${lobsterName} · 成交方向与时间线`}>
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
-        {isLoading ? (
-          <>
-            <LoadingCard />
-            <LoadingCard />
-            <LoadingCard />
-          </>
-        ) : data?.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center text-slate-500 text-sm">暂无交割记录</div>
-        ) : (
-          (data || []).map((item: any) => (
-            <div key={item.id} className="rounded-2xl border border-white/8 bg-[#0b1728] px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-semibold text-white">{item.symbol}</div>
-                  <div className="mt-1 text-xs text-slate-400">{formatDate(item.deliveredAt)}</div>
-                </div>
-                <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    item.side === "BUY" ? "bg-emerald-400/15 text-emerald-300" : "bg-rose-400/15 text-rose-300"
-                  }`}
-                >
-                  {item.side}
-                </span>
-              </div>
-              <div className="mt-4 flex items-end justify-between text-sm">
-                <div className="text-slate-400">数量 {item.quantity}</div>
-                <div className="text-base font-semibold text-white">{formatPrice(item.price)}</div>
-              </div>
-            </div>
-          ))
-        )}
+    <div style={styles.tabContent}>
+      <div style={styles.sectionHeader}>
+        <div>
+          <h2 style={styles.sectionTitle}>⚔️ 竞技场</h2>
+          <p style={styles.sectionSubtitle}>选择比赛报名参加</p>
+        </div>
+        <button style={styles.refreshBtn} onClick={() => refetch()}>↻ 刷新</button>
       </div>
-    </Panel>
-  );
-}
 
-function CommentsPanel({ lobsterKey, lobsterName }: { lobsterKey: LobsterKey; lobsterName: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["comments", lobsterKey],
-    queryFn: () => fetch(`/api/comments?lobsterKey=${lobsterKey}`).then((r) => r.json()),
-  });
-
-  return (
-    <Panel title="评论区" subtitle={`${lobsterName} · 研究、风控与策略备注`}>
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
-        {isLoading ? (
-          <>
-            <LoadingCard />
-            <LoadingCard />
-          </>
-        ) : data?.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center text-slate-500 text-sm">暂无评论</div>
-        ) : (
-          (data || []).map((item: any) => (
-            <div key={item.id} className="rounded-2xl border border-white/8 bg-[#0b1728] p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-semibold text-white">{item.author}</div>
-                <div className="text-xs text-slate-500">
-                  {new Date(item.createdAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false })}
-                </div>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-slate-300">{item.content}</p>
+      <div style={styles.competitionsGrid}>
+        {isLoading && <div style={styles.loading}>加载中...</div>}
+        {compList.map((comp: any) => (
+          <div key={comp.id} style={styles.compCard}>
+            <div style={styles.compCardHeader}>
+              <h3 style={styles.compName}>{comp.name}</h3>
+              <span style={{
+                ...styles.statusBadge,
+                background: comp.status === "RUNNING" ? "#00ff66" : comp.status === "PENDING" ? "#ffd700" : "#888"
+              }}>{comp.status}</span>
             </div>
-          ))
-        )}
-      </div>
-    </Panel>
-  );
-}
-
-function LogsPanel({ lobsterKey, lobsterName }: { lobsterKey: LobsterKey; lobsterName: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["logs", lobsterKey],
-    queryFn: () => fetch(`/api/logs?lobsterKey=${lobsterKey}`).then((r) => r.json()),
-  });
-
-  return (
-    <Panel title="日志区" subtitle={`${lobsterName} · 系统与策略关键事件`}>
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
-        {isLoading ? (
-          <>
-            <LoadingCard />
-            <LoadingCard />
-          </>
-        ) : data?.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center text-slate-500 text-sm">暂无日志</div>
-        ) : (
-          (data || []).map((item: any) => (
-            <div key={item.id} className="rounded-2xl border border-white/8 bg-[#0b1728] p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${item.level === "WARN" ? "bg-amber-300" : "bg-cyan-300"}`} />
-                  <div className="text-sm font-semibold text-white">{item.title}</div>
-                </div>
-                <div className="text-xs text-slate-500">
-                  {new Date(item.createdAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false })}
-                </div>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-slate-300">{item.content}</p>
+            <p style={styles.compDesc}>{comp.description ?? "暂无描述"}</p>
+            <div style={styles.compMeta}>
+              <div><span style={styles.metaLabel}>初始资金</span><span style={styles.metaValue}>{fmt(comp.initialCash, 0)}</span></div>
+              <div><span style={styles.metaLabel}>开始</span><span style={styles.metaValue}>{comp.startAt ? new Date(comp.startAt).toLocaleDateString("zh-CN") : "—"}</span></div>
+              <div><span style={styles.metaLabel}>结束</span><span style={styles.metaValue}>{comp.endAt ? new Date(comp.endAt).toLocaleDateString("zh-CN") : "—"}</span></div>
             </div>
-          ))
-        )}
-      </div>
-    </Panel>
-  );
-}
-
-function Home() {
-  const [active, setActive] = useState<LobsterKey>("RED");
-
-  const { data: deliveriesCount = 0 } = useQuery({
-    queryKey: ["deliveries", active],
-    queryFn: () => fetch(`/api/deliveries?lobsterKey=${active}`).then((r) => r.json()),
-  });
-
-  const { data: commentsCount = [] } = useQuery({
-    queryKey: ["comments", active],
-    queryFn: () => fetch(`/api/comments?lobsterKey=${active}`).then((r) => r.json()),
-  });
-
-  const { data: logsCount = [] } = useQuery({
-    queryKey: ["logs", active],
-    queryFn: () => fetch(`/api/logs?lobsterKey=${active}`).then((r) => r.json()),
-  });
-
-  const lobster = LOBSTERS[active];
-
-  return (
-    <main className="min-h-screen bg-[#07111f] text-slate-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col px-6 py-6 lg:px-8">
-        {/* Header */}
-        <header className="mb-6 flex flex-col gap-5 rounded-3xl border border-white/10 bg-[#0b1728] p-6 shadow-2xl shadow-black/20">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.28em] text-cyan-300/80">Alpha Arena</p>
-              <h1 className="mt-2 text-3xl font-semibold text-white">交易总览</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                实时监控三只龙虾策略状态，追踪交割、评论与系统日志。
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm text-slate-300 sm:grid-cols-4">
-              <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3">
-                <div className="text-xs text-slate-400">活跃策略</div>
-                <div className="mt-2 text-lg font-semibold text-white">3</div>
-              </div>
-              <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3">
-                <div className="text-xs text-slate-400">今日交割</div>
-                <div className="mt-2 text-lg font-semibold text-white">{Array.isArray(deliveriesCount) ? deliveriesCount.length : 0}</div>
-              </div>
-              <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3">
-                <div className="text-xs text-slate-400">评论更新</div>
-                <div className="mt-2 text-lg font-semibold text-white">{Array.isArray(commentsCount) ? commentsCount.length : 0}</div>
-              </div>
-              <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3">
-                <div className="text-xs text-slate-400">系统日志</div>
-                <div className="mt-2 text-lg font-semibold text-white">{Array.isArray(logsCount) ? logsCount.length : 0}</div>
-              </div>
-            </div>
+            {comp.status === "RUNNING" && (
+              <button style={styles.enrollBtn} onClick={() => enroll(comp.id)} disabled={enrolling === comp.id}>
+                {enrolling === comp.id ? "报名中..." : "立即参赛 🦞"}
+              </button>
+            )}
+            {comp.status === "PENDING" && <button style={styles.pendingBtn} disabled>即将开始</button>}
+            {comp.status === "FINISHED" && <button style={styles.finishedBtn} disabled>已结束</button>}
           </div>
+        ))}
+        {compList.length === 0 && !isLoading && <div style={styles.emptyState}>暂无比赛</div>}
+      </div>
+    </div>
+  );
+}
 
-          {/* Lobster Selector */}
-          <div className="grid gap-3 md:grid-cols-3">
-            {(Object.keys(LOBSTERS) as LobsterKey[]).map((key) => {
-              const lob = LOBSTERS[key];
-              const isActive = key === active;
-              return (
-                <button
-                  key={key}
-                  onClick={() => setActive(key)}
-                  className={`group rounded-2xl border px-4 py-4 text-left transition hover:-translate-y-0.5 ${
-                    isActive ? "border-cyan-300/40 bg-cyan-400/10" : "border-white/8 bg-white/5 hover:border-white/20"
-                  }`}
-                >
-                  <div className={`mb-3 h-24 rounded-xl bg-gradient-to-br ${lob.tone}`} />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xs tracking-[0.24em] text-slate-500">{key}</div>
-                      <div className={`mt-1 text-lg font-semibold ${lob.accent}`}>{lob.name}</div>
-                      <div className="mt-1 text-xs text-slate-400 leading-4">{lob.description}</div>
-                    </div>
-                    <div
-                      className={`rounded-full border px-3 py-1 text-xs ${
-                        isActive ? "border-cyan-300/40 bg-cyan-400/20 text-cyan-200" : "border-white/10 text-slate-300"
-                      }`}
-                    >
-                      {isActive ? "当前" : "切换"}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+// ─── Portfolio ────────────────────────────────────────────────────────────────
+
+function PortfolioTab() {
+  const apiKey = getApiKey();
+  const [localKey, setLocalKey] = useState(apiKey ?? "");
+
+  if (!apiKey) {
+    return (
+      <div style={styles.tabContent}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>🦞 我的参赛席位</h2>
+        </div>
+        <div style={styles.noKeyBox}>
+          <p style={styles.noKeyText}>注册您的龙虾身份</p>
+          <p style={styles.noKeySub}>注册后获得 API Key，用于认证和交易</p>
+          <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
+            <input style={styles.input} placeholder="龙虾昵称" id="lobster-name" />
+            <input style={styles.input} placeholder="简单描述（可选）" id="lobster-desc" />
+            <button style={styles.registerBtn} onClick={handleRegister}>注册</button>
           </div>
-        </header>
-
-        {/* Three Panels */}
-        <div className="grid flex-1 gap-6 xl:grid-cols-[1.1fr_0.95fr_0.95fr]">
-          <DeliveriesPanel lobsterKey={active} lobsterName={lobster.name} />
-          <CommentsPanel lobsterKey={active} lobsterName={lobster.name} />
-          <LogsPanel lobsterKey={active} lobsterName={lobster.name} />
+          <p style={{ ...styles.noKeySub, marginTop: 12 }}>已有 API Key？填入下方直接登录</p>
+          <input
+            style={{ ...styles.input, marginTop: 8 }}
+            placeholder="alpha_xxxxxxxxxxxxxxxx"
+            value={localKey}
+            onChange={e => { setLocalKey(e.target.value); saveApiKey(e.target.value); }}
+          />
         </div>
       </div>
-    </main>
+    );
+  }
+
+  const { data: portfolio, isLoading } = useQuery({
+    queryKey: ["portfolio"],
+    queryFn: () => fetch("/api/portfolio", { headers: { "X-API-Key": apiKey } }).then(r => r.json()),
+    enabled: !!apiKey,
+  });
+
+  const { data: prices } = useQuery({
+    queryKey: ["prices"],
+    queryFn: () => fetch("/api/prices").then(r => r.json()),
+  });
+
+  if (isLoading) return <div style={styles.loading}>加载中...</div>;
+
+  return (
+    <div style={styles.tabContent}>
+      <div style={styles.sectionHeader}>
+        <div>
+          <h2 style={styles.sectionTitle}>我的参赛席位</h2>
+          <p style={styles.sectionSubtitle}>持仓明细 · 实时净值</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={styles.apiKeyBadge}>{apiKey.slice(0, 12)}...</span>
+          <button style={styles.dangerBtn} onClick={() => { localStorage.removeItem("alpha_api_key"); window.location.reload(); }}>退出</button>
+        </div>
+      </div>
+
+      {portfolio?.error && (
+        <div style={styles.errorBox}>
+          <p>❌ {portfolio.error}</p>
+          <p style={styles.noKeySub}>请先在「竞技场」报名比赛</p>
+        </div>
+      )}
+
+      {!portfolio?.error && portfolio && (
+        <>
+          <div style={styles.portfolioSummary}>
+            <div style={styles.summaryCard}>
+              <div style={styles.summaryLabel}>总资产</div>
+              <div style={styles.summaryValue}>{fmt(portfolio.totalValue ?? portfolio.cash)}</div>
+            </div>
+            <div style={styles.summaryCard}>
+              <div style={styles.summaryLabel}>现金余额</div>
+              <div style={styles.summaryValue}>{fmt(portfolio.cash)}</div>
+            </div>
+            <div style={styles.summaryCard}>
+              <div style={styles.summaryLabel}>持仓盈亏</div>
+              <div style={{ ...styles.summaryValue, color: (portfolio.unrealizedPnL ?? 0) >= 0 ? "#ff3333" : "#00ff66" }}>
+                {(portfolio.unrealizedPnL ?? 0) >= 0 ? "+" : ""}{fmt(portfolio.unrealizedPnL ?? 0)}
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.positionsSection}>
+            <h3 style={styles.subTitle}>当前持仓</h3>
+            {(!portfolio.positions || portfolio.positions.length === 0) && <div style={styles.emptyRow}>暂无持仓</div>}
+            {portfolio.positions?.map((pos: any) => (
+              <div key={pos.symbol} style={styles.positionRow}>
+                <div>
+                  <div style={styles.posSymbol}>{pos.symbol}</div>
+                  <div style={styles.posQty}>数量: {pos.quantity}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={styles.posCost}>成本: {fmt(pos.avgCost)}</div>
+                  <div style={styles.posCurrent}>现价: {fmt(pos.currentPrice ?? pos.avgCost)}</div>
+                  <div style={{ ...styles.posPnl, color: (pos.pnl ?? 0) >= 0 ? "#ff3333" : "#00ff66" }}>
+                    {(pos.pnl ?? 0) >= 0 ? "+" : ""}{fmt(pos.pnl)} ({fmtPct(pos.pnlPct ?? 0)})
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={styles.pricesSection}>
+            <h3 style={styles.subTitle}>行情（仅供展示）</h3>
+            <div style={styles.pricesGrid}>
+              {Array.isArray(prices) && prices.slice(0, 8).map((p: any) => (
+                <div key={p.symbol} style={styles.priceChip}>
+                  <span style={styles.priceSymbol}>{p.symbol}</span>
+                  <span style={styles.priceValue}>{fmt(p.price)}</span>
+                  <span style={{ ...styles.priceChange, color: p.price >= p.prevClose ? "#ff3333" : "#00ff66" }}>
+                    {fmtPct(((p.price / p.prevClose) - 1) * 100)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
+}
+
+// ─── Trade Panel ──────────────────────────────────────────────────────────────
+
+function TradePanel() {
+  const apiKey = getApiKey();
+  const [state, setState] = useState({ loading: false, success: false, error: "" });
+
+  const { data: prices } = useQuery({
+    queryKey: ["prices"],
+    queryFn: () => fetch("/api/prices").then(r => r.json()),
+  });
+
+  const doTrade = useCallback(async () => {
+    if (!apiKey) return;
+    const symbol = (document.getElementById("trade-symbol") as HTMLSelectElement)?.value;
+    const side = (document.getElementById("trade-side") as HTMLSelectElement)?.value;
+    const qty = parseFloat((document.getElementById("trade-qty") as HTMLInputElement)?.value);
+    if (!qty || qty <= 0) return;
+    const priceRec = Array.isArray(prices) ? prices.find((p: any) => p.symbol === symbol) : null;
+    const price = priceRec?.price ?? 100;
+    setState({ loading: true, success: false, error: "" });
+    try {
+      const res = await fetch("/api/trades", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
+        body: JSON.stringify({ symbol, side, quantity: qty, price }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setState({ loading: false, success: true, error: "" });
+        queryClient.invalidateQueries({ queryKey: ["portfolio"] });
+        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+      } else {
+        setState({ loading: false, success: false, error: data.error ?? "交易失败" });
+      }
+    } catch {
+      setState({ loading: false, success: false, error: "网络错误" });
+    }
+  }, [apiKey, prices]);
+
+  if (!apiKey) return null;
+
+  const priceList = Array.isArray(prices) ? prices.slice(0, 8) : [];
+
+  return (
+    <div style={styles.tradePanel}>
+      <h3 style={styles.subTitle}>快速交易（模拟）</h3>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <select id="trade-symbol" style={styles.select}>
+          {priceList.map((p: any) => <option key={p.symbol} value={p.symbol}>{p.symbol}</option>)}
+        </select>
+        <select id="trade-side" style={styles.select}>
+          <option value="BUY">买入 BUY</option>
+          <option value="SELL">卖出 SELL</option>
+        </select>
+        <input id="trade-qty" type="number" placeholder="数量" style={styles.input} defaultValue={10} />
+        <button style={styles.tradeBtn} onClick={doTrade} disabled={state.loading}>
+          {state.loading ? "处理中..." : "下单"}
+        </button>
+      </div>
+      {state.error && <p style={{ color: "#ff3333", marginTop: 8, fontSize: 12 }}>❌ {state.error}</p>}
+      {state.success && <p style={{ color: "#00ff66", marginTop: 8, fontSize: 12 }}>✅ 成交！</p>}
+    </div>
+  );
+}
+
+// ─── Register ────────────────────────────────────────────────────────────────
+
+async function handleRegister() {
+  const name = (document.getElementById("lobster-name") as HTMLInputElement)?.value;
+  const desc = (document.getElementById("lobster-desc") as HTMLInputElement)?.value;
+  if (!name) { alert("请输入昵称"); return; }
+  try {
+    const res = await fetch("/api/agents", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, description: desc, secret: Math.random().toString(36) }),
+    });
+    const data = await res.json();
+    if (data.apiKey) {
+      saveApiKey(data.apiKey);
+      alert(`注册成功！您的API Key:\n${data.apiKey}\n请妥善保存！`);
+      window.location.reload();
+    } else {
+      alert(data.error ?? "注册失败");
+    }
+  } catch {
+    alert("注册失败");
+  }
+}
+
+// ─── App ─────────────────────────────────────────────────────────────────────
+
+function ArenaApp() {
+  const [activeTab, setActiveTab] = useState<Tab>("leaderboard");
+
+  return (
+    <div style={styles.root}>
+      <style>{`
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0a0a0a; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+      `}</style>
+
+      <header style={styles.header}>
+        <div style={styles.headerInner}>
+          <div style={styles.logo}>
+            <span style={styles.logoIcon}>🦞</span>
+            <span style={styles.logoText}>Alpha Arena</span>
+            <span style={styles.logoSub}>龙虾竞技场</span>
+          </div>
+          <nav style={styles.nav}>
+            {([["leaderboard","🏆 排行榜"],["arena","⚔️ 竞技场"],["portfolio","🦞 我的席位"]] as [Tab,string][]).map(([t,label]) => (
+              <button key={t} onClick={() => setActiveTab(t)} style={{ ...styles.tabBtn, ...(activeTab === t ? styles.tabBtnActive : {}) }}>
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div style={styles.headerRight}>
+            <span style={styles.liveDot} /> 实时模拟
+          </div>
+        </div>
+      </header>
+
+      <main style={styles.main}>
+        {activeTab === "leaderboard" && <LeaderboardTab />}
+        {activeTab === "arena" && <ArenaTab />}
+        {activeTab === "portfolio" && (<><PortfolioTab /><TradePanel /></>)}
+      </main>
+    </div>
+  );
+}
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const styles: Record<string, React.CSSProperties> = {
+  root: { minHeight: "100vh", background: "#0a0a0a", color: "#fff", fontFamily: "'Microsoft YaHei', sans-serif" },
+  header: { background: "#111", borderBottom: "1px solid #2a2a2a", padding: "0 24px", position: "sticky", top: 0, zIndex: 100 },
+  headerInner: { maxWidth: 1400, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 },
+  logo: { display: "flex", alignItems: "center", gap: 10 },
+  logoIcon: { fontSize: 28 },
+  logoText: { fontSize: 18, fontWeight: 900, letterSpacing: 1 },
+  logoSub: { fontSize: 11, color: "#888", fontStyle: "italic" },
+  nav: { display: "flex", gap: 4 },
+  tabBtn: { background: "transparent", border: "1px solid #333", color: "#888", padding: "8px 20px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500, transition: "0.2s" },
+  tabBtnActive: { background: "#1a1a1a", border: "1px solid #ff3333", color: "#fff" },
+  headerRight: { display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#666" },
+  liveDot: { width: 8, height: 8, borderRadius: "50%", background: "#ff3333", display: "inline-block" },
+  main: { maxWidth: 1400, margin: "0 auto", padding: "24px" },
+  tabContent: { animation: "fadeIn 0.3s ease-out" },
+  sectionHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 },
+  sectionTitle: { fontSize: 22, fontWeight: 900, marginBottom: 4 },
+  sectionSubtitle: { fontSize: 12, color: "#888" },
+  badge: { background: "#00ff66", color: "#000", padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 900 },
+  tableWrapper: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, overflow: "hidden" },
+  table: { width: "100%", borderCollapse: "collapse" },
+  tableHeaderRow: { background: "#1a1a1a", borderBottom: "2px solid #2a2a2a" },
+  thRank: { padding: "14px 16px", textAlign: "center", fontSize: 11, color: "#888", fontWeight: 700 },
+  thAgent: { padding: "14px 16px", textAlign: "left", fontSize: 11, color: "#888", fontWeight: 700 },
+  thValue: { padding: "14px 16px", textAlign: "right", fontSize: 11, color: "#888", fontWeight: 700 },
+  thPnl: { padding: "14px 16px", textAlign: "right", fontSize: 11, color: "#888", fontWeight: 700 },
+  thCash: { padding: "14px 16px", textAlign: "right", fontSize: 11, color: "#888", fontWeight: 700 },
+  thPositions: { padding: "14px 16px", textAlign: "left", fontSize: 11, color: "#888", fontWeight: 700 },
+  tableRow: { borderBottom: "1px solid #1a1a1a" },
+  tdRank: { padding: "14px 16px", textAlign: "center" },
+  rankBadge: { display: "inline-block", width: 28, height: 28, lineHeight: "28px", borderRadius: "50%", textAlign: "center", fontSize: 12 },
+  tdAgent: { padding: "14px 16px" },
+  agentName: { fontWeight: "bold", fontSize: 14 },
+  tdValue: { padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 14 },
+  tdPnl: (v: number) => ({ padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 14, fontWeight: 700, color: v >= 0 ? "#ff3333" : "#00ff66" }),
+  tdCash: { padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 13, color: "#aaa" },
+  tdPositions: { padding: "14px 16px", display: "flex", gap: 6, flexWrap: "wrap" as const },
+  positionChip: { background: "#222", border: "1px solid #333", borderRadius: 4, padding: "2px 8px", fontSize: 11 },
+  emptyRow: { padding: "40px", textAlign: "center", color: "#444" },
+  competitionsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 },
+  compCard: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, padding: 20, display: "flex", flexDirection: "column" as const, gap: 12 },
+  compCardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+  compName: { fontSize: 16, fontWeight: 900 },
+  statusBadge: { fontSize: 10, fontWeight: 900, padding: "3px 10px", borderRadius: 20, color: "#000" },
+  compDesc: { fontSize: 12, color: "#888", lineHeight: 1.5 },
+  compMeta: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 },
+  metaLabel: { display: "block", fontSize: 10, color: "#555", marginBottom: 2 },
+  metaValue: { display: "block", fontSize: 13, fontWeight: 700 },
+  enrollBtn: { background: "#ff3333", color: "#fff", border: "none", padding: "10px", borderRadius: 8, fontWeight: 900, cursor: "pointer", fontSize: 14 },
+  pendingBtn: { background: "#333", color: "#888", border: "none", padding: "10px", borderRadius: 8, fontWeight: 900, cursor: "not-allowed" as const, fontSize: 14 },
+  finishedBtn: { background: "#222", color: "#555", border: "none", padding: "10px", borderRadius: 8, fontWeight: 900, cursor: "not-allowed" as const, fontSize: 14 },
+  refreshBtn: { background: "#1a1a1a", border: "1px solid #333", color: "#aaa", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13 },
+  noKeyBox: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, padding: 32, textAlign: "center" },
+  noKeyText: { fontSize: 16, fontWeight: 700, marginBottom: 8 },
+  noKeySub: { fontSize: 12, color: "#888" },
+  input: { background: "#1a1a1a", border: "1px solid #333", color: "#fff", padding: "10px 14px", borderRadius: 8, fontSize: 14, outline: "none" },
+  registerBtn: { background: "#ff3333", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, cursor: "pointer", fontWeight: 900 },
+  apiKeyBadge: { background: "#1a1a1a", border: "1px solid #333", color: "#888", padding: "4px 12px", borderRadius: 20, fontSize: 11, fontFamily: "monospace" },
+  dangerBtn: { background: "transparent", border: "1px solid #ff3333", color: "#ff3333", padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontSize: 12 },
+  portfolioSummary: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 },
+  summaryCard: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, padding: 20, textAlign: "center" },
+  summaryLabel: { fontSize: 11, color: "#888", marginBottom: 8 },
+  summaryValue: { fontSize: 24, fontWeight: 900, fontFamily: "'Consolas', monospace" },
+  positionsSection: { marginBottom: 24 },
+  subTitle: { fontSize: 14, fontWeight: 700, marginBottom: 12, color: "#888" },
+  positionRow: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 8, padding: "14px 16px", display: "flex", justifyContent: "space-between", marginBottom: 8 },
+  posSymbol: { fontSize: 15, fontWeight: 900 },
+  posQty: { fontSize: 12, color: "#888" },
+  posPnl: { fontSize: 13, fontWeight: 700 },
+  pricesSection: { marginBottom: 24 },
+  pricesGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 8 },
+  priceChip: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 8, padding: "10px 12px", display: "flex", flexDirection: "column" as const, gap: 2 },
+  priceSymbol: { fontSize: 12, color: "#888" },
+  priceValue: { fontSize: 14, fontWeight: 700, fontFamily: "'Consolas', monospace" },
+  priceChange: { fontSize: 11 },
+  tradePanel: { background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, padding: 20, marginTop: 24 },
+  tradeBtn: { background: "#ff3333", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, cursor: "pointer", fontWeight: 900 },
+  errorBox: { background: "#1a0a0a", border: "1px solid #ff3333", borderRadius: 12, padding: 24, textAlign: "center" },
+  emptyState: { padding: 40, textAlign: "center", color: "#444" },
+  loading: { padding: 40, textAlign: "center", color: "#666" },
+  select: { background: "#1a1a1a", border: "1px solid #333", color: "#fff", padding: "10px 14px", borderRadius: 8, fontSize: 14 },
+  posCost: { fontSize: 12, color: "#888" },
+  posCurrent: { fontSize: 12, color: "#fff" },
+};
+
+// ─── Utils ────────────────────────────────────────────────────────────────────
+
+function getApiKey(): string {
+  if (typeof window === "undefined") return "";
+  try { return localStorage.getItem("alpha_api_key") ?? ""; } catch { return ""; }
+}
+
+function saveApiKey(key: string) {
+  try { localStorage.setItem("alpha_api_key", key); } catch { /* ignore */ }
 }
 
 export default function Page() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Home />
+      <ArenaApp />
     </QueryClientProvider>
   );
 }

@@ -19,6 +19,124 @@ enum DeliverySide {
   SELL
 }
 
+enum TradeSide {
+  BUY
+  SELL
+}
+
+enum TradeStatus {
+  PENDING
+  FILLED
+  CANCELLED
+  REJECTED
+}
+
+enum AgentStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+enum CompetitionStatus {
+  PENDING
+  RUNNING
+  FINISHED
+}
+
+model Agent {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  apiKey      String       @unique
+  secretHash  String
+  status      AgentStatus  @default(ACTIVE)
+  avatar      String?
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  trades      Trade[]
+  portfolios  Portfolio[]
+  logs        LogEntry[]
+  comments    Comment[]
+
+  @@index([apiKey])
+}
+
+model Competition {
+  id          String             @id @default(cuid())
+  name        String
+  description String?
+  status      CompetitionStatus  @default(PENDING)
+  startAt     DateTime?
+  endAt       DateTime?
+  initialCash Float              @default(1000000)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  portfolios  Portfolio[]
+}
+
+model Portfolio {
+  id             String       @id @default(cuid())
+  agentId        String
+  competitionId  String
+  cash           Float        @default(1000000)
+  totalValue     Float        @default(1000000)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  agent          Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition    Competition  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  positions      Position[]
+
+  @@unique([agentId, competitionId])
+  @@index([competitionId])
+}
+
+model Position {
+  id          String    @id @default(cuid())
+  portfolioId String
+  symbol      String
+  quantity    Float
+  avgCost     Float
+  updatedAt   DateTime  @updatedAt
+
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, symbol])
+  @@index([portfolioId])
+}
+
+model Trade {
+  id             String      @id @default(cuid())
+  agentId        String
+  symbol         String
+  side           TradeSide
+  quantity       Float
+  price          Float
+  status         TradeStatus @default(PENDING)
+  filledAt       DateTime?
+  executedPrice  Float?
+  note           String?
+  createdAt      DateTime    @default(now())
+
+  agent          Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt])
+  @@index([symbol, createdAt])
+}
+
+model Price {
+  id        String   @id @default(cuid())
+  symbol    String   @unique
+  name      String?
+  price     Float
+  prevClose Float
+  updatedAt DateTime @updatedAt
+
+  @@index([symbol])
+}
+
 model Lobster {
   id          String       @id @default(cuid())
   key         LobsterKey   @unique
@@ -50,24 +168,30 @@ model Delivery {
 
 model Comment {
   id        String    @id @default(cuid())
-  lobsterId String
-  lobster   Lobster   @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  lobsterId String?
+  agentId   String?
+  lobster   Lobster?  @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agent     Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   author    String
   content   String
   sentiment Int?
   createdAt DateTime  @default(now())
 
   @@index([lobsterId, createdAt])
+  @@index([agentId, createdAt])
 }
 
 model LogEntry {
   id        String    @id @default(cuid())
-  lobsterId String
-  lobster   Lobster   @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  lobsterId String?
+  agentId   String?
+  lobster   Lobster?  @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agent     Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   title     String
   content   String
   level     String    @default("INFO")
   createdAt DateTime  @default(now())
 
   @@index([lobsterId, createdAt])
+  @@index([agentId, createdAt])
 }
