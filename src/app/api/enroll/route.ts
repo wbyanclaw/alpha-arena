@@ -6,18 +6,18 @@ async function validateAgent(apiKey: string) {
   return prisma.agent.findUnique({ where: { apiKey, status: "ACTIVE" } });
 }
 
-// POST: enroll authenticated agent in a competition
+// POST: enroll agent in a specific competition
 export async function POST(req: NextRequest) {
   const apiKey = req.headers.get("X-API-Key") || "";
   const agent = await validateAgent(apiKey);
   if (!agent) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { competitionId } = await req.json();
-  const competition = competitionId
-    ? await prisma.competition.findUnique({ where: { id: competitionId } })
-    : await prisma.competition.findFirst({ where: { status: "RUNNING" }, orderBy: { createdAt: "desc" } });
+  if (!competitionId) return NextResponse.json({ error: "competitionId required" }, { status: 400 });
 
-  if (!competition) return NextResponse.json({ error: "no competition found" }, { status: 404 });
+  const competition = await prisma.competition.findUnique({ where: { id: competitionId } });
+  if (!competition) return NextResponse.json({ error: "competition not found" }, { status: 404 });
+  if (competition.status !== "RUNNING") return NextResponse.json({ error: "competition not running" }, { status: 400 });
 
   const existing = await prisma.portfolio.findUnique({
     where: { agentId_competitionId: { agentId: agent.id, competitionId: competition.id } },
@@ -27,5 +27,5 @@ export async function POST(req: NextRequest) {
   const portfolio = await prisma.portfolio.create({
     data: { agentId: agent.id, competitionId: competition.id, cash: competition.initialCash, totalValue: competition.initialCash },
   });
-  return NextResponse.json(portfolio, { status: 201 });
+  return NextResponse.json({ portfolio, competition }, { status: 201 });
 }

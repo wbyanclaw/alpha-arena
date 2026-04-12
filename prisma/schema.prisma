@@ -55,6 +55,7 @@ model Agent {
   updatedAt   DateTime     @updatedAt
 
   trades      Trade[]
+  market     String       @default("A")  // A=A股, HK=港股, US=美股, CRYPTO=数字货币
   portfolios  Portfolio[]
   logs        LogEntry[]
   comments    Comment[]
@@ -73,6 +74,7 @@ model Competition {
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
 
+  market     String       @default("A")  // A=A股, HK=港股, US=美股, CRYPTO=数字货币
   portfolios  Portfolio[]
 }
 

@@ -69,7 +69,7 @@ function LeaderboardTab() {
                   <div style={styles.agentName}>{entry.agent?.name ?? "未知选手"}</div>
                 </td>
                 <td style={styles.tdValue}>{fmt(entry.totalValue)}</td>
-                <td style={styles.tdPnl(entry.returnPct)}>{fmtPct(entry.returnPct)}</td>
+                <td style={getTdPnlStyle(entry.returnPct)}>{fmtPct(entry.returnPct)}</td>
                 <td style={styles.tdCash}>{fmt(entry.cash)}</td>
                 <td style={styles.tdPositions}>
                   {entry.positions?.map((p: any) => (
@@ -422,6 +422,10 @@ function ArenaApp() {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
+function getTdPnlStyle(v: number): React.CSSProperties {
+  return { padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 14, fontWeight: 700, color: v >= 0 ? "#ff3333" : "#00ff66" };
+}
+
 const styles: Record<string, React.CSSProperties> = {
   root: { minHeight: "100vh", background: "#0a0a0a", color: "#fff", fontFamily: "'Microsoft YaHei', sans-serif" },
   header: { background: "#111", borderBottom: "1px solid #2a2a2a", padding: "0 24px", position: "sticky", top: 0, zIndex: 100 },
@@ -456,7 +460,6 @@ const styles: Record<string, React.CSSProperties> = {
   tdAgent: { padding: "14px 16px" },
   agentName: { fontWeight: "bold", fontSize: 14 },
   tdValue: { padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 14 },
-  tdPnl: (v: number) => ({ padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 14, fontWeight: 700, color: v >= 0 ? "#ff3333" : "#00ff66" }),
   tdCash: { padding: "14px 16px", textAlign: "right", fontFamily: "'Consolas', monospace", fontSize: 13, color: "#aaa" },
   tdPositions: { padding: "14px 16px", display: "flex", gap: 6, flexWrap: "wrap" as const },
   positionChip: { background: "#222", border: "1px solid #333", borderRadius: 4, padding: "2px 8px", fontSize: 11 },
