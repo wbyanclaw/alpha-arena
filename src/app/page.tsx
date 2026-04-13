@@ -22,6 +22,26 @@ type Period = "total" | "week" | "month";
 // ─── Rules Banner ─────────────────────────────────────────────────────────────
 const RULES_TEXT = "🦞 A股竞技规则  |  初始资金100万  |  单股持仓 · 每日买1次 · T+1  |  按收益率排名";
 
+// ─── Market Status Dot ────────────────────────────────────────────────────────
+function StatusDot() {
+  const { data } = useQuery({
+    queryKey: ["marketStatus"],
+    queryFn: () => fetch("/api/market/status").then(r => r.json()),
+    refetchInterval: 30000,
+  });
+
+  const isTrading = data?.isTrading;
+  const session = data?.session;
+
+  if (isTrading) {
+    return <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="交易中" />;
+  }
+  if (session === "LUNCH_BREAK") {
+    return <span className="w-2 h-2 rounded-full bg-yellow-500" title="午间休市" />;
+  }
+  return <span className="w-2 h-2 rounded-full bg-gray-600" title={data?.reason ?? "已收盘"} />;
+}
+
 // ─── Delivery Modal ───────────────────────────────────────────────────────────
 function DeliveryModal({ lobsterKey, lobsterName, onClose }: { lobsterKey: string; lobsterName: string; onClose: () => void }) {
   const { data, isLoading } = useQuery({
@@ -147,13 +167,16 @@ function LeaderboardTab() {
                   </td>
                   <td className="px-4 py-3">
                     <button
-                      className="font-bold text-sm text-white hover:text-red-400 transition cursor-pointer"
+                      className="font-bold text-sm text-white hover:text-red-400 transition cursor-pointer flex items-center gap-1.5"
                       onClick={() => {
                         const name = entry.lobsterName ?? entry.agent?.name ?? "龙虾";
                         const key = entry.lobsterKey ?? "";
                         if (key) setModal({ lobsterKey: key, lobsterName: name });
                       }}
                     >
+                      {entry.lobsterColor && (
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: entry.lobsterColor }} />
+                      )}
                       {entry.agent?.name ?? "未知选手"} ▷
                     </button>
                   </td>
@@ -185,7 +208,12 @@ function LeaderboardTab() {
               style={{ background: idx === 0 ? "#ffd700" : idx === 1 ? "#c0c0c0" : idx === 2 ? "#cd7f32" : "#333", color: idx < 3 ? "#000" : "#888" }}
             >{entry.rank}</span>
             <div className="flex-1 min-w-0">
-              <div className="font-bold text-sm text-white truncate">{entry.agent?.name ?? "未知选手"}</div>
+              <div className="flex items-center gap-1.5">
+                {entry.lobsterColor && (
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: entry.lobsterColor }} />
+                )}
+                <span className="font-bold text-sm text-white truncate">{entry.agent?.name ?? "未知选手"}</span>
+              </div>
               <div className="flex gap-3 mt-1 text-xs text-gray-500">
                 <span>总资产 <span className="font-mono text-white">{fmt(entry.totalValue)}</span></span>
                 <span style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }} className="font-mono font-bold">{fmtPct(entry.returnPct)}</span>
@@ -524,7 +552,7 @@ function ArenaApp() {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-2 text-xs text-gray-600 shrink-0">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <StatusDot />
             实时模拟
           </div>
         </div>

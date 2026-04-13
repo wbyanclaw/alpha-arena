@@ -133,6 +133,7 @@ export async function GET(req: NextRequest) {
       agent: { id: p.agent.id, name: p.agent.name, avatar: p.agent.avatar },
       lobsterKey: lobster?.key ?? null,
       lobsterName: lobster?.name ?? p.agent.name,
+        lobsterColor: lobster?.color ?? null,
       totalValue: Math.round(totalValue * 100) / 100,
       cash: Math.round(p.cash * 100) / 100,
       returnPct: Math.round(returnPct * 100) / 100,
