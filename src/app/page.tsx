@@ -7,10 +7,12 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchInterval: 5000, retry: 1 } },
 });
 
-function fmt(v: number, d = 2) {
+function fmt(v: number | null | undefined, d = 2) {
+  if (v == null) return "—";
   return v.toLocaleString("zh-CN", { minimumFractionDigits: d, maximumFractionDigits: d });
 }
-function fmtPct(v: number) {
+function fmtPct(v: number | null | undefined) {
+  if (v == null) return "—%";
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 

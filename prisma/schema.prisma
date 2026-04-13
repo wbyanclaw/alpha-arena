@@ -101,6 +101,7 @@ model Position {
   symbol      String
   quantity    Float
   avgCost     Float
+  boughtAt    DateTime    @default(now())
   updatedAt   DateTime  @updatedAt
 
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
@@ -120,6 +121,10 @@ model Trade {
   filledAt       DateTime?
   executedPrice  Float?
   note           String?
+  commission    Float?
+  stampTax      Float?
+  transferFee   Float?
+  netAmount     Float?
   createdAt      DateTime    @default(now())
 
   agent          Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)

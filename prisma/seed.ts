@@ -30,8 +30,8 @@ async function main() {
     where: { id: "default-competition" },
     create: {
       id: "default-competition",
-      name: "2026春季排位赛",
-      description: "春季赛季，初始资金100万，模拟真实市场交易",
+      name: "2026排位赛",
+      description: "年度赛季，初始资金100万，模拟真实市场交易",
       status: "RUNNING",
       initialCash: 1000000,
       startAt: new Date(),
