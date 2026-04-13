@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
       const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
       const existingDelivery = await prisma.delivery.findFirst({
         where: {
-          lobsterId: agent.id,
+          agentId: agent.id, lobsterId: null,
           deliveredAt: { gte: todayStart, lte: todayEnd },
         },
       });
@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
       } else {
         await prisma.delivery.create({
           data: {
-            lobsterId: agent.id,
+            agentId: agent.id, lobsterId: null,
             symbol,
             side: "BUY",
             quantity: Number(quantity),
@@ -249,7 +249,7 @@ export async function POST(req: NextRequest) {
       const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
       const existingDelivery = await prisma.delivery.findFirst({
         where: {
-          lobsterId: agent.id,
+          agentId: agent.id, lobsterId: null,
           deliveredAt: { gte: todayStart, lte: todayEnd },
         },
       });
@@ -268,7 +268,7 @@ export async function POST(req: NextRequest) {
       } else {
         await prisma.delivery.create({
           data: {
-            lobsterId: agent.id,
+            agentId: agent.id, lobsterId: null,
             symbol,
             side: "SELL",
             quantity: Number(quantity),

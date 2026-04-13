@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
   provider = "sqlite"
 }
 
@@ -51,83 +51,84 @@ model Agent {
   status      AgentStatus  @default(ACTIVE)
   avatar      String?
   description String?
+  market      String       @default("A")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  trades      Trade[]
-  market     String       @default("A")  // A=A股, HK=港股, US=美股, CRYPTO=数字货币
-  portfolios  Portfolio[]
-  logs        LogEntry[]
-  comments    Comment[]
+  trades     Trade[]
+  portfolios Portfolio[]
+  logs      LogEntry[]
+  comments  Comment[]
+  deliveries Delivery[]
 
   @@index([apiKey])
 }
 
 model Competition {
-  id          String             @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
   description String?
-  status      CompetitionStatus  @default(PENDING)
+  status      CompetitionStatus @default(PENDING)
   startAt     DateTime?
   endAt       DateTime?
-  initialCash Float              @default(1000000)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  initialCash Float             @default(1000000)
+  market      String            @default("A")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
-  market     String       @default("A")  // A=A股, HK=港股, US=美股, CRYPTO=数字货币
-  portfolios  Portfolio[]
+  portfolios Portfolio[]
 }
 
 model Portfolio {
-  id             String       @id @default(cuid())
-  agentId        String
-  competitionId  String
-  cash           Float        @default(1000000)
-  totalValue     Float        @default(1000000)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id            String     @id @default(cuid())
+  agentId       String
+  competitionId String
+  cash          Float      @default(1000000)
+  totalValue    Float      @default(1000000)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-  agent          Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  competition    Competition  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
-  positions      Position[]
+  agent     Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  positions Position[]
 
   @@unique([agentId, competitionId])
   @@index([competitionId])
 }
 
 model Position {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   portfolioId String
   symbol      String
   quantity    Float
   avgCost     Float
-  boughtAt    DateTime    @default(now())
-  updatedAt   DateTime  @updatedAt
+  boughtAt    DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 
   @@unique([portfolioId, symbol])
   @@index([portfolioId])
 }
 
 model Trade {
-  id             String      @id @default(cuid())
-  agentId        String
-  symbol         String
-  side           TradeSide
-  quantity       Float
-  price          Float
-  status         TradeStatus @default(PENDING)
-  filledAt       DateTime?
-  executedPrice  Float?
-  note           String?
+  id            String      @id @default(cuid())
+  agentId       String
+  symbol        String
+  side          TradeSide
+  quantity      Float
+  price         Float
+  status        TradeStatus @default(PENDING)
+  filledAt      DateTime?
+  executedPrice Float?
+  note          String?
   commission    Float?
   stampTax      Float?
   transferFee   Float?
   netAmount     Float?
-  createdAt      DateTime    @default(now())
+  createdAt     DateTime    @default(now())
 
-  agent          Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId, createdAt])
   @@index([symbol, createdAt])
@@ -145,23 +146,25 @@ model Price {
 }
 
 model Lobster {
-  id          String       @id @default(cuid())
-  key         LobsterKey   @unique
+  id          String      @id @default(cuid())
+  key         LobsterKey  @unique
   name        String
   description String?
   color       String?
-  isActive    Boolean      @default(false)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deliveries  Delivery[]
-  comments    Comment[]
-  logs        LogEntry[]
+  isActive    Boolean     @default(false)
+  agentId     String?     @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  deliveries Delivery[]
+  comments  Comment[]
+  logs      LogEntry[]
 }
 
 model Delivery {
   id          String       @id @default(cuid())
-  lobsterId   String
-  lobster     Lobster      @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agentId     String
+  lobsterId   String?
   symbol      String
   side        DeliverySide
   quantity    Float
@@ -170,34 +173,40 @@ model Delivery {
   note        String?
   createdAt   DateTime     @default(now())
 
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  lobster Lobster? @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, deliveredAt])
   @@index([lobsterId, deliveredAt])
 }
 
 model Comment {
-  id        String    @id @default(cuid())
-  lobsterId String?
-  agentId   String?
-  lobster   Lobster?  @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
-  agent     Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
   author    String
   content   String
   sentiment Int?
-  createdAt DateTime  @default(now())
+  lobsterId String?
+  agentId   String?
+  createdAt DateTime @default(now())
+
+  lobster Lobster? @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agent   Agent?   @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([lobsterId, createdAt])
   @@index([agentId, createdAt])
 }
 
 model LogEntry {
-  id        String    @id @default(cuid())
-  lobsterId String?
-  agentId   String?
-  lobster   Lobster?  @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
-  agent     Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
   title     String
   content   String
-  level     String    @default("INFO")
-  createdAt DateTime  @default(now())
+  level     String   @default("INFO")
+  lobsterId String?
+  agentId   String?
+  createdAt DateTime @default(now())
+
+  lobster Lobster? @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agent   Agent?   @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([lobsterId, createdAt])
   @@index([agentId, createdAt])
