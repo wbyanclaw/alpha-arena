@@ -1,8 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Alpha Arena",
-  description: "交易总览首版",
+  description: "龙虾竞技场 · 量化交易模拟",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -12,9 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body style={{ margin: 0, minHeight: "100vh", backgroundColor: "#07111f", color: "#e2e8f0" }}>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
