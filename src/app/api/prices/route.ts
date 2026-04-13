@@ -1,83 +1,75 @@
 import { NextResponse } from "next/server";
 
+// 东方财富 A 股行情接口
 const MAJOR_A_SHARES = [
-  { symbol: "sh600519", code: "600519", name: "贵州茅台" },
-  { symbol: "sz000001", code: "000001", name: "平安银行" },
-  { symbol: "sh600036", code: "600036", name: "招商银行" },
-  { symbol: "sh601318", code: "601318", name: "中国平安" },
-  { symbol: "sz000858", code: "000858", name: "五粮液" },
-  { symbol: "sh600276", code: "600276", name: "恒瑞医药" },
-  { symbol: "sh601888", code: "601888", name: "中国中免" },
-  { symbol: "sh600030", code: "600030", name: "中信证券" },
-  { symbol: "sz002594", code: "002594", name: "比亚迪" },
-  { symbol: "sz300750", code: "300750", name: "宁德时代" },
+  { secid: "1.600519", code: "600519", name: "贵州茅台" },
+  { secid: "0.000001", code: "000001", name: "平安银行" },
+  { secid: "1.600036", code: "600036", name: "招商银行" },
+  { secid: "1.601318", code: "601318", name: "中国平安" },
+  { secid: "0.000858", code: "000858", name: "五粮液" },
+  { secid: "1.600276", code: "600276", name: "恒瑞医药" },
+  { secid: "1.601888", code: "601888", name: "中国中免" },
+  { secid: "1.600030", code: "600030", name: "中信证券" },
+  { secid: "0.002594", code: "002594", name: "比亚迪" },
+  { secid: "0.300750", code: "300750", name: "宁德时代" },
+  { secid: "0.300059", code: "300059", name: "东方财富" },
+  { secid: "1.688041", code: "688041", name: "寒武纪" },
+  { secid: "1.688981", code: "688981", name: "中微公司" },
+  { secid: "0.000002", code: "000002", name: "万科A" },
 ];
-
-function parseSinaLine(line: string) {
-  // hq_str_sh600519="贵州茅台,1444.000,1453.960,1443.310,1446.500,1433.000,1443.310,1443.320,2521364,3629675490.000,21,1443.310,100,1443.010,1400,1442.880,100,1442.600,200,1443.320,100,1443.590,700,1444.000,100,1444.010,100,1444.020,2026-04-13,15:00:01,00,"
-  const match = line.match(/="([^"]+)"/);
-  if (!match) return null;
-  const fields = match[1].split(",");
-  if (fields.length < 10) return null;
-
-  const name = fields[0];
-  const open = parseFloat(fields[1]) || 0;
-  const prevClose = parseFloat(fields[2]) || 0;
-  const price = parseFloat(fields[3]) || 0;
-  const high = parseFloat(fields[4]) || 0;
-  const low = parseFloat(fields[5]) || 0;
-  const volume = parseFloat(fields[8]) || 0; // 成交量（股）
-  const amount = parseFloat(fields[9]) || 0; // 成交额（元）
-
-  return {
-    name,
-    open,
-    prevClose,
-    price,
-    high,
-    low,
-    volume,
-    amount,
-    change: price - prevClose,
-    changePct: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
-  };
-}
 
 export async function GET() {
   try {
-    const symbols = MAJOR_A_SHARES.map(s => s.symbol).join(",");
-    const url = `https://hq.sinajs.cn/list=${symbols}`;
+    const secids = MAJOR_A_SHARES.map(s => s.secid).join(",");
+    const url = `https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f4,f5,f6,f7,f12,f14,f15,f16,f17,f18&secids=${secids}`;
 
     const res = await fetch(url, {
       cache: "no-store",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-        "Referer": "https://finance.sina.com.cn/",
-      },
-      
+      headers: { "User-Agent": "Mozilla/5.0" },
     });
 
-    if (!res.ok) throw new Error(`Sina API ${res.status}`);
+    if (!res.ok) throw new Error(`eastmoney ${res.status}`);
 
-    // GBK → UTF-8
-    const buf = await res.arrayBuffer();
-    const decoder = new TextDecoder("gbk");
-    const text = decoder.decode(buf);
+    const json = await res.json();
+    const data: Record<string, any> = {};
 
-    const lines = text.trim().split("\n");
-    const prices = MAJOR_A_SHARES.map((s, i) => {
-      const parsed = parseSinaLine(lines[i] || "");
+    if (json?.data?.diff) {
+      for (const item of json.data.diff) {
+        const secid = item.f12; // 股票代码
+        data[secid] = {
+          symbol: secid,
+          name: item.f14 || "",
+          price: item.f2 ?? 0,           // 现价
+          prevClose: item.f4 ?? 0,       // 昨收
+          change: item.f3 ?? 0,          // 涨跌额
+          changePct: item.f3 && item.f4 ? (item.f3 / item.f4) * 100 : 0,
+          open: item.f15 ?? 0,
+          high: item.f16 ?? 0,
+          low: item.f17 ?? 0,
+          volume: item.f5 ?? 0,
+          amount: item.f6 ?? 0,
+        };
+      }
+    }
+
+    const prices = MAJOR_A_SHARES.map(s => {
+      const d = data[s.code];
+      const price = d?.price ?? 0;
+      const prevClose = d?.prevClose ?? price;
+      const change = price - prevClose;
+      const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
       return {
         symbol: s.code,
-        name: parsed?.name || s.name,
-        price: parsed?.price || 0,
-        prevClose: parsed?.prevClose || 0,
-        open: parsed?.open || 0,
-        high: parsed?.high || 0,
-        low: parsed?.low || 0,
-        volume: parsed?.volume || 0,
-        change: parsed?.change || 0,
-        changePct: parsed?.changePct || 0,
+        name: d?.name || s.name,
+        price,
+        prevClose,
+        open: d?.open ?? price,
+        high: d?.high ?? price,
+        low: d?.low ?? price,
+        change: Math.round(change * 100) / 100,
+        changePct: Math.round(changePct * 100) / 100,
+        volume: d?.volume ?? 0,
+        amount: d?.amount ?? 0,
         market: "A",
       };
     });
@@ -85,6 +77,6 @@ export async function GET() {
     return NextResponse.json(prices);
   } catch (e: any) {
     console.error("prices error:", e);
-    return NextResponse.json({ error: "failed to fetch prices" }, { status: 500 });
+    return NextResponse.json({ error: "failed to fetch prices: " + e.message }, { status: 500 });
   }
 }

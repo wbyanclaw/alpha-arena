@@ -6,24 +6,23 @@ function getPeriodStart(period: string): Date | null {
   if (period === "week") {
     const d = new Date(now);
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
-    d.setDate(diff);
-    d.setHours(0, 0, 0, 0);
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    d.setDate(diff); d.setHours(0, 0, 0, 0);
     return d;
   }
   if (period === "month") {
     const d = new Date(now);
-    d.setDate(1);
-    d.setHours(0, 0, 0, 0);
+    d.setDate(1); d.setHours(0, 0, 0, 0);
     return d;
   }
-  return null; // total
+  return null;
 }
 
+// GET /api/leaderboard?period=total&market=A
 export async function GET(req: NextRequest) {
   const competitionId = req.nextUrl.searchParams.get("competitionId");
   const market = req.nextUrl.searchParams.get("market") || "A";
-  const period = req.nextUrl.searchParams.get("period") || "total"; // total | week | month
+  const period = req.nextUrl.searchParams.get("period") || "total";
 
   const competition = competitionId
     ? await prisma.competition.findUnique({ where: { id: competitionId } })
@@ -36,7 +35,17 @@ export async function GET(req: NextRequest) {
 
   const portfolios = await prisma.portfolio.findMany({
     where: { competitionId: competition.id },
-    include: { agent: { select: { id: true, name: true, avatar: true } }, positions: true },
+    include: {
+      agent: {
+        include: {
+          deliveries: {
+            orderBy: { deliveredAt: "desc" },
+            take: 1,
+          },
+        },
+      },
+      positions: true,
+    },
     orderBy: { totalValue: "desc" },
   });
 
@@ -44,6 +53,9 @@ export async function GET(req: NextRequest) {
 
   const leaderboard = await Promise.all(
     portfolios.map(async (p) => {
+      // Get lobster for this agent
+      const lobster = await prisma.lobster.findUnique({ where: { agentId: p.agentId } });
+
       // Enrich positions with current price
       const enrichedPositions = await Promise.all(
         p.positions.map(async (pos) => {
@@ -52,7 +64,6 @@ export async function GET(req: NextRequest) {
         })
       );
 
-      // Current total value
       const unrealizedPnL = enrichedPositions.reduce(
         (sum, pos) => sum + (pos.currentPrice - pos.avgCost) * pos.quantity, 0
       );
@@ -60,10 +71,9 @@ export async function GET(req: NextRequest) {
         (sum, pos) => sum + pos.currentPrice * pos.quantity, 0
       );
 
-      // Period return: compare to period start value
+      // Period return calculation
       let returnPct: number;
       if (periodStart) {
-        // Sum up trades from period start to compute period PnL
         const periodTrades = await prisma.trade.findMany({
           where: {
             agentId: p.agentId,
@@ -73,41 +83,54 @@ export async function GET(req: NextRequest) {
           orderBy: { filledAt: "asc" },
         });
 
-        // Simulate period return: start from initial cash, apply each filled trade
         let simCash = competition.initialCash;
         let simPosition = 0;
         let simAvgCost = 0;
+        let lastPrice = enrichedPositions[0]?.currentPrice ?? 0;
 
         for (const t of periodTrades) {
+          const px = t.executedPrice ?? 0;
+          lastPrice = px;
           if (t.side === "BUY" && simPosition === 0) {
-            // Only open new position if flat
             simPosition = t.quantity;
-            simAvgCost = t.executedPrice ?? 0;
-            simCash -= t.executedPrice ?? 0 * t.quantity + (t.commission ?? 0) + (t.transferFee ?? 0);
+            simAvgCost = px;
+            simCash -= px * t.quantity + (t.commission ?? 0) + (t.transferFee ?? 0);
           } else if (t.side === "SELL" && simPosition > 0) {
-            // Close position
-            simCash += t.executedPrice ?? 0 * t.quantity - (t.commission ?? 0) - (t.stampTax ?? 0) - (t.transferFee ?? 0);
+            simCash += px * t.quantity - (t.commission ?? 0) - (t.stampTax ?? 0) - (t.transferFee ?? 0);
             simPosition = 0;
             simAvgCost = 0;
           }
         }
 
-        // Add current position value if still holding
-        const currentPrice = enrichedPositions[0]?.currentPrice ?? simAvgCost;
-        const finalValue = simCash + simPosition * currentPrice;
+        const finalValue = simCash + simPosition * lastPrice;
         returnPct = ((finalValue / competition.initialCash) - 1) * 100;
       } else {
-        // Total return
         returnPct = ((totalValue / competition.initialCash) - 1) * 100;
       }
 
+      // Latest delivery for this period
+      const latestDelivery = p.agent.deliveries[0] ?? null;
+
       return {
         rank: 0,
-        agent: p.agent,
+        agent: {
+          id: p.agent.id,
+          name: p.agent.name,
+          avatar: p.agent.avatar,
+        },
+        lobsterKey: lobster?.key ?? null,
+        lobsterName: lobster?.name ?? p.agent.name,
         totalValue: Math.round(totalValue * 100) / 100,
         cash: Math.round(p.cash * 100) / 100,
         returnPct: Math.round(returnPct * 100) / 100,
         unrealizedPnL: Math.round(unrealizedPnL * 100) / 100,
+        latestDelivery: latestDelivery ? {
+          symbol: latestDelivery.symbol,
+          side: latestDelivery.side,
+          price: latestDelivery.price,
+          quantity: latestDelivery.quantity,
+          deliveredAt: latestDelivery.deliveredAt,
+        } : null,
         positions: enrichedPositions.map(pos => ({
           symbol: pos.symbol,
           quantity: pos.quantity,

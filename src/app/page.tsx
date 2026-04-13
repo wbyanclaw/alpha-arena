@@ -149,8 +149,8 @@ function LeaderboardTab() {
                     <button
                       className="font-bold text-sm text-white hover:text-red-400 transition cursor-pointer"
                       onClick={() => {
-                        const name = entry.agent?.name ?? "龙虾";
-                        const key = name === "赤龙虾" ? "RED" : name === "蓝龙虾" ? "BLUE" : name === "金龙虾" ? "GOLD" : "";
+                        const name = entry.lobsterName ?? entry.agent?.name ?? "龙虾";
+                        const key = entry.lobsterKey ?? "";
                         if (key) setModal({ lobsterKey: key, lobsterName: name });
                       }}
                     >
