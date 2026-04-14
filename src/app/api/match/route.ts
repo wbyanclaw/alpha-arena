@@ -84,6 +84,18 @@ export async function POST(req: NextRequest) {
             where: { id: order.id },
             data: { status: "MATCHED", matchedAt: now },
           }),
+          // 写入交割单
+          prisma.delivery.create({
+            data: {
+              agentId: order.agentId,
+              symbol: order.symbol,
+              side: "BUY",
+              quantity: order.quantity,
+              price: execPrice,
+              deliveredAt: now,
+              note: order.note ?? undefined,
+            },
+          }),
         ]);
 
         const existingPos = portfolio.positions.find(p => p.symbol === order.symbol);
@@ -123,6 +135,18 @@ export async function POST(req: NextRequest) {
           prisma.order.update({
             where: { id: order.id },
             data: { status: "MATCHED", matchedAt: now },
+          }),
+          // 写入交割单
+          prisma.delivery.create({
+            data: {
+              agentId: order.agentId,
+              symbol: order.symbol,
+              side: "SELL",
+              quantity: order.quantity,
+              price: execPrice,
+              deliveredAt: now,
+              note: order.note ?? undefined,
+            },
           }),
         ]);
 
