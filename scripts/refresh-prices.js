@@ -1,30 +1,33 @@
 /**
- * 行情定时刷新脚本（纯 Node.js，无依赖）
+ * 行情定时刷新 + 收盘撮合
  * 用法: node scripts/refresh-prices.js
+ * crontab:
+ *   */5 9-15 * * 1-5 cd /path && node scripts/refresh-prices.js prices
+ *   5 15 * * 1-5     cd /path && node scripts/refresh-prices.js match
  */
-const { CRON_SECRET, API_BASE = "http://localhost:3000" } = process.env;
+const { CRON_SECRET, API_BASE = 'http://localhost:3000' } = process.env;
+const cmd = process.argv[2] || 'prices';
+
+async function call(url) {
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!res.ok) throw new Error(JSON.stringify(data));
+  return data;
+}
 
 async function main() {
-  if (!CRON_SECRET) {
-    console.error("CRON_SECRET not set in .env");
-    process.exit(1);
-  }
-
-  const url = `${API_BASE}/api/prices/refresh?secret=${CRON_SECRET}`;
-  console.log(`[${new Date().toISOString()}] Refreshing prices...`);
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (res.ok) {
-      console.log(`✅ Updated ${data.updated} stocks, ${data.failed} failed at ${data.refreshedAt}`);
-    } else {
-      console.error(`❌ API error:`, data);
-    }
-  } catch (e) {
-    console.error(`❌ Network error: ${e.message}`);
-    process.exit(1);
+  if (!CRON_SECRET) { console.error('CRON_SECRET not set'); process.exit(1); }
+  if (cmd === 'match') {
+    const url = `${API_BASE}/api/match?secret=${CRON_SECRET}`;
+    console.log(`[${new Date().toISOString()}] Running match...`);
+    const data = await call(url);
+    console.log(`✅ Matched ${data.matched}/${data.total} orders`);
+  } else {
+    const url = `${API_BASE}/api/prices/refresh?secret=${CRON_SECRET}`;
+    console.log(`[${new Date().toISOString()}] Refreshing prices...`);
+    const data = await call(url);
+    console.log(`✅ Updated ${data.updated} stocks, ${data.failed} failed`);
   }
 }
 
-main();
+main().catch(e => { console.error(`❌ ${e.message}`); process.exit(1); });

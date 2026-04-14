@@ -57,6 +57,7 @@ model Agent {
 
   trades     Trade[]
   portfolios Portfolio[]
+  orders     Order[]
   logs      LogEntry[]
   comments  Comment[]
   deliveries Delivery[]
@@ -77,6 +78,7 @@ model Competition {
   updatedAt   DateTime         @updatedAt
 
   portfolios Portfolio[]
+  orders     Order[]
 }
 
 model Portfolio {
@@ -91,6 +93,8 @@ model Portfolio {
   agent     Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
   competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
   positions Position[]
+  orders     Order[]
+  settlements DailySettlement[]
 
   @@unique([agentId, competitionId])
   @@index([competitionId])
@@ -210,4 +214,46 @@ model LogEntry {
 
   @@index([lobsterId, createdAt])
   @@index([agentId, createdAt])
+}
+
+// 挂单队列（盘后统一成交）
+model Order {
+  id            String      @id @default(cuid())
+  agentId       String
+  competitionId String
+  portfolioId   String
+  symbol        String
+  side          TradeSide   // BUY or SELL
+  quantity      Float
+  note          String?     // AI 决策理由
+  status        String      @default("PENDING")  // PENDING | MATCHED | CANCELLED | REJECTED
+  rejectReason  String?
+  submittedAt   DateTime    @default(now())
+  matchedAt     DateTime?
+
+  agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  portfolio   Portfolio   @relation(fields: [portfolioId], references: [id])
+
+  @@index([agentId, submittedAt])
+  @@index([competitionId, status])
+  @@index([portfolioId])
+}
+
+// 每日收盘结算快照
+model DailySettlement {
+  id            String   @id @default(cuid())
+  portfolioId   String
+  date          String   // "2026-04-14"
+  cash          Float
+  positionJson  String?  // JSON: {symbol, quantity, avgCost}
+  positionDays  Int      @default(0)
+  totalValue    Float
+  returnPct     Float
+  createdAt     DateTime @default(now())
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, date])
+  @@index([portfolioId])
 }

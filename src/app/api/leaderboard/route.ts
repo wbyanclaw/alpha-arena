@@ -43,6 +43,14 @@ export async function GET(req: NextRequest) {
         },
       },
       positions: true,
+      orders: {
+        where: {
+          submittedAt: {
+            gte: new Date(new Date().toISOString().slice(0, 10) + "T00:00:00"),
+          },
+        },
+        take: 1,
+      },
     },
     orderBy: { totalValue: "desc" },
   });
@@ -59,11 +67,26 @@ export async function GET(req: NextRequest) {
   const lobsterMap = new Map(lobsters.map(l => [l.agentId, l]));
 
   // 批量查所有相关行情
-  const allSymbols = [...new Set(portfolios.flatMap(p => p.positions.map(pos => pos.symbol)))];
+  const allSymbols = [...new Set([
+    ...portfolios.flatMap(p => p.positions.map(pos => pos.symbol)),
+    ...portfolios.flatMap(p => p.orders.filter(o => o.status === "PENDING").map(o => o.symbol)),
+  ])];
   const prices = allSymbols.length > 0
     ? await prisma.price.findMany({ where: { symbol: { in: allSymbols } } })
     : [];
   const priceMap = new Map(prices.map(p => [p.symbol, p]));
+
+  // 批量查今日挂单
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
+  const todayOrders = await prisma.order.findMany({
+    where: {
+      portfolioId: { in: portfolios.map(p => p.id) },
+      submittedAt: { gte: todayStart, lte: todayEnd },
+      status: "PENDING",
+    },
+  });
+  const todayOrderMap = new Map(todayOrders.map(o => [o.portfolioId, o]));
 
   // 批量查所有相关 agent 的 period trades
   const periodStart = getPeriodStart(period);
@@ -138,12 +161,22 @@ export async function GET(req: NextRequest) {
       cash: Math.round(p.cash * 100) / 100,
       returnPct: Math.round(returnPct * 100) / 100,
       unrealizedPnL: Math.round(unrealizedPnL * 100) / 100,
+      holdingsDays: enrichedPositions[0]
+        ? Math.floor((Date.now() - new Date(enrichedPositions[0].boughtAt).getTime()) / 86400000)
+        : 0,
       latestDelivery: latestDelivery ? {
         symbol: latestDelivery.symbol,
         side: latestDelivery.side,
         price: latestDelivery.price,
         quantity: latestDelivery.quantity,
         deliveredAt: latestDelivery.deliveredAt,
+      } : null,
+      todayOrder: todayOrderMap.get(p.id) ? {
+        symbol: todayOrderMap.get(p.id)!.symbol,
+        side: todayOrderMap.get(p.id)!.side,
+        quantity: todayOrderMap.get(p.id)!.quantity,
+        note: todayOrderMap.get(p.id)!.note,
+        submittedAt: todayOrderMap.get(p.id)!.submittedAt,
       } : null,
       positions: enrichedPositions.map(pos => ({
         symbol: pos.symbol,

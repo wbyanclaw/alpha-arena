@@ -3,24 +3,23 @@ import { PrismaClient } from "/home/wbyan/workspaces/coder/alpha-arena/src/gener
 import crypto from "crypto";
 
 const prisma = new PrismaClient();
-
-function hash(s: string) {
-  return crypto.createHash("sha256").update(s).digest("hex");
-}
+function hash(s: string) { return crypto.createHash("sha256").update(s).digest("hex"); }
 
 async function main() {
   await prisma.logEntry.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.delivery.deleteMany();
-  await prisma.lobster.deleteMany();
-  await prisma.agent.deleteMany();
-  await prisma.portfolio.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.trade.deleteMany();
   await prisma.position.deleteMany();
+  await prisma.portfolio.deleteMany();
+  await prisma.lobster.deleteMany();
+  await prisma.agent.deleteMany();
+  await prisma.dailySettlement.deleteMany();
   await prisma.price.deleteMany();
   await prisma.competition.deleteMany();
 
-  // 种子行情（A 股）
+  // 行情
   const STOCKS = [
     { symbol: "600519", name: "贵州茅台",    price: 1680.00, prevClose: 1690.00 },
     { symbol: "600036", name: "招商银行",    price: 38.50,  prevClose: 38.20 },
@@ -45,80 +44,27 @@ async function main() {
     });
   }
 
-  // 创建 Agent（龙虾身份）
-  const redAgent = await prisma.agent.create({
-    data: { name: "赤龙虾", apiKey: "alpha_red001", secretHash: hash("red-secret"), market: "A" },
-  });
-  const blueAgent = await prisma.agent.create({
-    data: { name: "蓝龙虾", apiKey: "alpha_blue001", secretHash: hash("blue-secret"), market: "A" },
-  });
-  const goldAgent = await prisma.agent.create({
-    data: { name: "金龙虾", apiKey: "alpha_gold001", secretHash: hash("gold-secret"), market: "A" },
-  });
+  // Agent
+  const redAgent = await prisma.agent.create({ data: { name: "赤龙虾", apiKey: "alpha_red001", secretHash: hash("red"), market: "A" } });
+  const blueAgent = await prisma.agent.create({ data: { name: "蓝龙虾", apiKey: "alpha_blue001", secretHash: hash("blue"), market: "A" } });
+  const goldAgent = await prisma.agent.create({ data: { name: "金龙虾", apiKey: "alpha_gold001", secretHash: hash("gold"), market: "A" } });
 
-  // 创建 Lobster 并关联 Agent
-  const red = await prisma.lobster.create({
-    data: { key: "RED", name: "赤龙虾", description: "激进型策略，高频切换，追求趋势动量", color: "#f43f5e", isActive: true, agentId: redAgent.id },
-  });
-  const blue = await prisma.lobster.create({
-    data: { key: "BLUE", name: "蓝龙虾", description: "稳健型策略，均衡配置，侧重风险对冲", color: "#06b6d4", isActive: false, agentId: blueAgent.id },
-  });
-  const gold = await prisma.lobster.create({
-    data: { key: "GOLD", name: "金龙虾", description: "长周期策略，价值投资，顺势而为", color: "#f59e0b", isActive: false, agentId: goldAgent.id },
-  });
+  // Lobster → Agent
+  const red = await prisma.lobster.create({ data: { key: "RED", name: "赤龙虾", description: "激进型策略，高频切换", color: "#f43f5e", isActive: true, agentId: redAgent.id } });
+  const blue = await prisma.lobster.create({ data: { key: "BLUE", name: "蓝龙虾", description: "稳健型策略，均衡配置", color: "#06b6d4", isActive: false, agentId: blueAgent.id } });
+  const gold = await prisma.lobster.create({ data: { key: "GOLD", name: "金龙虾", description: "长周期策略，价值投资", color: "#f59e0b", isActive: false, agentId: goldAgent.id } });
 
-  // 创建默认 A 股比赛
+  // 比赛
   const comp = await prisma.competition.create({
-    data: {
-      id: "a-share-daily",
-      name: "日赛",
-      description: "每日A股挑战赛",
-      status: "RUNNING",
-      initialCash: 1000000,
-      market: "A",
-      startAt: new Date("2026-04-01"),
-      endAt: null,
-    },
+    data: { id: "a-share-daily", name: "日赛", description: "每日A股挑战赛", status: "RUNNING", initialCash: 1000000, market: "A", startAt: new Date("2026-04-01") },
   });
 
-  // 报名三只龙虾
+  // 报名
   for (const agent of [redAgent, blueAgent, goldAgent]) {
-    await prisma.portfolio.create({
-      data: { agentId: agent.id, competitionId: comp.id, cash: 1000000, totalValue: 1000000 },
-    });
+    await prisma.portfolio.create({ data: { agentId: agent.id, competitionId: comp.id, cash: 1000000, totalValue: 1000000 } });
   }
 
-  // 模拟历史交割单（过去3天，每天每龙虾各1条）
-  const symbols = ["600519", "000002", "300750"];
-  const sides = ["BUY", "BUY", "BUY"];
-  const agents = [redAgent, blueAgent, goldAgent];
-
-  for (let day = 3; day >= 1; day--) {
-    const date = new Date();
-    date.setDate(date.getDate() - day);
-    date.setHours(9, 30, 0, 0);
-
-    for (let i = 0; i < agents.length; i++) {
-      const a = agents[i];
-      const sym = symbols[i];
-      const priceRec = STOCKS.find(s => s.symbol === sym)!;
-      // 先买入
-      await prisma.delivery.create({
-        data: {
-          agentId: a.id,
-          lobsterId: a.id === redAgent.id ? red.id : a.id === blueAgent.id ? blue.id : gold.id,
-          symbol: sym,
-          side: "BUY",
-          quantity: 100,
-          price: priceRec.price,
-          deliveredAt: new Date(date),
-          note: `第${4 - day}天建仓 ${sym}`,
-        },
-      });
-    }
-  }
-
-  console.log("Seed done: 3 lobsters, 3 agents, 1 competition, prices seeded.");
+  console.log("Seed done.");
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

@@ -20,7 +20,7 @@ type Tab = "leaderboard" | "arena" | "portfolio";
 type Period = "total" | "week" | "month";
 
 // ─── Rules Banner ─────────────────────────────────────────────────────────────
-const RULES_TEXT = "🦞 A股竞技规则  |  初始资金100万  |  单股持仓 · 每日买1次 · T+1  |  按收益率排名";
+const RULES_TEXT = "🦞 A股竞技规则  |  初始资金100万  |  15:00前下单·收盘价成交  |  单股持仓·T+1  |  按收益率排名";
 
 // ─── Market Status Dot ────────────────────────────────────────────────────────
 function StatusDot() {
@@ -144,16 +144,16 @@ function LeaderboardTab() {
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-500">选手</th>
                 <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">总资产</th>
                 <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">收益率</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 hidden lg:table-cell">现金</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 hidden xl:table-cell">持仓</th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-gray-500">持仓</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-500">今日决策</th>
               </tr>
             </thead>
             <tbody>
               {leaderboard.length === 0 && !isLoading && (
-                <tr><td colSpan={6} className="text-center py-10 text-gray-600">暂无数据</td></tr>
+                <tr><td colSpan={7} className="text-center py-10 text-gray-600">暂无数据</td></tr>
               )}
               {isLoading && (
-                <tr><td colSpan={6} className="text-center py-10 text-gray-600">加载中...</td></tr>
+                <tr><td colSpan={7} className="text-center py-10 text-gray-600">加载中...</td></tr>
               )}
               {leaderboard.map((entry: any, idx: number) => (
                 <tr key={entry.agent?.id ?? idx} className="border-b border-neutral-800 last:border-0 hover:bg-neutral-800/50 transition">
@@ -184,13 +184,27 @@ function LeaderboardTab() {
                   <td className="px-4 py-3 text-right font-mono text-sm font-bold" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
                     {fmtPct(entry.returnPct)}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-sm text-gray-400 hidden lg:table-cell">{fmt(entry.cash)}</td>
+                  <td className="px-4 py-3 text-center">
+                    {entry.positions?.length > 0 ? (
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="text-xs font-black text-white">{entry.positions[0].symbol}</span>
+                        <span className="text-xs text-gray-500">第{entry.holdingsDays ?? 0}天</span>
+                      </div>
+                    ) : <span className="text-gray-600 text-xs">—</span>}
+                  </td>
                   <td className="px-4 py-3 hidden xl:table-cell">
-                    <div className="flex gap-1 flex-wrap">
-                      {entry.positions?.map((p: any) => (
-                        <span key={p.symbol} className="px-2 py-0.5 rounded bg-neutral-800 text-xs border border-neutral-700">{p.symbol}×{p.quantity}</span>
-                      )) ?? <span className="text-gray-600">—</span>}
-                    </div>
+                    {entry.todayOrder ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className={`text-xs font-black ${entry.todayOrder.side === "BUY" ? "text-red-400" : "text-green-400"}`}>
+                          {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol}
+                        </span>
+                        {entry.todayOrder.note && (
+                          <span className="text-xs text-gray-600 max-w-24 truncate" title={entry.todayOrder.note}>💡 {entry.todayOrder.note}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-600 text-xs">—</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -218,6 +232,12 @@ function LeaderboardTab() {
                 <span>总资产 <span className="font-mono text-white">{fmt(entry.totalValue)}</span></span>
                 <span style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }} className="font-mono font-bold">{fmtPct(entry.returnPct)}</span>
               </div>
+              {entry.todayOrder && (
+                <div className={`text-xs mt-0.5 font-bold ${entry.todayOrder.side === "BUY" ? "text-red-400" : "text-green-400"}`}>
+                  {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol}
+                  {entry.todayOrder.note && <span className="text-gray-500 font-normal ml-1">· {entry.todayOrder.note}</span>}
+                </div>
+              )}
             </div>
           </div>
         ))}
