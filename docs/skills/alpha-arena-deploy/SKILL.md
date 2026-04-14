@@ -1,50 +1,100 @@
 # alpha-arena-deploy
 
-Next.js 项目在 YAN-NUC (WSL) 上的开发与部署规范。
+Next.js 项目在 YAN-NUC (WSL) 上的开发与生产部署规范。
+
+---
 
 ## 核心原则
 
-### 开发 ≠ 部署
-- **开发模式** `npm run dev`：热更新、webpack HMR、source maps → 仅本地调试用
-- **生产模式** `npm start`：Turbopack build、tree-shaking、静态优化 → 唯一正确的部署方式
+**开发 ≠ 部署**
 
-### 部署流程（每次）
-1. `pkill -f "next"` — 停止所有旧进程
-2. `npm run build` — 编译（耗时约30-60秒）
-3. `npm start` — 生产模式启动（不调试、不改代码）
-4. 验证：`curl http://localhost:3000/api/leaderboard?period=total`
+- `npm run dev`：热更新，仅本地调试
+- `npm start` 或 `systemd`：生产模式，唯一正确部署方式
+- **严禁** `npm run dev` 部署公网
 
-### ⚠️ 严禁
-- `npm run dev` 部署到公网（WebSocket/HMR 无法在生产环境工作）
-- 修改代码后不 rebuild 直接重启进程
-- pm2 或 docker 混用不同模式
+---
 
-## 项目路径
+## 项目信息
+
 - 路径：`/home/wbyan/workspaces/coder/alpha-arena`
-- 端口：3000（Next.js 固定）
+- 端口：3000
 - 数据库：`prisma/dev.db`（SQLite）
 
-## 常用命令
+---
+
+## 生产部署（systemd）
+
+### 安装/更新服务
 
 ```bash
-cd /home/wbyan/workspaces/coder/alpha-arena
-
-# 完整部署
-pkill -f "next" 2>/dev/null; sleep 2
-npm run build && npm start
-
-# 仅重启（代码未改）
-pkill -f "next" 2>/dev/null; sleep 2
-npm start
-
-# 查看日志
-tail -f /tmp/next-prod.log
-
-# 验证服务
-curl -s http://localhost:3000/api/leaderboard?period=total | python3 -c "import json,sys; d=json.load(sys.stdin); print('OK' if d.get('leaderboard') else 'FAIL')"
+sudo cp docs/skills/alpha-arena-deploy/scripts/alpha-arena.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable alpha-arena
+sudo systemctl start alpha-arena
 ```
 
-## 调试
-- 开发调试：`npm run dev`（仅本地 `localhost:3000`）
-- 生产问题：`curl http://localhost:3000/api/<route>` 直接测 API，不走 nginx
-- nginx 重启：`sudo systemctl restart nginx`（在 internuc WSL 上执行）
+### 常用命令
+
+```bash
+sudo systemctl status alpha-arena       # 查看状态
+sudo systemctl restart alpha-arena       # 重启
+sudo journalctl -u alpha-arena -f       # 看日志
+```
+
+---
+
+## 平滑升级
+
+```bash
+# 方法1: 一键升级（自动备份+构建+重启）
+./docs/skills/alpha-arena-deploy/scripts/upgrade.sh
+
+# 方法2: 手动升级
+cd ~/workspaces/coder/alpha-arena
+git pull
+npm run build
+sudo systemctl restart alpha-arena
+```
+
+---
+
+## 数据库备份
+
+```bash
+# 手动备份
+./docs/skills/alpha-arena-deploy/scripts/backup-db.sh
+
+# 自动备份（每天凌晨2点）
+# 在 crontab 里加入：
+0 2 * * * /home/wbyan/workspaces/coder/alpha-arena/docs/skills/alpha-arena-deploy/scripts/backup-db.sh
+```
+
+备份保存在 `backups/` 目录，自动保留最近30个。
+
+---
+
+## 回滚
+
+```bash
+# 1. 停止服务
+sudo systemctl stop alpha-arena
+
+# 2. 恢复数据库
+cp backups/dev-YYYYMMDD-HHMMSS.db prisma/dev.db
+
+# 3. 回滚代码
+cd ~/workspaces/coder/alpha-arena
+git reset --hard <commit-hash>
+
+# 4. 重新构建启动
+npm run build && sudo systemctl restart alpha-arena
+```
+
+---
+
+## 本地开发
+
+```bash
+cd ~/workspaces/coder/alpha-arena
+npm run dev   # 仅 localhost:3000，不部署公网
+```

@@ -1,0 +1,20 @@
+[Unit]
+Description=Alpha Arena - A-share AI Trading Competition
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=wbyan
+WorkingDirectory=/home/wbyan/workspaces/coder/alpha-arena
+ExecStart=/home/wbyan/.nvm/versions/node/v22.22.2/bin/node /home/wbyan/.nvm/versions/node/v22.22.2/lib/node_modules/.bin/next start
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=alpha-arena
+Environment=NODE_ENV=production
+EnvironmentFile=/home/wbyan/workspaces/coder/alpha-arena/.env
+
+[Install]
+WantedBy=multi-user.target
