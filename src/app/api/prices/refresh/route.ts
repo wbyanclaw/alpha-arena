@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-const MAJOR_A_SHARES = [
+const STOCKS = [
   { secid: "1.600519", code: "600519", name: "贵州茅台" },
   { secid: "0.000001", code: "000001", name: "平安银行" },
   { secid: "1.600036", code: "600036", name: "招商银行" },
@@ -18,61 +18,70 @@ const MAJOR_A_SHARES = [
   { secid: "0.000002", code: "000002", name: "万科A" },
 ];
 
+async function fetchEastmoney(): Promise<Map<string, any> | null> {
+  try {
+    const secids = STOCKS.map(s => s.secid).join(",");
+    const url = `https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f4,f5,f6,f12,f14,f15,f16,f17&secids=${secids}`;
+    const res = await fetch(url, { cache: "no-store", headers: { "User-Agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const map = new Map<string, any>();
+    if (json?.data?.diff) {
+      for (const item of json.data.diff) { map.set(item.f12, item); }
+    }
+    return map.size > 0 ? map : null;
+  } catch { return null; }
+}
+
+async function fetchSina(): Promise<Map<string, any> | null> {
+  try {
+    const symbols = STOCKS.map(s => s.secid.replace("1.", "sh").replace("0.", "sz")).join(",");
+    const res = await fetch(`https://hq.sinajs.cn/list=${symbols}`, {
+      cache: "no-store",
+      headers: { "User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn/" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    const text = new TextDecoder("gbk").decode(buf);
+    const map = new Map<string, any>();
+    for (const line of text.trim().split("\n")) {
+      const m = line.match(/="([^"]+)"/);
+      if (!m) continue;
+      const f = m[1].split(",");
+      if (f.length < 10) continue;
+      const code = f[0].startsWith("sh") ? f[0].slice(2) : f[0].startsWith("sz") ? f[0].slice(2) : null;
+      if (!code) continue;
+      map.set(code, { f2: parseFloat(f[3]) || 0, f4: parseFloat(f[2]) || 0, f14: f[0] });
+    }
+    return map.size > 0 ? map : null;
+  } catch { return null; }
+}
+
 export async function GET(req: NextRequest) {
-  // 简单秘钥保护
   const secret = req.nextUrl.searchParams.get("secret");
   if (secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  try {
-    const secids = MAJOR_A_SHARES.map(s => s.secid).join(",");
-    const url = `https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f4,f5,f6,f12,f14,f15,f16,f17&secids=${secids}`;
+  let emMap = await fetchEastmoney();
+  let source = "eastmoney";
+  if (!emMap || emMap.size === 0) { emMap = await fetchSina(); source = "sina"; }
 
-    const res = await fetch(url, {
-      cache: "no-store",
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-
-    if (!res.ok) throw new Error(`eastmoney ${res.status}`);
-    const json = await res.json();
-
-    const data: Record<string, any> = {};
-    if (json?.data?.diff) {
-      for (const item of json.data.diff) {
-        data[item.f12] = {
-          price: item.f2 ?? 0,
-          prevClose: item.f4 ?? 0,
-          name: item.f14 || "",
-          high: item.f15 ?? 0,
-          low: item.f16 ?? 0,
-        };
-      }
-    }
-
-    let updated = 0;
-    let failed = 0;
-
-    for (const s of MAJOR_A_SHARES) {
-      const d = data[s.code];
-      if (!d || d.price <= 0) { failed++; continue; }
-      try {
-        await prisma.price.upsert({
-          where: { symbol: s.code },
-          create: { symbol: s.code, name: d.name || s.name, price: d.price, prevClose: d.prevClose },
-          update: { price: d.price, prevClose: d.prevClose, name: d.name || s.name },
-        });
-        updated++;
-      } catch { failed++; }
-    }
-
-    return NextResponse.json({
-      success: true,
-      updated,
-      failed,
-      refreshedAt: new Date().toISOString(),
-    });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  let updated = 0, failed = 0;
+  for (const s of STOCKS) {
+    const d = emMap?.get(s.code);
+    const price = d?.f2 ?? 0;
+    if (price <= 0) { failed++; continue; }
+    try {
+      await prisma.price.upsert({
+        where: { symbol: s.code },
+        create: { symbol: s.code, name: d?.f14 || s.name, price, prevClose: d?.f4 || price },
+        update: { price, prevClose: d?.f4 || price, name: d?.f14 || s.name },
+      });
+      updated++;
+    } catch { failed++; }
   }
+
+  return NextResponse.json({ success: true, updated, failed, source, refreshedAt: new Date().toISOString() });
 }

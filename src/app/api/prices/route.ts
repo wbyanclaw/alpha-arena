@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
-// 东方财富 A 股行情接口
-const MAJOR_A_SHARES = [
+const STOCKS = [
   { secid: "1.600519", code: "600519", name: "贵州茅台" },
   { secid: "0.000001", code: "000001", name: "平安银行" },
   { secid: "1.600036", code: "600036", name: "招商银行" },
@@ -18,65 +17,86 @@ const MAJOR_A_SHARES = [
   { secid: "0.000002", code: "000002", name: "万科A" },
 ];
 
-export async function GET() {
+// 东方财富主源
+async function fetchEastmoney(): Promise<Map<string, any> | null> {
   try {
-    const secids = MAJOR_A_SHARES.map(s => s.secid).join(",");
-    const url = `https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f4,f5,f6,f7,f12,f14,f15,f16,f17,f18&secids=${secids}`;
-
-    const res = await fetch(url, {
-      cache: "no-store",
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-
-    if (!res.ok) throw new Error(`eastmoney ${res.status}`);
-
+    const secids = STOCKS.map(s => s.secid).join(",");
+    const url = `https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f4,f5,f6,f12,f14,f15,f16,f17&secids=${secids}`;
+    const res = await fetch(url, { cache: "no-store", headers: { "User-Agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
     const json = await res.json();
-    const data: Record<string, any> = {};
-
+    const map = new Map<string, any>();
     if (json?.data?.diff) {
       for (const item of json.data.diff) {
-        const secid = item.f12; // 股票代码
-        data[secid] = {
-          symbol: secid,
-          name: item.f14 || "",
-          price: item.f2 ?? 0,           // 现价
-          prevClose: item.f4 ?? 0,       // 昨收
-          change: item.f3 ?? 0,          // 涨跌额
-          changePct: item.f3 && item.f4 ? (item.f3 / item.f4) * 100 : 0,
-          open: item.f15 ?? 0,
-          high: item.f16 ?? 0,
-          low: item.f17 ?? 0,
-          volume: item.f5 ?? 0,
-          amount: item.f6 ?? 0,
-        };
+        map.set(item.f12, item);
       }
     }
+    return map.size > 0 ? map : null;
+  } catch { return null; }
+}
 
-    const prices = MAJOR_A_SHARES.map(s => {
-      const d = data[s.code];
-      const price = d?.price ?? 0;
-      const prevClose = d?.prevClose ?? price;
-      const change = price - prevClose;
-      const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
-      return {
-        symbol: s.code,
-        name: d?.name || s.name,
-        price,
-        prevClose,
-        open: d?.open ?? price,
-        high: d?.high ?? price,
-        low: d?.low ?? price,
-        change: Math.round(change * 100) / 100,
-        changePct: Math.round(changePct * 100) / 100,
-        volume: d?.volume ?? 0,
-        amount: d?.amount ?? 0,
-        market: "A",
-      };
+// 新浪备用源（GBK）
+async function fetchSina(): Promise<Map<string, any> | null> {
+  try {
+    const symbols = STOCKS.map(s => s.secid.replace("1.", "sh").replace("0.", "sz")).join(",");
+    const res = await fetch(`https://hq.sinajs.cn/list=${symbols}`, {
+      cache: "no-store",
+      headers: { "User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn/" },
+      signal: AbortSignal.timeout(5000),
     });
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    const text = new TextDecoder("gbk").decode(buf);
+    const map = new Map<string, any>();
+    const lines = text.trim().split("\n");
+    for (const line of lines) {
+      const m = line.match(/="([^"]+)"/);
+      if (!m) continue;
+      const f = m[1].split(",");
+      if (f.length < 10) continue;
+      const code = (f[0].startsWith("sh") ? f[0].slice(2) : f[0].startsWith("sz") ? f[0].slice(2) : null);
+      if (!code) continue;
+      map.set(code, {
+        f2: parseFloat(f[3]) || 0,
+        f4: parseFloat(f[2]) || 0,
+        f14: f[0],
+        f15: parseFloat(f[4]) || 0,
+        f16: parseFloat(f[5]) || 0,
+      });
+    }
+    return map.size > 0 ? map : null;
+  } catch { return null; }
+}
 
-    return NextResponse.json(prices);
-  } catch (e: any) {
-    console.error("prices error:", e);
-    return NextResponse.json({ error: "failed to fetch prices: " + e.message }, { status: 500 });
+export async function GET() {
+  // 优先东方财富，失败则新浪备用
+  let emMap = await fetchEastmoney();
+  let source = "eastmoney";
+
+  if (!emMap || emMap.size === 0) {
+    emMap = await fetchSina();
+    source = "sina";
   }
+
+  const prices = STOCKS.map(s => {
+    const d = emMap?.get(s.code);
+    const price = d?.f2 ?? 0;
+    const prevClose = d?.f4 ?? price;
+    const change = price - prevClose;
+    const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
+    return {
+      symbol: s.code,
+      name: s.name,
+      price,
+      prevClose,
+      change: Math.round(change * 100) / 100,
+      changePct: Math.round(changePct * 100) / 100,
+      high: d?.f15 ?? price,
+      low: d?.f16 ?? price,
+      volume: d?.f5 ?? 0,
+      source,
+    };
+  });
+
+  return NextResponse.json(prices);
 }
