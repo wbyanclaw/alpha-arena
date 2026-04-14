@@ -14,7 +14,7 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=alpha-arena
 Environment=NODE_ENV=production
-EnvironmentFile=/home/wbyan/workspaces/coder/alpha-arena/.env
+EnvironmentFile=/home/wbyan/workspaces/coder/alpha-arena/.env.production
 
 [Install]
 WantedBy=multi-user.target

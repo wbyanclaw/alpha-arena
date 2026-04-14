@@ -4,56 +4,58 @@ Next.js 项目在 YAN-NUC (WSL) 上的开发与生产部署规范。
 
 ---
 
-## 核心原则
+## 双环境分离
 
-**开发 ≠ 部署**
+| 环境 | 数据库 | 端口 | 用途 |
+|------|---------|------|------|
+| 开发 `.env` | `prisma/dev.db` | 3000 | 本地调试 |
+| 生产 `.env.production` | `prisma/prod.db` | 3000 | 公网服务 |
 
-- `npm run dev`：热更新，仅本地调试
-- `npm start` 或 `systemd`：生产模式，唯一正确部署方式
-- **严禁** `npm run dev` 部署公网
-
----
-
-## 项目信息
-
-- 路径：`/home/wbyan/workspaces/coder/alpha-arena`
-- 端口：3000
-- 数据库：`prisma/dev.db`（SQLite）
+**关键原则：dev 和 prod 数据库完全隔离，互不影响。**
 
 ---
 
-## 生产部署（systemd）
-
-### 安装/更新服务
+## 开发流程
 
 ```bash
+cd ~/workspaces/coder/alpha-arena
+
+# 1. 开发
+npm run dev   # 使用 dev.db，可随意操作
+
+# 2. 确认没问题后，提交代码
+git add . && git commit -m "fix: ..."
+git push
+```
+
+---
+
+## 生产部署
+
+```bash
+# 在 internuc WSL 上执行
+cd ~/workspaces/coder/alpha-arena
+git pull
+
+# 一键部署（自动备份 prod.db + 构建 + 重启）
+./docs/skills/alpha-arena-deploy/scripts/deploy.sh
+```
+
+---
+
+## systemd 服务（生产）
+
+```bash
+# 安装/更新服务
 sudo cp docs/skills/alpha-arena-deploy/scripts/alpha-arena.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable alpha-arena
 sudo systemctl start alpha-arena
-```
 
-### 常用命令
-
-```bash
-sudo systemctl status alpha-arena       # 查看状态
-sudo systemctl restart alpha-arena       # 重启
-sudo journalctl -u alpha-arena -f       # 看日志
-```
-
----
-
-## 平滑升级
-
-```bash
-# 方法1: 一键升级（自动备份+构建+重启）
-./docs/skills/alpha-arena-deploy/scripts/upgrade.sh
-
-# 方法2: 手动升级
-cd ~/workspaces/coder/alpha-arena
-git pull
-npm run build
-sudo systemctl restart alpha-arena
+# 常用命令
+sudo systemctl status alpha-arena           # 状态
+sudo systemctl restart alpha-arena           # 重启
+sudo journalctl -u alpha-arena -f         # 日志
 ```
 
 ---
@@ -65,11 +67,8 @@ sudo systemctl restart alpha-arena
 ./docs/skills/alpha-arena-deploy/scripts/backup-db.sh
 
 # 自动备份（每天凌晨2点）
-# 在 crontab 里加入：
-0 2 * * * /home/wbyan/workspaces/coder/alpha-arena/docs/skills/alpha-arena-deploy/scripts/backup-db.sh
+(crontab -l 2>/dev/null; echo "0 2 * * * $HOME/workspaces/coder/alpha-arena/docs/skills/alpha-arena-deploy/scripts/backup-db.sh") | crontab -
 ```
-
-备份保存在 `backups/` 目录，自动保留最近30个。
 
 ---
 
@@ -80,21 +79,12 @@ sudo systemctl restart alpha-arena
 sudo systemctl stop alpha-arena
 
 # 2. 恢复数据库
-cp backups/dev-YYYYMMDD-HHMMSS.db prisma/dev.db
+cp backups/prod-YYYYMMDD-HHMMSS.db prisma/prod.db
 
 # 3. 回滚代码
-cd ~/workspaces/coder/alpha-arena
 git reset --hard <commit-hash>
+npm run build
 
-# 4. 重新构建启动
-npm run build && sudo systemctl restart alpha-arena
-```
-
----
-
-## 本地开发
-
-```bash
-cd ~/workspaces/coder/alpha-arena
-npm run dev   # 仅 localhost:3000，不部署公网
+# 4. 重启
+sudo systemctl start alpha-arena
 ```

@@ -1,24 +1,24 @@
 #!/bin/bash
-# alpha-arena 部署脚本
+# alpha-arena 部署脚本（生产环境）
 set -e
 
-PROJECT_DIR="/home/wbyan/workspaces/coder/alpha-arena"
-LOG_FILE="/tmp/next-prod.log"
+APP_DIR="/home/wbyan/workspaces/coder/alpha-arena"
+LOG="/tmp/alpha-upgrade.log"
+BACKUP_DIR="$APP_DIR/backups"
+PROD_DB="$APP_DIR/prisma/prod.db"
 
-cd "$PROJECT_DIR"
+echo "[$(date)] 部署开始" >> $LOG
 
-echo "[deploy] 停止旧进程..."
-pkill -f "next" 2>/dev/null || true
-sleep 2
+# 1. 备份生产数据库
+mkdir -p "$BACKUP_DIR"
+cp "$PROD_DB" "$BACKUP_DIR/prod-$(date +%Y%m%d-%H%M%S).db"
+ls -t "$BACKUP_DIR"/prod-*.db | tail -n +11 | xargs rm -f 2>/dev/null || true
+echo "[$(date)] 生产数据库已备份" >> $LOG
 
-echo "[deploy] 构建生产版本..."
-npm run build
+# 2. 构建
+cd "$APP_DIR"
+npm run build >> $LOG 2>&1
 
-echo "[deploy] 启动生产服务..."
-npm start > "$LOG_FILE" 2>&1 &
-sleep 8
-
-echo "[deploy] 验证 API..."
-curl -sf http://localhost:3000/api/leaderboard?period=total > /dev/null && echo "[deploy] ✓ 服务正常" || echo "[deploy] ✗ 服务异常"
-
-echo "[deploy] 日志: tail -f $LOG_FILE"
+# 3. 重启
+sudo systemctl restart alpha-arena
+echo "[$(date)] ✓ 部署完成" >> $LOG
