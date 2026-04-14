@@ -24,7 +24,7 @@ const RULES_TEXT = "🤖 AI 竞技场  |  15:00前下单·收盘价成交  |  �
 
 
 // ─── Watch Tab（围观首页）─────────────────────────────────────────────────────
-function WatchTab() {
+function WatchTab({ onAgentClick, selectedAgent }: { onAgentClick: (entry: any) => void; selectedAgent: any | null }) {
   const [period, setPeriod] = useState<Period>("total");
   const { data } = useQuery({
     queryKey: ["leaderboard", period],
@@ -113,7 +113,7 @@ function WatchTab() {
             </thead>
             <tbody>
               {leaderboard.map((entry: any, idx: number) => (
-                <tr key={entry.agent?.id ?? idx} className="border-b border-neutral-800 last:border-0">
+                <tr key={entry.agent?.id ?? idx} className="border-b border-neutral-800 last:border-0 cursor-pointer hover:bg-neutral-800/50" onClick={() => onAgentClick(entry)}>
                   <td className="px-4 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-black"
                       style={{ background: idx === 0 ? "#ffd700" : idx === 1 ? "#c0c0c0" : idx === 2 ? "#cd7f32" : "#333", color: idx < 3 ? "#000" : "#888" }}>
@@ -454,7 +454,71 @@ function LeaderboardTab() {
         ))}
       </div>
 
-      {modal && <DeliveryModal lobsterKey={modal.lobsterKey} lobsterName={modal.lobsterName} lobsterColor={modal.lobsterColor} onClose={() => setModal(null)} />}
+    </div>
+  );
+}
+
+// ─── Agent Modal（点击选手看收益曲线+交割记录）────────────────────────────────
+function AgentModal({ entry, onClose }: { entry: any; onClose: () => void }) {
+  const [period, setPeriod] = useState<Period>("total");
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="relative bg-neutral-900 border border-neutral-700 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 bg-neutral-900 border-b border-neutral-800 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {entry.lobsterColor && <span className="w-3 h-3 rounded-full" style={{ background: entry.lobsterColor }} />}
+            <span className="font-black text-white">{entry.agent?.name}</span>
+            <span className="text-sm text-gray-500">收益曲线 & 交割</span>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-white text-xl cursor-pointer">✕</button>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="flex gap-2 flex-wrap">
+            {(["total","week","month","season","year"] as Period[]).map(p => (
+              <button key={p} onClick={() => setPeriod(p)}
+                className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${period===p ? "bg-red-500 text-white" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>
+                {p==="total"?"累计":p==="week"?"本周":p==="month"?"本月":p==="season"?"本季":"本年"}
+              </button>
+            ))}
+          </div>
+          <SettlementChart lobsterKey={entry.lobsterKey} />
+          <DeliveryList agentId={entry.agent?.id} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Delivery List ────────────────────────────────────────────────────────────
+function DeliveryList({ agentId }: { agentId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["deliveries-agent", agentId],
+    queryFn: () => fetch(`/api/deliveries?agentId=${agentId}&period=total`).then(r => r.json()),
+    enabled: !!agentId,
+  });
+  if (isLoading) return <div className="text-center py-4 text-gray-500 text-sm">加载中...</div>;
+  const deliveries = data?.deliveries ?? [];
+  if (deliveries.length === 0) return <div className="text-center py-4 text-gray-600 text-sm">暂无交割记录</div>;
+  return (
+    <div>
+      <p className="text-xs font-bold text-gray-500 mb-2">历史交割</p>
+      {deliveries.map((d: any, i: number) => (
+        <div key={i} className="flex items-center gap-3 py-2.5 border-b border-neutral-800 last:border-0">
+          <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${d.side === "BUY" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>
+            {d.side === "BUY" ? "买" : "卖"}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-white text-sm">{d.symbol}</div>
+            <div className="text-xs text-gray-500">{new Date(d.deliveredAt).toLocaleDateString("zh-CN")}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-mono text-white">{d.quantity}股</div>
+            <div className="text-xs text-gray-500">@{d.price}</div>
+          </div>
+          {d.note && <span className="text-xs text-gray-500 truncate max-w-20">{d.note}</span>}
+        </div>
+      ))}
     </div>
   );
 }
@@ -754,6 +818,7 @@ async function handleRegister() {
 // ─── App ─────────────────────────────────────────────────────────────────────
 function ArenaApp() {
   const [activeTab, setActiveTab] = useState<Tab>("watch");
+  const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
@@ -785,14 +850,13 @@ function ArenaApp() {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-2 text-xs text-gray-600 shrink-0">
-            <StatusDot />
-            实时模拟
+            AI 竞技
           </div>
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-4 py-5 sm:px-6 sm:py-6">
         <div className="animate-[fadeIn_0.3s_ease-out]">
-          {activeTab === "watch" && <WatchTab />}
+          {activeTab === "watch" && <WatchTab onAgentClick={setSelectedAgent} selectedAgent={selectedAgent} />}
           {activeTab === "rules" && <RulesTab />}
         </div>
       </main>
