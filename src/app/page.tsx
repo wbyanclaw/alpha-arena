@@ -52,7 +52,6 @@ function WatchTab() {
           <p className="text-gray-400 text-sm mb-5">{competition.description ?? "每日A股 AI 竞技"}</p>
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-5">
             <StatCard label="参赛者" value={String(totalAgents)} icon="🤖" />
-            <StatCard label="总资金" value={fmt((totalAgents * 1000000), 0)} icon="💰" />
             <StatCard label="最高收益" value={top3[0] ? fmtPct(top3[0].returnPct) : "—"} icon="🏆" isHighlight />
             <StatCard label="平均收益" value={leaderboard.length > 0 ? fmtPct(leaderboard.reduce((s: number, e: any) => s + e.returnPct, 0) / leaderboard.length) : "—"} icon="📊" />
             <StatCard label="今日决策" value={String(recentDecisions.length)} icon="📋" />
@@ -71,8 +70,8 @@ function WatchTab() {
             <div key={idx} className={"rounded-xl border p-4 text-center " + (idx === 0 ? "bg-yellow-500/10 border-yellow-500/30" : idx === 1 ? "bg-gray-500/10 border-gray-500/20" : "bg-orange-500/10 border-orange-500/20")}>
               <div className="text-2xl mb-1">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}</div>
               <div className="font-black text-white text-sm truncate">{entry.agent?.name ?? "—"}</div>
-              <div className="text-lg font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>{fmtPct(entry.returnPct)}</div>
-              <div className="text-xs text-gray-500 mt-0.5">收益率</div>
+              <div className="text-xl font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>{fmtPct(entry.returnPct)}</div>
+              <div className="text-xs text-gray-500 mt-0.5">累计收益</div>
             </div>
           ))}
         </div>
@@ -357,7 +356,6 @@ function LeaderboardTab() {
               <tr className="bg-neutral-800 border-b border-neutral-700">
                 <th className="px-4 py-3 text-center text-xs font-bold text-gray-500">排名</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-500">选手</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">总资产</th>
                 <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">收益率</th>
                 <th className="px-4 py-3 text-center text-xs font-bold text-gray-500">持仓</th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-500">今日决策</th>
@@ -365,10 +363,10 @@ function LeaderboardTab() {
             </thead>
             <tbody>
               {leaderboard.length === 0 && !isLoading && (
-                <tr><td colSpan={7} className="text-center py-10 text-gray-600">暂无数据</td></tr>
+                <tr><td colSpan={5} className="text-center py-10 text-gray-600">暂无数据</td></tr>
               )}
               {isLoading && (
-                <tr><td colSpan={7} className="text-center py-10 text-gray-600">加载中...</td></tr>
+                <tr><td colSpan={5} className="text-center py-10 text-gray-600">加载中...</td></tr>
               )}
               {leaderboard.map((entry: any, idx: number) => (
                 <tr key={entry.agent?.id ?? idx} className="border-b border-neutral-800 last:border-0 hover:bg-neutral-800/50 transition">
@@ -395,7 +393,6 @@ function LeaderboardTab() {
                       {entry.agent?.name ?? "未知选手"} ▷
                     </button>
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-sm font-bold text-white">{fmt(entry.totalValue)}</td>
                   <td className="px-4 py-3 text-right font-mono text-sm font-bold" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
                     {fmtPct(entry.returnPct)}
                   </td>
@@ -407,7 +404,7 @@ function LeaderboardTab() {
                       </div>
                     ) : <span className="text-gray-600 text-xs">—</span>}
                   </td>
-                  <td className="px-4 py-3 hidden xl:table-cell">
+                  <td className="px-4 py-3">
                     {entry.todayOrder ? (
                       <div className="flex flex-col gap-0.5">
                         <span className={`text-xs font-black ${entry.todayOrder.side === "BUY" ? "text-red-400" : "text-green-400"}`}>
@@ -443,9 +440,8 @@ function LeaderboardTab() {
                 )}
                 <span className="font-bold text-sm text-white truncate">{entry.agent?.name ?? "未知选手"}</span>
               </div>
-              <div className="flex gap-3 mt-1 text-xs text-gray-500">
-                <span>总资产 <span className="font-mono text-white">{fmt(entry.totalValue)}</span></span>
-                <span style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }} className="font-mono font-bold">{fmtPct(entry.returnPct)}</span>
+              <div className="text-xs text-gray-500 mt-1">
+                收益率 <span style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }} className="font-mono font-bold">{fmtPct(entry.returnPct)}</span>
               </div>
               {entry.todayOrder && (
                 <div className={`text-xs mt-0.5 font-bold ${entry.todayOrder.side === "BUY" ? "text-red-400" : "text-green-400"}`}>
@@ -511,7 +507,7 @@ function ArenaTab() {
             </div>
             <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{comp.description ?? "暂无描述"}</p>
             <div className="grid grid-cols-3 gap-2 text-xs">
-              <div><span className="block text-gray-600 mb-0.5">初始资金</span><span className="font-bold text-white">{fmt(comp.initialCash, 0)}</span></div>
+
               <div><span className="block text-gray-600 mb-0.5">开始</span><span className="font-bold text-white text-xs">{comp.startAt ? new Date(comp.startAt).toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" }) : "—"}</span></div>
               <div><span className="block text-gray-600 mb-0.5">结束</span><span className="font-bold text-white text-xs">{comp.endAt ? new Date(comp.endAt).toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" }) : "—"}</span></div>
             </div>
@@ -618,8 +614,10 @@ function PortfolioTab() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center">
-              <div className="text-xs text-gray-500 mb-2">总资产</div>
-              <div className="text-2xl font-black text-white font-mono">{fmt(portfolio.totalValue ?? portfolio.cash)}</div>
+              <div className="text-xs text-gray-500 mb-2">总收益率</div>
+              <div className="text-2xl font-black font-mono" style={{ color: (portfolio.unrealizedPnL ?? 0) >= 0 ? "#ff3333" : "#00ff66" }}>
+                {fmtPct(((portfolio.totalValue ?? portfolio.cash) / 1000000 - 1) * 100)}
+              </div>
             </div>
             <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center">
               <div className="text-xs text-gray-500 mb-2">现金余额</div>
