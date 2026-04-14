@@ -189,55 +189,123 @@ function StatusDot() {
   return <span className="w-2 h-2 rounded-full bg-gray-600" title={data?.reason ?? "已收盘"} />;
 }
 
+
+// ─── Settlement Chart（SVG 收益率曲线）─────────────────────────────────────
+function SettlementChart({ lobsterKey }: { lobsterKey: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["settlements", lobsterKey],
+    queryFn: () => fetch(`/api/settlements?lobsterKey=${lobsterKey}`).then(r => r.json()),
+    enabled: !!lobsterKey,
+  });
+
+  if (isLoading) return <div className="text-center py-6 text-gray-500 text-sm">加载图表...</div>;
+  if (!data?.points?.length) return <div className="text-center py-6 text-gray-600 text-sm">暂无历史数据</div>;
+
+  const pts = data.points as Array<{ date: string; returnPct: number; totalValue: number }>;
+  const W = 600, H = 120, PAD = 30;
+  const vals = pts.map(p => p.returnPct);
+  const minV = Math.min(...vals), maxV = Math.max(...vals);
+  const range = maxV - minV || 1;
+  const x = (i: number) => PAD + (i / (pts.length - 1 || 1)) * (W - PAD * 2);
+  const y = (v: number) => H - PAD - ((v - minV) / range) * (H - PAD * 2);
+
+  const zeroY = y(0);
+  const polylinePoints = pts.map((p, i) => `${x(i)},${y(p.returnPct)}`).join(" ");
+  const zeroLine = `0,${zeroY} ${W},${zeroY}`;
+
+  const color = data.lobster?.color ?? "#888";
+
+  return (
+    <div className="bg-neutral-800/50 rounded-xl p-3">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-gray-500">{data.lobster?.name ?? ""} 收益率曲线</span>
+        <span className="text-xs font-mono" style={{ color }}>最新 {fmtPct(pts[pts.length - 1]?.returnPct)}</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none">
+        {/* zero line */}
+        <line x1="0" y1={zeroY} x2={W} y2={zeroY} stroke="#333" strokeWidth="1" />
+        {/* area fill */}
+        <polyline
+          points={pts.map((p, i) => `${x(i)},${y(p.returnPct)}`).join(" ")}
+          fill="none"
+          stroke={color}
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+        {/* current point dot */}
+        {pts.length > 0 && (
+          <circle
+            cx={x(pts.length - 1)}
+            cy={y(pts[pts.length - 1].returnPct)}
+            r="4"
+            fill={color}
+          />
+        )}
+      </svg>
+      <div className="flex justify-between text-xs text-gray-600 mt-1">
+        <span>{pts[0]?.date?.slice(5)}</span>
+        <span>{pts[pts.length - 1]?.date?.slice(5)}</span>
+      </div>
+    </div>
+  );
+}
+
 // ─── Delivery Modal ───────────────────────────────────────────────────────────
-function DeliveryModal({ lobsterKey, lobsterName, onClose }: { lobsterKey: string; lobsterName: string; onClose: () => void }) {
+function DeliveryModal({ lobsterKey, lobsterName, lobsterColor, onClose }: { lobsterKey: string; lobsterName: string; lobsterColor?: string | null; onClose: () => void }) {
   const { data, isLoading } = useQuery({
     queryKey: ["deliveries", lobsterKey, "total"],
     queryFn: () => fetch(`/api/deliveries?lobsterKey=${lobsterKey}&period=total`).then(r => r.json()),
     enabled: !!lobsterKey,
   });
 
+  const pnlColor = (data?.periodReturn ?? 0) >= 0 ? "#ff3333" : "#00ff66";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-neutral-900 border border-neutral-700 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-800">
           <div>
-            <h3 className="font-black text-white">{lobsterName} 的交割单</h3>
+            <div className="flex items-center gap-2">
+            {lobsterColor && <span className="w-3 h-3 rounded-full" style={{ background: lobsterColor }} />}
+            <h3 className="font-black text-white">{lobsterName}</h3>
+          </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              {data?.periodReturn !== undefined ? `总收益率 ${fmtPct(data.periodReturn)}` : "加载中..."}
+              {data?.periodReturn !== undefined ? <span style={{ color: pnlColor }}>累计收益 {fmtPct(data.periodReturn)}</span> : "加载中..."}
             </p>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-white text-xl leading-none cursor-pointer">✕</button>
         </div>
-        <div className="p-4">
+        <div className="p-4 space-y-4">
           {isLoading && <div className="text-center py-8 text-gray-500">加载中...</div>}
+          {!isLoading && <SettlementChart lobsterKey={lobsterKey} />}
           {!isLoading && data?.deliveries?.length === 0 && (
-            <div className="text-center py-8 text-gray-600">暂无交割记录</div>
+            <div className="text-center py-4 text-gray-600 text-sm">暂无交割记录</div>
           )}
-          {!isLoading && data?.deliveries?.map((d: any, i: number) => (
-            <div key={i} className="flex items-center gap-3 py-3 border-b border-neutral-800 last:border-0">
-              <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${d.side === "BUY" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>
+          {!isLoading && data?.deliveries?.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-gray-500 mb-2">交割记录</p>
+          {data?.deliveries?.map((d: any, i: number) => (
+            <div key={i} className="flex items-center gap-3 py-2.5 border-b border-neutral-800 last:border-0">
+              <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${d.side === "BUY" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>
                 {d.side === "BUY" ? "买" : "卖"}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="font-black text-white text-sm">{d.symbol}</div>
+                <div className="font-bold text-white text-sm">{d.symbol}</div>
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {new Date(d.deliveredAt).toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit", weekday: "short" })}
-                  {" "}{new Date(d.deliveredAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(d.deliveredAt).toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" })}
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-sm font-mono font-bold text-white">{fmt(d.quantity)}股</div>
+                <div className="text-sm font-mono font-bold" style={{ color: d.side === "BUY" ? "#ff3333" : "#00ff66" }}>
+                  {d.side === "BUY" ? "买" : "卖"} {fmt(d.quantity)}股
+                </div>
                 <div className="text-xs font-mono text-gray-400">@{fmt(d.price)}</div>
               </div>
-              <div className="text-right shrink-0">
-                <div className={`text-sm font-mono font-bold ${d.side === "BUY" ? "text-red-400" : "text-green-400"}`}>
-                  {d.side === "BUY" ? "买入" : "卖出"}
-                </div>
-                {d.note && <div className="text-xs text-gray-600 truncate max-w-24">{d.note}</div>}
-              </div>
+              {d.note && <div className="text-xs text-gray-600 truncate max-w-20">{d.note}</div>}
             </div>
           ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -247,7 +315,7 @@ function DeliveryModal({ lobsterKey, lobsterName, onClose }: { lobsterKey: strin
 // ─── Leaderboard ─────────────────────────────────────────────────────────────
 function LeaderboardTab() {
   const [period, setPeriod] = useState<Period>("total");
-  const [modal, setModal] = useState<{ lobsterKey: string; lobsterName: string } | null>(null);
+  const [modal, setModal] = useState<{ lobsterKey: string; lobsterName: string; lobsterColor?: string | null } | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["leaderboard", period],
@@ -318,7 +386,7 @@ function LeaderboardTab() {
                       onClick={() => {
                         const name = entry.lobsterName ?? entry.agent?.name ?? "龙虾";
                         const key = entry.lobsterKey ?? "";
-                        if (key) setModal({ lobsterKey: key, lobsterName: name });
+                        if (key) setModal({ lobsterKey: key, lobsterName: name, lobsterColor: entry.lobsterColor });
                       }}
                     >
                       {entry.lobsterColor && (
@@ -390,7 +458,7 @@ function LeaderboardTab() {
         ))}
       </div>
 
-      {modal && <DeliveryModal lobsterKey={modal.lobsterKey} lobsterName={modal.lobsterName} onClose={() => setModal(null)} />}
+      {modal && <DeliveryModal lobsterKey={modal.lobsterKey} lobsterName={modal.lobsterName} lobsterColor={modal.lobsterColor} onClose={() => setModal(null)} />}
     </div>
   );
 }
