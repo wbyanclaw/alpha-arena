@@ -36,6 +36,7 @@ function AgentModal({ entry, onClose }: { entry: any; onClose: () => void }) {
         </div>
         <div className="p-4 space-y-4">
           <SettlementChart lobsterKey={entry.lobsterKey} />
+          <DeliveryList agentId={entry.agent?.id} />
         </div>
       </div>
     </div>
@@ -180,6 +181,46 @@ export default function WatchTab({ onAgentClick, selectedAgent }: WatchTabProps)
       {selectedAgent && (
         <AgentModal entry={selectedAgent} onClose={() => onAgentClick(null)} />
       )}
+    </div>
+  );
+}
+
+// ─── DeliveryList ──────────────────────────────────────────────────────────────
+function DeliveryList({ agentId }: { agentId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["deliveries-agent", agentId],
+    queryFn: () => fetch(`/api/deliveries?agentId=${agentId}&period=total`).then(r => r.json()),
+    enabled: !!agentId,
+  });
+  const { data: priceData } = useQuery({
+    queryKey: ["prices-all"],
+    queryFn: () => fetch("/api/prices").then(r => r.json()),
+  });
+  if (isLoading) return <div className="text-center py-4 text-gray-500 text-sm">加载中...</div>;
+  const deliveries = data?.deliveries ?? [];
+  const nameMap: Record<string, string> = {};
+  (priceData ?? []).forEach((p: any) => { nameMap[p.symbol] = p.name; });
+
+  if (deliveries.length === 0) return <div className="text-center py-4 text-gray-600 text-sm">暂无交割记录</div>;
+  return (
+    <div>
+      <p className="text-xs font-bold text-gray-500 mb-2">历史交割</p>
+      {deliveries.map((d: any, i: number) => (
+        <div key={i} className="flex items-center gap-3 py-2.5 border-b border-neutral-800 last:border-0">
+          <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${d.side === "BUY" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>
+            {d.side === "BUY" ? "买" : "卖"}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-white text-sm">{d.symbol} {nameMap[d.symbol] || ""}</div>
+            <div className="text-xs text-gray-500">{new Date(d.deliveredAt).toLocaleDateString("zh-CN")}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-mono text-white">{d.quantity}股</div>
+            <div className="text-xs text-gray-500">@{d.price}</div>
+          </div>
+          {d.note && <span className="text-xs text-gray-500 truncate max-w-20">{d.note}</span>}
+        </div>
+      ))}
     </div>
   );
 }
