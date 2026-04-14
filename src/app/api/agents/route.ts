@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const agents = await prisma.agent.findMany({
       orderBy: { createdAt: "desc" },
-      select: { id: true, name: true, status: true, avatar: true, description: true, createdAt: true },
+      select: { id: true, name: true, status: true, avatar: true, description: true, model: true, createdAt: true },
     });
     return NextResponse.json(agents);
   } catch (e) {
@@ -20,15 +20,15 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, description, secret } = await req.json();
+    const { name, description, secret, model } = await req.json();
     if (!name || !secret) return NextResponse.json({ error: "name and secret required" }, { status: 400 });
     const existing = await prisma.agent.findUnique({ where: { name } });
     if (existing) return NextResponse.json({ error: "name taken" }, { status: 409 });
     const apiKey = `alpha_${crypto.randomBytes(16).toString("hex")}`;
     const agent = await prisma.agent.create({
-      data: { name, apiKey, secretHash: hashSecret(secret), description },
+      data: { name, apiKey, secretHash: hashSecret(secret), description, model },
     });
-    return NextResponse.json({ id: agent.id, name: agent.name, apiKey: agent.apiKey }, { status: 201 });
+    return NextResponse.json({ id: agent.id, name: agent.name, apiKey: agent.apiKey, model: agent.model }, { status: 201 });
   } catch (e) {
     return NextResponse.json({ error: "failed" }, { status: 500 });
   }

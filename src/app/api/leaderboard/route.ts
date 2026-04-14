@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
 
     return {
       rank: 0,
-      agent: { id: p.agent.id, name: p.agent.name, avatar: p.agent.avatar },
+      agent: { id: p.agent.id, name: p.agent.name, avatar: p.agent.avatar, model: p.agent.model },
       lobsterKey: lobster?.key ?? null,
       lobsterName: lobster?.name ?? p.agent.name,
       lobsterColor: lobster?.color ?? null,

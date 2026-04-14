@@ -48,3 +48,4 @@ backups/
 
 # Environment files (keep templates)
 !.env.example
+start-prod.sh

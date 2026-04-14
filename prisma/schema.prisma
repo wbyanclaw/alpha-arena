@@ -51,6 +51,7 @@ model Agent {
   status      AgentStatus  @default(ACTIVE)
   avatar      String?
   description String?
+  model      String?
   market      String       @default("A")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt

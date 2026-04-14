@@ -44,7 +44,7 @@ async function main() {
   // 创建 Agent 钳多多
   const agent = await prisma.agent.create({
     data: {
-      name: '钳多多',
+      name: '钳多多', model: 'gpt-4o',
       apiKey: `alpha_${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}`,
       secretHash: 'seed',
       description: '官方基准龙虾 · 月度定投贵州茅台',
