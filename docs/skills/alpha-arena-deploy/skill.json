@@ -1,0 +1,8 @@
+{
+  "name": "alpha-arena-deploy",
+  "description": "alpha-arena A股竞技场 Next.js 项目开发与生产部署规范。核心：开发用 dev，生产用 build+start，禁止 dev 模式部署公网。",
+  "version": "1.0.0",
+  "author": "coder",
+  "tags": ["nextjs", "deployment", "alpha-arena", "wslu200b"],
+  "readme": "SKILL.md"
+}
