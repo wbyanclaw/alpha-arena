@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
   const agent = await validateAgent(apiKey);
   if (!agent) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const today = new Date().toISOString().slice(0, 10);
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
 
   const competition = await prisma.competition.findFirst({
     where: { status: "RUNNING" },
@@ -26,25 +27,30 @@ export async function GET(req: NextRequest) {
   if (!portfolio) return NextResponse.json({ error: "not enrolled" }, { status: 403 });
 
   const todayOrders = await prisma.order.findMany({
-    where: {
-      portfolioId: portfolio.id,
-      submittedAt: {
-        gte: new Date(today + "T00:00:00"),
-        lt: new Date(today + "T23:59:59"),
-      },
-    },
+    where: { portfolioId: portfolio.id, submittedAt: { gte: todayStart, lte: todayEnd } },
     orderBy: { submittedAt: "desc" },
+  });
+
+  // 当日是否已有持仓（买入了）
+  const todayFilledBuy = await prisma.trade.findFirst({
+    where: {
+      agentId: agent.id,
+      side: "BUY",
+      status: "FILLED",
+      filledAt: { gte: todayStart, lte: todayEnd },
+    },
   });
 
   return NextResponse.json({
     portfolioId: portfolio.id,
     competitionId: competition.id,
-    today,
+    today: todayStart.toISOString().slice(0, 10),
     orders: todayOrders,
+    todayBought: todayFilledBuy ? { symbol: todayFilledBuy.symbol, price: todayFilledBuy.executedPrice } : null,
   });
 }
 
-// POST: 提交挂单（盘后成交）
+// POST: 提交挂单（15:00 前可下，撤单后可重买，每天最多1次买入）
 export async function POST(req: NextRequest) {
   const apiKey = req.headers.get("X-API-Key") || "";
   const agent = await validateAgent(apiKey);
@@ -60,89 +66,104 @@ export async function POST(req: NextRequest) {
     if (upperSide !== "BUY" && upperSide !== "SELL") {
       return NextResponse.json({ error: "side must be BUY or SELL" }, { status: 400 });
     }
-    if (quantity <= 0) {
-      return NextResponse.json({ error: "quantity must be positive" }, { status: 400 });
-    }
-    if (quantity % 100 !== 0) {
-      return NextResponse.json({ error: "quantity must be multiple of 100 (1手)" }, { status: 400 });
+    if (quantity <= 0 || quantity % 100 !== 0) {
+      return NextResponse.json({ error: "quantity must be positive multiple of 100 (1手=100股)" }, { status: 400 });
     }
 
-    // 验证是否在交易时间外（盘后下单）
     const now = new Date();
     const timeStr = now.toTimeString().slice(0, 8);
-    const MORNING_START = "09:30:00", MORNING_END = "11:30:00";
-    const AFTERNOON_START = "13:00:00", AFTERNOON_END = "15:00:00";
-    const isDuringTradingHours =
-      (timeStr >= MORNING_START && timeStr <= MORNING_END) ||
-      (timeStr >= AFTERNOON_START && timeStr <= AFTERNOON_END);
+    const dayOfWeek = now.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-    if (isDuringTradingHours) {
+    if (isWeekend) {
+      return NextResponse.json({ error: "周末休市，请等待周一 09:30", code: "WEEKEND" }, { status: 400 });
+    }
+
+    if (timeStr >= "15:00:00") {
       return NextResponse.json({
-        error: "盘后下单规则：请在 15:00 后下单，收盘价统一成交",
-        code: "DURING_TRADING_HOURS",
+        error: "已过下单时间（15:00），当日无法再下单，请等待明日 09:30",
+        code: "AFTER_DEADLINE",
       }, { status: 400 });
     }
 
-    // 找当前比赛
+    const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
+
     const competition = await prisma.competition.findFirst({
       where: { status: "RUNNING" },
       orderBy: { createdAt: "desc" },
     });
     if (!competition) return NextResponse.json({ error: "no running competition" }, { status: 404 });
 
-    // 找持仓
     const portfolio = await prisma.portfolio.findUnique({
       where: { agentId_competitionId: { agentId: agent.id, competitionId: competition.id } },
       include: { positions: true },
     });
-    if (!portfolio) return NextResponse.json({ error: "not enrolled" }, { status: 403 });
+    if (!portfolio) return NextResponse.json({ error: "未参加当前赛季" }, { status: 403 });
 
-    // 检查当天是否已有挂单
-    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
-    const existingOrder = await prisma.order.findFirst({
-      where: { portfolioId: portfolio.id, submittedAt: { gte: todayStart, lte: todayEnd }, status: "PENDING" },
-    });
-    if (existingOrder) {
-      return NextResponse.json({
-        error: `今日已有挂单：${existingOrder.side} ${existingOrder.symbol} ${existingOrder.quantity}手，请先取消后再提交`,
-        code: "DAILY_ORDER_EXISTS",
-      }, { status: 409 });
-    }
-
-    // SELL 校验：检查是否有持仓
+    // ── 卖出规则（无限制）──────────────────────────────
     if (upperSide === "SELL") {
       const pos = portfolio.positions.find(p => p.symbol === symbol);
       if (!pos || pos.quantity < quantity) {
         return NextResponse.json({
-          error: `持仓不足。当前${symbol}持仓${pos?.quantity ?? 0}股，拟卖出${quantity}股`,
-          code: "INSUFFICIENT_POSITION",
+          error: `持仓不足：${symbol} 当前持仓 ${pos?.quantity ?? 0} 股，拟卖出 ${quantity} 股`,
+          code: "INSUFFICIENT",
         }, { status: 400 });
       }
+      const order = await prisma.order.create({
+        data: {
+          agentId: agent.id,
+          competitionId: competition.id,
+          portfolioId: portfolio.id,
+          symbol,
+          side: "SELL",
+          quantity,
+          note: note || null,
+          status: "PENDING",
+        },
+      });
+      return NextResponse.json({
+        ...order,
+        message: "卖出挂单已提交，将于今日收盘后以收盘价成交",
+      }, { status: 201 });
     }
 
-    // BUY 校验：检查是否已有持仓（非卖同一只则拒绝）
-    if (upperSide === "BUY") {
-      const existingPositions = portfolio.positions.filter(p => p.quantity > 0);
-      if (existingPositions.length > 0) {
-        const held = existingPositions[0];
-        if (held.symbol !== symbol) {
-          return NextResponse.json({
-            error: `单股规则：当前已持仓 ${held.symbol}，每天只能买一只股票`,
-            code: "SINGLE_STOCK_VIOLATION",
-          }, { status: 400 });
-        }
-      }
+    // ── 买入规则（每天1次，撤单后可重买）─────────────
+    // 检查今日是否已有成交的买单（含撤单后重买：需查 TRADE 历史，不查 PENDING order）
+    const todayFilledBuy = await prisma.trade.findFirst({
+      where: {
+        agentId: agent.id,
+        side: "BUY",
+        status: "FILLED",
+        filledAt: { gte: todayStart, lte: todayEnd },
+      },
+    });
+
+    if (todayFilledBuy) {
+      return NextResponse.json({
+        error: `今日已买入：${todayFilledBuy.symbol}（${todayFilledBuy.quantity}股 @ ${todayFilledBuy.executedPrice}），每天最多买入1次，请明日再买`,
+        code: "DAILY_BUY_LIMIT",
+      }, { status: 400 });
     }
 
-    // 写入挂单
+    // 检查是否有持仓（非本日买入）：T+1 限制
+    const existingPositions = portfolio.positions.filter(p => p.quantity > 0);
+    if (existingPositions.length > 0) {
+      const held = existingPositions[0];
+      return NextResponse.json({
+        error: `T+1 限制：当前持有 ${held.symbol}，最早明日才可卖出换股`,
+        code: "T1_RESTRICTION",
+      }, { status: 400 });
+    }
+
+    // 通过所有校验，写入挂单
     const order = await prisma.order.create({
       data: {
         agentId: agent.id,
         competitionId: competition.id,
         portfolioId: portfolio.id,
         symbol,
-        side: upperSide as "BUY" | "SELL",
+        side: "BUY",
         quantity,
         note: note || null,
         status: "PENDING",
@@ -151,7 +172,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ...order,
-      message: "挂单已提交，将于今日收盘后以收盘价统一成交",
+      message: "买入挂单已提交，将于今日收盘后以收盘价成交。15:00 前可撤销重新购买。",
     }, { status: 201 });
 
   } catch (e) {
@@ -160,17 +181,22 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE: 取消当日挂单
+// DELETE: 撤销当日挂单（15:00 前有效）
 export async function DELETE(req: NextRequest) {
   const apiKey = req.headers.get("X-API-Key") || "";
   const agent = await validateAgent(apiKey);
   if (!agent) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
+  const now = new Date();
+  if (now.toTimeString().slice(0, 8) >= "15:00:00") {
+    return NextResponse.json({ error: "15:00 后无法撤销挂单", code: "AFTER_DEADLINE" }, { status: 400 });
+  }
+
   const orderId = req.nextUrl.searchParams.get("orderId");
   if (!orderId) return NextResponse.json({ error: "orderId required" }, { status: 400 });
 
   const order = await prisma.order.findUnique({ where: { id: orderId } });
-  if (!order) return NextResponse.json({ error: "order not found" }, { status: 404 });
+  if (!order) return NextResponse.json({ error: "not found" }, { status: 404 });
   if (order.agentId !== agent.id) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   if (order.status !== "PENDING") return NextResponse.json({ error: "order already processed" }, { status: 400 });
 
@@ -179,5 +205,5 @@ export async function DELETE(req: NextRequest) {
     data: { status: "CANCELLED" },
   });
 
-  return NextResponse.json({ message: "挂单已取消" });
+  return NextResponse.json({ message: "挂单已撤销，当日可重新提交新的买入挂单" });
 }

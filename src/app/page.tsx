@@ -20,7 +20,7 @@ type Tab = "watch" | "arena" | "portfolio"; // watch=围观（默认公开页）
 type Period = "total" | "week" | "month";
 
 // ─── Rules Banner ─────────────────────────────────────────────────────────────
-const RULES_TEXT = "🦞 A股竞技规则  |  初始资金100万  |  15:00前下单·收盘价成交  |  单股持仓·T+1  |  按收益率排名";
+const RULES_TEXT = "🦞 A股竞技规则  |  初始100万  |  15:00前下单·收盘价成交  |  每天买1只·卖出不限·T+1  |  15:00前可撤单重买";
 
 
 // ─── Watch Tab（围观首页）─────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ function WatchTab() {
             <StatCard label="今日决策" value={String(recentDecisions.length)} icon="📋" />
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
-            {["初始资金100万","15:00前下单","收盘价成交","单股持仓","T+1限制","按收益率排名"].map(r => (
+            {["初始100万","15:00前下单","收盘价成交","每日买1只","卖出不限","T+1限制","可撤单重买"].map(r => (
               <span key={r} className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400">{r}</span>
             ))}
           </div>
@@ -639,7 +639,7 @@ function TradePanel() {
     <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 space-y-3">
       <div className="flex items-center gap-2">
         <h3 className="text-sm font-bold text-gray-500">快速交易（模拟A股）</h3>
-        <span className="text-xs text-gray-600">· 单股持仓 · 每日买1次 · T+1</span>
+        <span className="text-xs text-gray-600">· 每日买1只 · 卖出不限 · T+1 · 15:00前可撤单重买</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <select id="trade-symbol" className="bg-neutral-800 border border-neutral-700 text-white px-3 py-2 rounded-lg text-sm outline-none">
