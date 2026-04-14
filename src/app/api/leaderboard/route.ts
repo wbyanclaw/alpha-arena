@@ -11,9 +11,17 @@ function getPeriodStart(period: string): Date | null {
     return d;
   }
   if (period === "month") {
-    const d = new Date(now);
-    d.setDate(1); d.setHours(0, 0, 0, 0);
+    const d = new Date(now); d.setDate(1); d.setHours(0, 0, 0, 0);
     return d;
+  }
+  if (period === "season") {
+    const d = new Date(now);
+    const q = Math.floor(d.getMonth() / 3);
+    d.setMonth(q * 3, 1); d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  if (period === "year") {
+    return new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
   }
   return null;
 }
@@ -27,13 +35,12 @@ export async function GET(req: NextRequest) {
   const competition = competitionId
     ? await prisma.competition.findUnique({ where: { id: competitionId } })
     : await prisma.competition.findFirst({
-        where: { status: "RUNNING", market },
+        where: { market },
         orderBy: { createdAt: "desc" },
       });
 
   if (!competition) return NextResponse.json({ error: "no competition found" }, { status: 404 });
 
-  // 批量拉取所有参赛组合
   const portfolios = await prisma.portfolio.findMany({
     where: { competitionId: competition.id },
     include: {
@@ -59,58 +66,32 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ competition, period, leaderboard: [], updatedAt: new Date().toISOString() });
   }
 
-  // 批量查 lobster（解决 N+1）
   const agentIds = portfolios.map(p => p.agentId);
-  const lobsters = await prisma.lobster.findMany({
-    where: { agentId: { in: agentIds } },
-  });
+  const lobsters = await prisma.lobster.findMany({ where: { agentId: { in: agentIds } } });
   const lobsterMap = new Map(lobsters.map(l => [l.agentId, l]));
 
-  // 批量查所有相关行情
-  const allSymbols = [...new Set([
-    ...portfolios.flatMap(p => p.positions.map(pos => pos.symbol)),
-    ...portfolios.flatMap(p => p.orders.filter(o => o.status === "PENDING").map(o => o.symbol)),
-  ])];
-  const prices = allSymbols.length > 0
-    ? await prisma.price.findMany({ where: { symbol: { in: allSymbols } } })
-    : [];
+  const allSymbols = portfolios.flatMap(p => p.positions.map(pos => pos.symbol));
+  const prices = allSymbols.length > 0 ? await prisma.price.findMany({ where: { symbol: { in: allSymbols } } }) : [];
   const priceMap = new Map(prices.map(p => [p.symbol, p]));
 
-  // 批量查今日挂单
-  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
-  const todayOrders = await prisma.order.findMany({
-    where: {
-      portfolioId: { in: portfolios.map(p => p.id) },
-      submittedAt: { gte: todayStart, lte: todayEnd },
-      status: "PENDING",
-    },
-  });
-  const todayOrderMap = new Map(todayOrders.map(o => [o.portfolioId, o]));
-
-  // 批量查所有相关 agent 的 period trades
   const periodStart = getPeriodStart(period);
-  const periodTrades = periodStart
-    ? await prisma.trade.findMany({
-        where: {
-          agentId: { in: agentIds },
-          status: "FILLED",
-          filledAt: { gte: periodStart },
-        },
-        orderBy: { filledAt: "asc" },
+  const periodStartStr = periodStart ? periodStart.toISOString().slice(0, 10) : null;
+
+  // 批量查 period 起始的结算快照
+  const settlementStarts = periodStartStr
+    ? await prisma.dailySettlement.findMany({
+        where: { portfolioId: { in: portfolios.map(p => p.id) }, date: { lte: periodStartStr } },
+        orderBy: { date: "desc" },
       })
     : [];
-
-  const tradesByAgent = new Map<string, typeof periodTrades>();
-  for (const t of periodTrades) {
-    if (!tradesByAgent.has(t.agentId)) tradesByAgent.set(t.agentId, []);
-    tradesByAgent.get(t.agentId)!.push(t);
+  // 取每个 portfolio 最新的一条
+  const startValueMap = new Map<string, number>();
+  for (const s of settlementStarts) {
+    if (!startValueMap.has(s.portfolioId)) startValueMap.set(s.portfolioId, s.totalValue);
   }
 
   const leaderboard = portfolios.map((p) => {
     const lobster = lobsterMap.get(p.agentId) ?? null;
-
-    // Enrich positions
     const enrichedPositions = p.positions.map(pos => {
       const priceRec = priceMap.get(pos.symbol);
       return { ...pos, currentPrice: priceRec?.price ?? pos.avgCost };
@@ -123,40 +104,18 @@ export async function GET(req: NextRequest) {
       (sum, pos) => sum + pos.currentPrice * pos.quantity, 0
     );
 
-    // Period return
-    let returnPct: number;
-    if (periodStart) {
-      const agentTrades = tradesByAgent.get(p.agentId) ?? [];
-      let simCash = competition.initialCash;
-      let simPosition = 0;
-      let lastPrice = enrichedPositions[0]?.currentPrice ?? 0;
-
-      for (const t of agentTrades) {
-        const px = t.executedPrice ?? 0;
-        lastPrice = px;
-        if (t.side === "BUY" && simPosition === 0) {
-          simPosition = t.quantity;
-          simCash -= px * t.quantity + (t.commission ?? 0) + (t.transferFee ?? 0);
-        } else if (t.side === "SELL" && simPosition > 0) {
-          simCash += px * t.quantity - (t.commission ?? 0) - (t.stampTax ?? 0) - (t.transferFee ?? 0);
-          simPosition = 0;
-        }
-      }
-
-      const finalValue = simCash + simPosition * lastPrice;
-      returnPct = ((finalValue / competition.initialCash) - 1) * 100;
-    } else {
-      returnPct = ((totalValue / competition.initialCash) - 1) * 100;
-    }
+    const startValue = startValueMap.get(p.id) ?? competition.initialCash;
+    const returnPct = ((totalValue / startValue) - 1) * 100;
 
     const latestDelivery = p.agent.deliveries[0] ?? null;
+    const todayOrder = p.orders[0] ?? null;
 
     return {
       rank: 0,
       agent: { id: p.agent.id, name: p.agent.name, avatar: p.agent.avatar },
       lobsterKey: lobster?.key ?? null,
       lobsterName: lobster?.name ?? p.agent.name,
-        lobsterColor: lobster?.color ?? null,
+      lobsterColor: lobster?.color ?? null,
       totalValue: Math.round(totalValue * 100) / 100,
       cash: Math.round(p.cash * 100) / 100,
       returnPct: Math.round(returnPct * 100) / 100,
@@ -171,12 +130,13 @@ export async function GET(req: NextRequest) {
         quantity: latestDelivery.quantity,
         deliveredAt: latestDelivery.deliveredAt,
       } : null,
-      todayOrder: todayOrderMap.get(p.id) ? {
-        symbol: todayOrderMap.get(p.id)!.symbol,
-        side: todayOrderMap.get(p.id)!.side,
-        quantity: todayOrderMap.get(p.id)!.quantity,
-        note: todayOrderMap.get(p.id)!.note,
-        submittedAt: todayOrderMap.get(p.id)!.submittedAt,
+      todayOrder: todayOrder ? {
+        symbol: todayOrder.symbol,
+        side: todayOrder.side,
+        quantity: todayOrder.quantity,
+        note: todayOrder.note,
+        submittedAt: todayOrder.submittedAt,
+        status: todayOrder.status,
       } : null,
       positions: enrichedPositions.map(pos => ({
         symbol: pos.symbol,

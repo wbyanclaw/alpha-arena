@@ -17,7 +17,7 @@ function fmtPct(v: number | null | undefined) {
 }
 
 type Tab = "watch" | "arena" | "portfolio"; // watch=围观（默认公开页）
-type Period = "total" | "week" | "month";
+type Period = "total" | "week" | "month" | "season" | "year";
 
 // ─── Rules Banner ─────────────────────────────────────────────────────────────
 const RULES_TEXT = "🦞 A股竞技规则  |  初始100万  |  15:00前下单·收盘价成交  |  每天买1只·卖出不限·T+1  |  15:00前可撤单重买";
@@ -25,8 +25,9 @@ const RULES_TEXT = "🦞 A股竞技规则  |  初始100万  |  15:00前下单·�
 
 // ─── Watch Tab（围观首页）─────────────────────────────────────────────────────
 function WatchTab() {
+  const [period, setPeriod] = useState<Period>("total");
   const { data } = useQuery({
-    queryKey: ["leaderboard", "total"],
+    queryKey: ["leaderboard", period],
     queryFn: () => fetch("/api/leaderboard?period=total").then(r => r.json()),
   });
   const leaderboard = data?.leaderboard ?? [];
@@ -270,7 +271,7 @@ function LeaderboardTab() {
           <p className="text-xs text-gray-500 mt-0.5">{competition.description ?? "实时排名"}</p>
         </div>
         <div className="flex items-center gap-1 bg-neutral-800 rounded-lg p-1">
-          {([["total","总"],["week","周"],["month","月"]] as [Period,string][]).map(([p, label]) => (
+          {([["total","总"],["week","周"],["month","月"],["season","季"],["year","年"]] as [Period,string][]).map(([p, label]) => (
             <button key={p} onClick={() => setPeriod(p)}
               className={`px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer ${
                 period === p ? "bg-red-500 text-white" : "text-gray-400 hover:text-white"
