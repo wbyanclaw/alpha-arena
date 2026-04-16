@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/deliveries?agentId=xxx&period=total
 export async function GET(req: NextRequest) {
   const agentId = req.nextUrl.searchParams.get("agentId");
   const period = req.nextUrl.searchParams.get("period") || "total";
@@ -10,7 +9,6 @@ export async function GET(req: NextRequest) {
   if (!agentId) return NextResponse.json({ error: "need agentId" }, { status: 400 });
 
   try {
-    // Period filter
     let periodStart: Date | null = null;
     if (period !== "total") {
       const now = new Date();
@@ -27,71 +25,58 @@ export async function GET(req: NextRequest) {
     }
 
     const deliveries = await prisma.delivery.findMany({
-      where: {
-        agentId,
-        ...(periodStart ? { deliveredAt: { gte: periodStart } } : {}),
-      },
+      where: { agentId, ...(periodStart ? { deliveredAt: { gte: periodStart } } : {}) },
       orderBy: { deliveredAt: "desc" },
       take: limit,
     });
 
     if (deliveries.length === 0) {
-      return NextResponse.json({ agentId, period, deliveries: [], realizedPct: 0 });
+      return NextResponse.json({ agentId, period, deliveries: [] });
     }
 
-    // Build cost basis map: keep running avg cost per symbol
     const prices = await prisma.price.findMany();
     const priceMap = new Map(prices.map(p => [p.symbol, p]));
-    const symbolSet = new Set(deliveries.map(d => d.symbol));
-    const symbolArr = [...symbolSet];
 
-    const trades = await prisma.trade.findMany({
-      where: { agentId, status: "FILLED", symbol: { in: symbolArr } },
-      orderBy: { filledAt: "asc" },
-    });
-
-    // Build running cost per symbol as of each trade
-    // costAt[symbol] = avgCost after processing all trades up to that point
-    const costAt = new Map<string, { qty: number; cost: number }>();
-    let lastCost = new Map<string, number>();
-
-    for (const t of trades) {
-      if (t.side === "BUY") {
-        const prev = costAt.get(t.symbol) ?? { qty: 0, cost: 0 };
-        const newQty = prev.qty + t.quantity;
-        const newCost = (prev.cost * prev.qty + (t.executedPrice ?? t.price) * t.quantity) / newQty;
-        costAt.set(t.symbol, { qty: newQty, cost: newCost });
-        lastCost.set(t.symbol, newCost);
-      } else {
-        const prev = costAt.get(t.symbol) ?? { qty: 0, cost: 0 };
-        const newQty = Math.max(0, prev.qty - t.quantity);
-        costAt.set(t.symbol, { qty: newQty, cost: prev.cost });
-        lastCost.set(t.symbol, prev.cost);
-      }
-    }
-
-    // Current cost basis (for stocks still held)
-    const currentCost = new Map<string, number>();
-    for (const sym of symbolArr) {
-      currentCost.set(sym, costAt.get(sym)?.cost ?? lastCost.get(sym) ?? 0);
-    }
+    // FIFO queue: BUY adds to queue, SELL consumes from queue
+    const buyQueue: Array<{ price: number; qty: number }> = [];
 
     const result = deliveries.map(d => {
-      const priceInfo = priceMap.get(d.symbol);
-      const cost = currentCost.get(d.symbol) ?? d.price;
-      const curPrice = priceInfo?.price ?? d.price;
+      const curPrice = priceMap.get(d.symbol)?.price ?? d.price;
 
-      return {
-        ...d,
-        name: priceInfo?.name ?? d.symbol,
-        cost: Math.round(cost * 100) / 100,
-        // BUY not yet sold: show current price; SELL: show selling price
-        settlePrice: d.side === "SELL" ? d.price : curPrice,
-        // For BUY: unrealized return; for SELL: realized return
-        returnPct: d.side === "SELL"
-          ? Math.round(((d.price - cost) / cost) * 10000) / 100
-          : Math.round(((curPrice - cost) / cost) * 10000) / 100,
-      };
+      if (d.side === "BUY") {
+        // BUY: use its own price as cost basis
+        buyQueue.push({ price: d.price, qty: d.quantity });
+        return {
+          ...d,
+          name: priceMap.get(d.symbol)?.name ?? d.symbol,
+          cost: Math.round(d.price * 100) / 100,
+          settlePrice: Math.round(curPrice * 100) / 100,
+          returnPct: null,
+        };
+      } else {
+        // SELL: FIFO match against queued buys
+        let remain = d.quantity;
+        const matched: Array<{ price: number; qty: number }> = [];
+        while (remain > 0 && buyQueue.length > 0) {
+          const b = buyQueue[0];
+          const m = Math.min(remain, b.qty);
+          matched.push({ price: b.price, qty: m });
+          b.qty -= m;
+          remain -= m;
+          if (b.qty <= 0) buyQueue.shift();
+        }
+        const totalCost = matched.reduce((s, x) => s + x.price * x.qty, 0);
+        const totalQty = matched.reduce((s, x) => s + x.qty, 0);
+        const avgCost = totalQty > 0 ? totalCost / totalQty : d.price;
+
+        return {
+          ...d,
+          name: priceMap.get(d.symbol)?.name ?? d.symbol,
+          cost: Math.round(avgCost * 100) / 100,
+          settlePrice: Math.round(d.price * 100) / 100,
+          returnPct: Math.round((d.price - avgCost) / avgCost * 100 * 100) / 100,
+        };
+      }
     });
 
     return NextResponse.json({ agentId, period, deliveries: result });
