@@ -35,7 +35,7 @@ export default function SettlementChart({ lobsterKey }: { lobsterKey: string }) 
     <div className="bg-black/20 rounded-xl p-3 border border-neutral-800">
       <div className="flex justify-between items-center mb-2">
         <span className="text-xs text-gray-500">收益率曲线</span>
-        <span className="text-xs font-mono font-bold" style={{ color: (data?.periodReturn ?? 0) >= 0 ? "#ff3333" : "#00ff66" }}>
+        <span className="text-xs font-mono font-bold" style={{ color: (data?.periodReturn ?? 0) >= 0 ? "#00ff66" : "#ff3333" }}>
           {fmtPct(data?.periodReturn)}
         </span>
       </div>
