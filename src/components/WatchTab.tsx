@@ -21,14 +21,15 @@ function RankBadge({ rank }: { rank: number }) {
 
 function ActionBadge({ order }: { order: any }) {
   if (!order) return null;
+  const isPending = order.status === "PENDING";
   return (
-    <span className={"text-xs font-bold " + (order.side === "BUY" ? "text-red-400" : "text-blue-400")}>
-      {order.side === "BUY" ? "买入" : "卖出"} {order.symbol}
+    <span className={"text-xs font-bold flex items-center gap-1 " + (order.side === "BUY" ? "text-red-400" : "text-blue-400")}>
+      <span>{order.side === "BUY" ? "买入" : "卖出"} {order.symbol}</span>
+      {isPending && <span className="text-xs font-bold text-amber-400 bg-amber-400/10 border border-amber-400/30 px-1 rounded">挂单</span>}
     </span>
   );
 }
 
-// ─── Agent Row: compact leaderboard row ───────────────────────────────────────
 function AgentRow({ entry, onClick }: { entry: any; onClick: () => void }) {
   return (
     <div onClick={onClick} className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-800/60 cursor-pointer border-b border-neutral-800/50 last:border-0 transition-colors">
