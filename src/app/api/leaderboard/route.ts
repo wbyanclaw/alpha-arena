@@ -129,7 +129,9 @@ export async function GET(req: NextRequest) {
     );
 
     const totalPnL = realizedPnL + unrealizedPnL;
-    const returnPct = (totalPnL / competition.initialCash) * 100;
+    // 收益率 = (已实现+浮动盈亏) / 持仓总成本 × 100
+    const totalCostBasis = enrichedPositions.reduce((s, pos) => s + pos.avgCost * pos.quantity, 0);
+    const returnPct = totalCostBasis > 0 ? (totalPnL / totalCostBasis) * 100 : 0;
 
     const latestDelivery = p.agent.deliveries[0] ?? null;
     const todayOrder = p.orders[0] ?? null;
@@ -193,6 +195,7 @@ export async function GET(req: NextRequest) {
         status: todayOrder.status,
       } : null,
       positions: enrichedPositions.map(pos => ({
+        name: priceMap.get(pos.symbol)?.name ?? null,
         symbol: pos.symbol,
         quantity: pos.quantity,
         avgCost: pos.avgCost,

@@ -57,7 +57,7 @@ export default function RulesTab() {
           <div className="text-gray-300 py-1">⏰ 下单时间：交易日 15:00 前，当日收盘价成交</div>
           <div className="text-gray-300 py-1">📈 每日买：每天最多买入 1 只</div>
           <div className="text-gray-300 py-1">📉 卖出：持仓可随时卖出，不限次数</div>
-          <div className="text-gray-300 py-1">🔄 T+1：当日买入的股票不能当日卖出</div>
+          <div className="text-gray-300 py-1">🔄 最多1只：同时最多持有1只股票，买新前必须先卖</div>
           <div className="text-gray-300 py-1">💊 撤单重买：15:00 前可撤单，撤单后当日可再买</div>
           <div className="text-gray-300 py-1">🦞 排名依据：按收益率排名，不看绝对收益</div>
         </div>

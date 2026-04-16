@@ -146,14 +146,17 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // 检查是否有持仓（非本日买入）：T+1 限制
+    // 最多1只持仓：新买必须先卖（可以加仓同一只）
     const existingPositions = portfolio.positions.filter(p => p.quantity > 0);
     if (existingPositions.length > 0) {
       const held = existingPositions[0];
-      return NextResponse.json({
-        error: `T+1 限制：当前持有 ${held.symbol}，最早明日才可卖出换股`,
-        code: "T1_RESTRICTION",
-      }, { status: 400 });
+      if (held.symbol !== symbol) {
+        return NextResponse.json({
+          error: `已有持仓 ${held.symbol}，需先卖出才能买入其他股票`,
+          code: "POSITION_LIMIT",
+        }, { status: 400 });
+      }
+      // 同品种：允许加仓（不进入这个分支）
     }
 
     // 通过所有校验，写入挂单

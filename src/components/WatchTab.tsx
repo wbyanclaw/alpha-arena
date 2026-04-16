@@ -51,7 +51,9 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2 text-xs text-gray-400">
-  <span className="text-gray-600 text-xs">持仓中</span>
+  {entry.positions?.length > 0
+                  ? <span className="text-xs text-gray-400">{entry.positions[0].name ?? entry.positions[0].symbol}</span>
+                  : <span className="text-gray-600 text-xs">空仓</span>}
       </div>
       {entry.todayOrder && (
         <div className={"mt-2 text-xs font-bold " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
@@ -85,7 +87,7 @@ function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
 
       {/* Holdings indicator */}
       <div className="text-xs text-gray-500">
-        {entry.positions?.length > 0 ? "持仓中" : "空仓"}
+        {entry.positions?.length > 0 ? (entry.positions[0].name ?? entry.positions[0].symbol) : "空仓"}
       </div>
 
       {/* Chart toggle */}
