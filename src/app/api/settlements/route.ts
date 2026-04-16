@@ -23,46 +23,22 @@ export async function GET(req: NextRequest) {
         .map(s => ({ date: s.date, totalValue: s.totalValue, returnPct: s.returnPct }));
     }
 
-    // 如果只有历史快照，补一个今日点（用实时价格）
+    // 用 portfolio 真实持仓 + 实时价格，生成今日数据点
     const today = new Date().toISOString().slice(0, 10);
     const lastSettlement = settlements[settlements.length - 1];
-    if (!lastSettlement || lastSettlement.date !== today) {
-      // 从 trade 重建当前组合
-      const trades = await prisma.trade.findMany({
-        where: { agentId, status: "FILLED" },
-        orderBy: { filledAt: "asc" },
-      });
+
+    if (portfolio) {
       const prices = await prisma.price.findMany();
       const priceMap = new Map(prices.map(p => [p.symbol, p]));
 
-      let simCash = 1000000;
-      const posMap = new Map<string, { qty: number; cost: number }>();
-
-      for (const t of trades) {
-        const px = t.executedPrice ?? t.price;
-        if (t.side === "BUY") {
-          const ex = posMap.get(t.symbol);
-          if (ex) {
-            const newQty = ex.qty + t.quantity;
-            ex.cost = (ex.cost * ex.qty + px * t.quantity) / newQty;
-            ex.qty = newQty;
-          } else {
-            posMap.set(t.symbol, { qty: t.quantity, cost: px });
-          }
-        } else {
-          const ex = posMap.get(t.symbol);
-          if (ex) { ex.qty -= t.quantity; if (ex.qty <= 0) posMap.delete(t.symbol); }
-        }
+      let curValue = portfolio.cash;
+      const positions = await prisma.position.findMany({ where: { portfolioId: portfolio.id } });
+      for (const pos of positions) {
+        const curPx = priceMap.get(pos.symbol)?.price ?? pos.avgCost;
+        curValue += curPx * pos.quantity;
       }
 
-      // 计算当前总市值
-      let curValue = simCash;
-      for (const [sym, pos] of posMap) {
-        const curPx = priceMap.get(sym)?.price ?? pos.cost;
-        curValue += curPx * pos.qty;
-      }
-
-      const todayReturn = ((curValue / 1000000) - 1) * 100;
+      const todayReturn = ((curValue / portfolio.totalValue) - 1) * 100;
       settlements.push({
         date: today,
         totalValue: Math.round(curValue * 100) / 100,
