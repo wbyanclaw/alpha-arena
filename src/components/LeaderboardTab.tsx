@@ -78,7 +78,7 @@ function LeaderboardTable({ period }: { period: Period }) {
                   : <span className="text-gray-600 text-sm">空仓</span>
                 }
               </td>
-              <td className="px-4 py-3 text-right font-mono text-sm font-bold" style={{ color: entry.returnPct >= 0 ? "#00ff66" : "#ff3333" }}>
+              <td className="px-4 py-3 text-right font-mono text-sm font-bold" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
                 {fmtPct(entry.returnPct)}
               </td>
             </tr>

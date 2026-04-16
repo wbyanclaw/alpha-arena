@@ -44,7 +44,7 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
           )}
         </div>
         <div className="text-right">
-          <div className="text-xl font-black" style={{ color: entry.returnPct >= 0 ? "#00ff66" : "#ff3333" }}>
+          <div className="text-xl font-black" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
             {fmtPct(entry.returnPct)}
           </div>
           <div className="text-xs text-gray-500">累计收益</div>
@@ -179,7 +179,7 @@ export default function WatchTab({ onAgentClick, selectedAgent }: WatchTabProps)
             <div key={idx} className={"rounded-xl border p-4 text-center " + (idx === 0 ? "bg-yellow-500/10 border-yellow-500/30" : idx === 1 ? "bg-gray-500/10 border-gray-500/20" : "bg-orange-500/10 border-orange-500/20")}>
               <div className="text-2xl mb-1">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}</div>
               <div className="font-black text-white text-sm truncate">{entry.agent?.name ?? "—"}</div>
-              <div className="text-xl font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#00ff66" : "#ff3333" }}>{fmtPct(entry.returnPct)}</div>
+              <div className="text-xl font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>{fmtPct(entry.returnPct)}</div>
               <div className="text-xs text-gray-500 mt-0.5">累计收益</div>
             </div>
           ))}
