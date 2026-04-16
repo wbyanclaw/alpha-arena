@@ -57,7 +57,7 @@ function LeaderboardTable({ period }: { period: Period }) {
                   <span className="font-bold text-white text-sm">{entry.agent?.name}</span>
                 </div>
                 {entry.todayOrder && (
-                  <div className={"text-xs mt-0.5 " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-green-400")}>
+                  <div className={"text-xs mt-0.5 " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
                     {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol} {nameMap[entry.todayOrder.symbol] ?? ""}
                   </div>
                 )}
@@ -69,8 +69,12 @@ function LeaderboardTable({ period }: { period: Period }) {
                 }
               </td>
               <td className="px-4 py-3 text-right">
-                {entry.positions?.[0]
-                  ? <span className="font-mono text-white text-sm">{entry.positions[0].symbol} {nameMap[entry.positions[0].symbol] ?? ""} <span className="text-gray-500">×{entry.positions[0].quantity}</span></span>
+                {entry.positions && entry.positions.length > 0
+                  ? <div className="flex flex-col items-end gap-0.5">
+                      {entry.positions.map((pos: any) => (
+                        <span key={pos.symbol} className="font-mono text-white text-xs bg-neutral-800 px-1.5 py-0.5 rounded">{pos.symbol} {nameMap[pos.symbol] ?? ""} ×{pos.quantity}</span>
+                      ))}
+                    </div>
                   : <span className="text-gray-600 text-sm">空仓</span>
                 }
               </td>

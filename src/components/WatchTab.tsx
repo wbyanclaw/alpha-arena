@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import SettlementChart from "./SettlementChart";
 import DeliveryList from "./DeliveryList";
 
-type Period = "total" | "week" | "month" | "season" | "year";
-
 function fmtPct(v: number | null | undefined) {
   if (v == null) return "—%";
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
@@ -46,13 +44,13 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
           )}
         </div>
         <div className="text-right">
-          <div className="text-xl font-black" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
+          <div className="text-xl font-black" style={{ color: entry.returnPct >= 0 ? "#00ff66" : "#ff3333" }}>
             {fmtPct(entry.returnPct)}
           </div>
           <div className="text-xs text-gray-500">累计收益</div>
         </div>
       </div>
-      <div className="flex gap-2 text-xs text-gray-400">
+      <div className="flex flex-wrap gap-2 text-xs text-gray-400">
         {entry.positions?.map((pos: any) => (
           <span key={pos.symbol} className="bg-neutral-800 px-2 py-1 rounded">
             {pos.symbol} {nameMap[pos.symbol] ?? ""} ×{pos.quantity}
@@ -63,7 +61,7 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
         )}
       </div>
       {entry.todayOrder && (
-        <div className={"mt-2 text-xs font-bold " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-green-400")}>
+        <div className={"mt-2 text-xs font-bold " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
           {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol} {nameMap[entry.todayOrder.symbol] ?? ""}
           {entry.todayOrder.note && <span className="text-gray-500 ml-1">· {entry.todayOrder.note}</span>}
         </div>
@@ -74,15 +72,7 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
 
 // ─── Agent Detail Panel ────────────────────────────────────────────────────────
 function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
-  const [period, setPeriod] = useState<Period>("total");
-
-  const periodLabels: Record<Period, string> = {
-    total: "累计",
-    week: "本周",
-    month: "本月",
-    season: "本季",
-    year: "本年",
-  };
+  const [showChart, setShowChart] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -100,24 +90,6 @@ function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
         <button onClick={onClose} className="text-gray-500 hover:text-white cursor-pointer text-lg">✕</button>
       </div>
 
-      {/* Period tabs */}
-      <div className="flex gap-2 flex-wrap">
-        {(["total","week","month","season","year"] as Period[]).map(p => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition ${
-              period === p ? "bg-red-500 text-white" : "bg-neutral-800 text-gray-400 hover:text-white"
-            }`}
-          >
-            {periodLabels[p]}
-          </button>
-        ))}
-      </div>
-
-      {/* Chart */}
-      <SettlementChart lobsterKey={entry.lobsterKey} />
-
       {/* Holdings */}
       <div>
         <p className="text-xs font-bold text-gray-500 mb-2">当前持仓</p>
@@ -133,6 +105,19 @@ function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
           )}
         </div>
       </div>
+
+      {/* Chart toggle */}
+      {entry.lobsterKey && (
+        <div>
+          <button
+            onClick={() => setShowChart(v => !v)}
+            className="text-xs text-gray-500 hover:text-white cursor-pointer mb-2 flex items-center gap-1"
+          >
+            <span>{showChart ? "▼" : "▶"}</span> 收益曲线
+          </button>
+          {showChart && <SettlementChart lobsterKey={entry.lobsterKey} />}
+        </div>
+      )}
 
       {/* Delivery history */}
       <DeliveryList agentId={entry.agent?.id} />
@@ -194,7 +179,7 @@ export default function WatchTab({ onAgentClick, selectedAgent }: WatchTabProps)
             <div key={idx} className={"rounded-xl border p-4 text-center " + (idx === 0 ? "bg-yellow-500/10 border-yellow-500/30" : idx === 1 ? "bg-gray-500/10 border-gray-500/20" : "bg-orange-500/10 border-orange-500/20")}>
               <div className="text-2xl mb-1">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}</div>
               <div className="font-black text-white text-sm truncate">{entry.agent?.name ?? "—"}</div>
-              <div className="text-xl font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>{fmtPct(entry.returnPct)}</div>
+              <div className="text-xl font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#00ff66" : "#ff3333" }}>{fmtPct(entry.returnPct)}</div>
               <div className="text-xs text-gray-500 mt-0.5">累计收益</div>
             </div>
           ))}

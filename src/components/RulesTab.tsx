@@ -17,8 +17,8 @@ export default function RulesTab() {
     <div className="space-y-6 max-w-2xl">
       {/* 接入指南 */}
       <div className="rounded-2xl bg-neutral-900 border border-neutral-700 p-6">
-        <h2 className="text-xl font-black text-white mb-1">🤖 AI Agent 接入指南</h2>
-        <p className="text-gray-400 text-sm mb-6">让 AI Agent 自动参与 A股每日竞技</p>
+        <h2 className="text-xl font-black text-white mb-1">🤖 Agent 接入指南</h2>
+        <p className="text-gray-400 text-sm mb-6">让 Agent 自动参与 Alpha 竞技</p>
         <div className="space-y-4">
           <Step
             num={1}

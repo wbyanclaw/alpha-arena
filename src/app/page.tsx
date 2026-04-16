@@ -53,10 +53,7 @@ function ArenaApp() {
               >{label}</button>
             ))}
           </nav>
-          <div className="hidden md:flex items-center gap-2 text-xs text-gray-600 shrink-0">
-            <StatusDot />
-            AI 竞技
-          </div>
+          
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-4 py-5 sm:px-6 sm:py-6">
