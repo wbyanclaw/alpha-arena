@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     include: {
       agent: {
         include: {
-          deliveries: { orderBy: { deliveredAt: "desc" }, take: 1 },
+          deliveries: { orderBy: { deliveredAt: "desc" }, take: 20 },
         },
       },
       positions: true,
@@ -59,7 +59,6 @@ export async function GET(req: NextRequest) {
         take: 1,
       },
     },
-    orderBy: { totalValue: "desc" },
   });
 
   if (portfolios.length === 0) {
@@ -70,45 +69,99 @@ export async function GET(req: NextRequest) {
   const lobsters = await prisma.lobster.findMany({ where: { agentId: { in: agentIds } } });
   const lobsterMap = new Map(lobsters.map(l => [l.agentId, l]));
 
+  // 全量 trade（已成交）用于算 realized PnL
+  const trades = await prisma.trade.findMany({
+    where: { agentId: { in: agentIds }, status: "FILLED" },
+    orderBy: { filledAt: "asc" },
+  });
+  const tradesByAgent = new Map<string, typeof trades>();
+  for (const t of trades) {
+    if (!tradesByAgent.has(t.agentId)) tradesByAgent.set(t.agentId, []);
+    tradesByAgent.get(t.agentId)!.push(t);
+  }
+
   const allSymbols = portfolios.flatMap(p => p.positions.map(pos => pos.symbol));
-  const prices = allSymbols.length > 0 ? await prisma.price.findMany({ where: { symbol: { in: allSymbols } } }) : [];
+  const prices = allSymbols.length > 0
+    ? await prisma.price.findMany({ where: { symbol: { in: [...new Set(allSymbols)] } } })
+    : [];
   const priceMap = new Map(prices.map(p => [p.symbol, p]));
 
   const periodStart = getPeriodStart(period);
-  const periodStartStr = periodStart ? periodStart.toISOString().slice(0, 10) : null;
-
-  // 批量查 period 起始的结算快照
-  const settlementStarts = periodStartStr
-    ? await prisma.dailySettlement.findMany({
-        where: { portfolioId: { in: portfolios.map(p => p.id) }, date: { lte: periodStartStr } },
-        orderBy: { date: "desc" },
-      })
-    : [];
-  // 取每个 portfolio 最新的一条
-  const startValueMap = new Map<string, number>();
-  for (const s of settlementStarts) {
-    if (!startValueMap.has(s.portfolioId)) startValueMap.set(s.portfolioId, s.totalValue);
-  }
+  const periodStartStr = periodStart ? periodStart.toISOString() : null;
 
   const leaderboard = portfolios.map((p) => {
     const lobster = lobsterMap.get(p.agentId) ?? null;
+    const agentTrades = tradesByAgent.get(p.agent.id) ?? [];
+
+    // ── realized PnL：所有 SELL 的净收益之和 ──────────────
+    // 每笔 SELL 的盈亏 = (卖出价 - 对应买入均价) × 数量 - 费用
+    // 为简化，按 FIFO 匹配买卖
+    const buys: { price: number; qty: number }[] = [];
+    let realizedPnL = 0;
+
+    for (const t of agentTrades) {
+      if (t.side === "BUY") {
+        buys.push({ price: t.executedPrice ?? t.price, qty: t.quantity });
+      } else {
+        // SELL：FIFO 匹配买单
+        let remain = t.quantity;
+        const sellPrice = t.executedPrice ?? t.price;
+        const fees = (t.commission ?? 0) + (t.stampTax ?? 0) + (t.transferFee ?? 0);
+        while (remain > 0 && buys.length > 0) {
+          const b = buys[0];
+          const matched = Math.min(remain, b.qty);
+          realizedPnL += (sellPrice - b.price) * matched - fees * (matched / t.quantity);
+          b.qty -= matched;
+          remain -= matched;
+          if (b.qty <= 0) buys.shift();
+        }
+      }
+    }
+
+    // ── unrealized PnL：当前持仓浮动盈亏 ─────────────────
     const enrichedPositions = p.positions.map(pos => {
       const priceRec = priceMap.get(pos.symbol);
-      return { ...pos, currentPrice: priceRec?.price ?? pos.avgCost };
+      const currentPrice = priceRec?.price ?? pos.avgCost;
+      return { ...pos, currentPrice };
     });
-
     const unrealizedPnL = enrichedPositions.reduce(
       (sum, pos) => sum + (pos.currentPrice - pos.avgCost) * pos.quantity, 0
     );
-    const totalValue = p.cash + enrichedPositions.reduce(
-      (sum, pos) => sum + pos.currentPrice * pos.quantity, 0
-    );
 
-    const startValue = startValueMap.get(p.id) ?? competition.initialCash;
-    const returnPct = ((totalValue / startValue) - 1) * 100;
+    const totalPnL = realizedPnL + unrealizedPnL;
+    const returnPct = (totalPnL / competition.initialCash) * 100;
 
     const latestDelivery = p.agent.deliveries[0] ?? null;
     const todayOrder = p.orders[0] ?? null;
+
+    // period 过滤：只取 period 之后的交易用于 period return
+    let periodReturnPct = returnPct;
+    if (periodStartStr) {
+      const periodTrades = agentTrades.filter(t => t.filledAt && t.filledAt.toISOString() >= periodStartStr);
+      const periodPos = p.positions; // 简化：持仓按当前算，不单独处理 period 边界
+      const periodBuys: { price: number; qty: number }[] = [];
+      let pRealized = 0;
+      for (const t of periodTrades) {
+        if (t.side === "BUY") periodBuys.push({ price: t.executedPrice ?? t.price, qty: t.quantity });
+        else {
+          let remain = t.quantity;
+          const sellPrice = t.executedPrice ?? t.price;
+          const fees = (t.commission ?? 0) + (t.stampTax ?? 0) + (t.transferFee ?? 0);
+          while (remain > 0 && periodBuys.length > 0) {
+            const b = periodBuys[0];
+            const matched = Math.min(remain, b.qty);
+            pRealized += (sellPrice - b.price) * matched - fees * (matched / t.quantity);
+            b.qty -= matched;
+            remain -= matched;
+            if (b.qty <= 0) periodBuys.shift();
+          }
+        }
+      }
+      const pUnrealized = enrichedPositions.reduce(
+        (sum, pos) => sum + (pos.currentPrice - pos.avgCost) * pos.quantity, 0
+      );
+      periodReturnPct = ((pRealized + pUnrealized) / competition.initialCash) * 100;
+    }
 
     return {
       rank: 0,
@@ -116,10 +169,11 @@ export async function GET(req: NextRequest) {
       lobsterKey: lobster?.key ?? null,
       lobsterName: lobster?.name ?? p.agent.name,
       lobsterColor: lobster?.color ?? null,
-      totalValue: Math.round(totalValue * 100) / 100,
-      cash: Math.round(p.cash * 100) / 100,
-      returnPct: Math.round(returnPct * 100) / 100,
+      realizedPnL: Math.round(realizedPnL * 100) / 100,
       unrealizedPnL: Math.round(unrealizedPnL * 100) / 100,
+      totalPnL: Math.round(totalPnL * 100) / 100,
+      returnPct: Math.round(returnPct * 100) / 100,
+      periodReturnPct: Math.round(periodReturnPct * 100) / 100,
       holdingsDays: enrichedPositions[0]
         ? Math.floor((Date.now() - new Date(enrichedPositions[0].boughtAt).getTime()) / 86400000)
         : 0,
