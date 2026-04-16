@@ -53,6 +53,17 @@ export async function GET(req: NextRequest) {
       take: limit,
     });
 
+    // Add stock names
+    const symbols = [...new Set(deliveries.map(d => d.symbol))];
+    const prices = symbols.length > 0
+      ? await prisma.price.findMany({ where: { symbol: { in: symbols } } })
+      : [];
+    const priceMap = new Map(prices.map(p => [p.symbol, p.name ?? p.symbol]));
+    const deliveriesWithNames = deliveries.map(d => ({
+      ...d,
+      name: priceMap.get(d.symbol) ?? d.symbol,
+    }));
+
     // Compute period return from trades
     const trades = await prisma.trade.findMany({
       where: {
@@ -90,7 +101,7 @@ export async function GET(req: NextRequest) {
       period,
       periodReturn: Math.round(periodReturn * 100) / 100,
       tradesCount: trades.length,
-      deliveries,
+      deliveries: deliveriesWithNames,
     });
   } catch (e) {
     console.error(e);

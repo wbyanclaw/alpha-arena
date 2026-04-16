@@ -11,7 +11,6 @@ export default function DeliveryList({ agentId }: { agentId: string }) {
     queryKey: ["prices-all"],
     queryFn: () => fetch("/api/prices").then(r => r.json()),
   });
-
   const nameMap: Record<string, string> = {};
   (priceData ?? []).forEach((p: any) => { nameMap[p.symbol] = p.name; });
 
@@ -28,8 +27,9 @@ export default function DeliveryList({ agentId }: { agentId: string }) {
             <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-black ${d.side === "BUY" ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"}`}>
               {d.side === "BUY" ? "买" : "卖"}
             </span>
-            <span className="text-white">{nameMap[d.symbol] ?? d.symbol}</span>
-            <span className="text-gray-500 ml-auto text-xs">{new Date(d.deliveredAt).toLocaleDateString("zh-CN")}</span>
+            <span className="text-white flex-1">{nameMap[d.symbol] ?? d.symbol}</span>
+            <span className="text-gray-500 text-xs">{d.side === "BUY" ? "成本" : "卖出"} ¥{d.price}</span>
+            <span className="text-gray-600 text-xs">{new Date(d.deliveredAt).toLocaleDateString("zh-CN")}</span>
           </div>
         ))}
       </div>

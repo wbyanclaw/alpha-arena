@@ -27,7 +27,7 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
   });
   const nameMap: Record<string, string> = {};
   (priceData ?? []).forEach((p: any) => { nameMap[p.symbol] = p.name; });
-
+  const pos = entry.positions?.[0];
   return (
     <div
       onClick={onClick}
@@ -50,14 +50,15 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
           <div className="text-xs text-gray-500">累计收益</div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 text-xs text-gray-400">
-  {entry.positions?.length > 0
-                  ? <span className="text-xs text-gray-400">{entry.positions[0].name ?? entry.positions[0].symbol}</span>
-                  : <span className="text-gray-600 text-xs">空仓</span>}
+      <div className="text-xs text-gray-400">
+        {pos
+          ? <span>{pos.name ?? pos.symbol} 成本¥{pos.avgCost}</span>
+          : <span className="text-gray-600">空仓</span>
+        }
       </div>
       {entry.todayOrder && (
         <div className={"mt-2 text-xs font-bold " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
-          {entry.todayOrder.side === "BUY" ? "买" : "卖"} {nameMap[entry.todayOrder.symbol] ?? entry.todayOrder.symbol}
+          {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol} {nameMap[entry.todayOrder.symbol] ?? ""}
           {entry.todayOrder.note && <span className="text-gray-500 ml-1">· {entry.todayOrder.note}</span>}
         </div>
       )}
@@ -68,6 +69,7 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
 // ─── Agent Detail Panel ────────────────────────────────────────────────────────
 function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
   const [showChart, setShowChart] = useState(false);
+  const pos = entry.positions?.[0];
 
   return (
     <div className="space-y-4">
@@ -85,13 +87,23 @@ function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
         <button onClick={onClose} className="text-gray-500 hover:text-white cursor-pointer text-lg">✕</button>
       </div>
 
-      {/* Holdings indicator */}
-      <div className="text-xs text-gray-500">
-        {entry.positions?.length > 0 ? (entry.positions[0].name ?? entry.positions[0].symbol) : "空仓"}
+      {/* Holdings */}
+      <div>
+        <p className="text-xs font-bold text-gray-500 mb-2">当前持仓</p>
+        {pos
+          ? <div className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <span className="text-white">{pos.name ?? pos.symbol}</span>
+                <span className="text-gray-400">成本 ¥{pos.avgCost} → 现价 ¥{pos.currentPrice}</span>
+              </div>
+              <div className="text-xs text-gray-500">持仓收益 {fmtPct(((pos.currentPrice - pos.avgCost) / pos.avgCost) * 100)}</div>
+            </div>
+          : <div className="text-gray-600 text-sm">空仓</div>
+        }
       </div>
 
-      {/* Chart toggle */}
-      {entry.lobsterKey && (
+      {/* Chart */}
+      {entry.agent?.id && (
         <div>
           <button
             onClick={() => setShowChart(v => !v)}
@@ -99,7 +111,7 @@ function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
           >
             <span>{showChart ? "▼" : "▶"}</span> 收益曲线
           </button>
-          {showChart && <SettlementChart lobsterKey={entry.lobsterKey} />}
+          {showChart && <SettlementChart agentId={entry.agent.id} />}
         </div>
       )}
 
@@ -149,7 +161,7 @@ export default function WatchTab({ onAgentClick, selectedAgent }: WatchTabProps)
             <StatCard label="今日决策" value={String(leaderboard.filter((e: any) => e.todayOrder).length)} icon="📋" />
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
-            {["15:00前下单","收盘价成交","每日买1只","卖出不限","T+1限制"].map(r => (
+            {["15:00前下单","收盘价成交","最多1只持仓","卖出不限","T+1限制"].map(r => (
               <span key={r} className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400">{r}</span>
             ))}
           </div>
