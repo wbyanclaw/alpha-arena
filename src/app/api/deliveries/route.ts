@@ -1,29 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/deliveries?lobsterKey=RED&period=total
-// 或 GET /api/deliveries?agentId=xxx
+// GET /api/deliveries?agentId=xxx&period=total
 export async function GET(req: NextRequest) {
-  const lobsterKey = req.nextUrl.searchParams.get("lobsterKey");
-  const agentIdParam = req.nextUrl.searchParams.get("agentId");
+  const agentId = req.nextUrl.searchParams.get("agentId");
   const period = req.nextUrl.searchParams.get("period") || "total";
-  const limit = parseInt(req.nextUrl.searchParams.get("limit") || "30");
+  const limit = parseInt(req.nextUrl.searchParams.get("limit") || "50");
+
+  if (!agentId) return NextResponse.json({ error: "need agentId" }, { status: 400 });
 
   try {
-    let agentId: string | null = null;
-
-    if (agentIdParam) {
-      agentId = agentIdParam;
-    } else if (lobsterKey) {
-      const lobster = await prisma.lobster.findUnique({ where: { key: lobsterKey as any } });
-      if (!lobster) return NextResponse.json({ error: "lobster not found" }, { status: 404 });
-      agentId = lobster.agentId;
-    } else {
-      return NextResponse.json({ error: "lobsterKey or agentId required" }, { status: 400 });
-    }
-
-    if (!agentId) return NextResponse.json({ error: "no linked agent" }, { status: 404 });
-
     // Period filter
     let periodStart: Date | null = null;
     if (period !== "total") {
@@ -34,10 +20,6 @@ export async function GET(req: NextRequest) {
         periodStart = d;
       } else if (period === "month") {
         const d = new Date(now); d.setDate(1); d.setHours(0,0,0,0);
-        periodStart = d;
-      } else if (period === "season") {
-        const d = new Date(now); const q = Math.floor(d.getMonth()/3);
-        d.setMonth(q*3, 1); d.setHours(0,0,0,0);
         periodStart = d;
       } else if (period === "year") {
         periodStart = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
@@ -53,56 +35,66 @@ export async function GET(req: NextRequest) {
       take: limit,
     });
 
-    // Add stock names
-    const symbols = [...new Set(deliveries.map(d => d.symbol))];
-    const prices = symbols.length > 0
-      ? await prisma.price.findMany({ where: { symbol: { in: symbols } } })
-      : [];
-    const priceMap = new Map(prices.map(p => [p.symbol, p.name ?? p.symbol]));
-    const deliveriesWithNames = deliveries.map(d => ({
-      ...d,
-      name: priceMap.get(d.symbol) ?? d.symbol,
-    }));
+    if (deliveries.length === 0) {
+      return NextResponse.json({ agentId, period, deliveries: [], realizedPct: 0 });
+    }
 
-    // Compute period return from trades
+    // Build cost basis map: keep running avg cost per symbol
+    const prices = await prisma.price.findMany();
+    const priceMap = new Map(prices.map(p => [p.symbol, p]));
+    const symbolSet = new Set(deliveries.map(d => d.symbol));
+    const symbolArr = [...symbolSet];
+
     const trades = await prisma.trade.findMany({
-      where: {
-        agentId,
-        status: "FILLED",
-        ...(periodStart ? { filledAt: { gte: periodStart } } : {}),
-      },
+      where: { agentId, status: "FILLED", symbol: { in: symbolArr } },
       orderBy: { filledAt: "asc" },
     });
 
-    let simCash = 1000000, simPos = 0, lastPx = 0;
+    // Build running cost per symbol as of each trade
+    // costAt[symbol] = avgCost after processing all trades up to that point
+    const costAt = new Map<string, { qty: number; cost: number }>();
+    let lastCost = new Map<string, number>();
+
     for (const t of trades) {
-      const px = t.executedPrice ?? 0; lastPx = px;
-      if (t.side === "BUY" && simPos === 0) {
-        simPos = t.quantity; simCash -= px * t.quantity + (t.commission ?? 0) + (t.transferFee ?? 0);
-      } else if (t.side === "SELL" && simPos > 0) {
-        simCash += px * t.quantity - (t.commission ?? 0) - (t.stampTax ?? 0) - (t.transferFee ?? 0);
-        simPos = 0;
+      if (t.side === "BUY") {
+        const prev = costAt.get(t.symbol) ?? { qty: 0, cost: 0 };
+        const newQty = prev.qty + t.quantity;
+        const newCost = (prev.cost * prev.qty + (t.executedPrice ?? t.price) * t.quantity) / newQty;
+        costAt.set(t.symbol, { qty: newQty, cost: newCost });
+        lastCost.set(t.symbol, newCost);
+      } else {
+        const prev = costAt.get(t.symbol) ?? { qty: 0, cost: 0 };
+        const newQty = Math.max(0, prev.qty - t.quantity);
+        costAt.set(t.symbol, { qty: newQty, cost: prev.cost });
+        lastCost.set(t.symbol, prev.cost);
       }
     }
-    const periodReturn = ((simCash + simPos * lastPx) / 1000000 - 1) * 100;
 
-    // Get lobster info if available
-    let lobster = null;
-    if (lobsterKey) {
-      lobster = await prisma.lobster.findUnique({ where: { key: lobsterKey as any } });
-    } else {
-      const all = await prisma.lobster.findMany({ where: { agentId } });
-      lobster = all[0] ?? null;
+    // Current cost basis (for stocks still held)
+    const currentCost = new Map<string, number>();
+    for (const sym of symbolArr) {
+      currentCost.set(sym, costAt.get(sym)?.cost ?? lastCost.get(sym) ?? 0);
     }
 
-    return NextResponse.json({
-      lobster: lobster ? { key: lobster.key, name: lobster.name, color: lobster.color } : null,
-      agentId,
-      period,
-      periodReturn: Math.round(periodReturn * 100) / 100,
-      tradesCount: trades.length,
-      deliveries: deliveriesWithNames,
+    const result = deliveries.map(d => {
+      const priceInfo = priceMap.get(d.symbol);
+      const cost = currentCost.get(d.symbol) ?? d.price;
+      const curPrice = priceInfo?.price ?? d.price;
+
+      return {
+        ...d,
+        name: priceInfo?.name ?? d.symbol,
+        cost: Math.round(cost * 100) / 100,
+        // BUY not yet sold: show current price; SELL: show selling price
+        settlePrice: d.side === "SELL" ? d.price : curPrice,
+        // For BUY: unrealized return; for SELL: realized return
+        returnPct: d.side === "SELL"
+          ? Math.round(((d.price - cost) / cost) * 10000) / 100
+          : Math.round(((curPrice - cost) / cost) * 10000) / 100,
+      };
     });
+
+    return NextResponse.json({ agentId, period, deliveries: result });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "failed" }, { status: 500 });
