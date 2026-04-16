@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
     const deliveries = await prisma.delivery.findMany({
       where: { agentId, ...(periodStart ? { deliveredAt: { gte: periodStart } } : {}) },
-      orderBy: { deliveredAt: "desc" },
+      orderBy: { deliveredAt: "asc" },
       take: limit,
     });
 
@@ -37,15 +37,16 @@ export async function GET(req: NextRequest) {
     const prices = await prisma.price.findMany();
     const priceMap = new Map(prices.map(p => [p.symbol, p]));
 
-    // FIFO queue: BUY adds to queue, SELL consumes from queue
-    const buyQueue: Array<{ price: number; qty: number }> = [];
+    // FIFO queue per symbol
+    const buyQueue = new Map<string, Array<{ price: number; qty: number }>>();
 
     const result = deliveries.map(d => {
       const curPrice = priceMap.get(d.symbol)?.price ?? d.price;
 
       if (d.side === "BUY") {
-        // BUY: use its own price as cost basis
-        buyQueue.push({ price: d.price, qty: d.quantity });
+        const q = buyQueue.get(d.symbol) ?? [];
+        q.push({ price: d.price, qty: d.quantity });
+        buyQueue.set(d.symbol, q);
         return {
           ...d,
           name: priceMap.get(d.symbol)?.name ?? d.symbol,
@@ -54,17 +55,19 @@ export async function GET(req: NextRequest) {
           returnPct: null,
         };
       } else {
-        // SELL: FIFO match against queued buys
+        // SELL: FIFO match within same symbol
+        const q = buyQueue.get(d.symbol) ?? [];
         let remain = d.quantity;
         const matched: Array<{ price: number; qty: number }> = [];
-        while (remain > 0 && buyQueue.length > 0) {
-          const b = buyQueue[0];
+        while (remain > 0 && q.length > 0) {
+          const b = q[0];
           const m = Math.min(remain, b.qty);
           matched.push({ price: b.price, qty: m });
           b.qty -= m;
           remain -= m;
-          if (b.qty <= 0) buyQueue.shift();
+          if (b.qty <= 0) q.shift();
         }
+        buyQueue.set(d.symbol, q);
         const totalCost = matched.reduce((s, x) => s + x.price * x.qty, 0);
         const totalQty = matched.reduce((s, x) => s + x.qty, 0);
         const avgCost = totalQty > 0 ? totalCost / totalQty : d.price;
@@ -74,7 +77,7 @@ export async function GET(req: NextRequest) {
           name: priceMap.get(d.symbol)?.name ?? d.symbol,
           cost: Math.round(avgCost * 100) / 100,
           settlePrice: Math.round(d.price * 100) / 100,
-          returnPct: Math.round((d.price - avgCost) / avgCost * 100 * 100) / 100,
+          returnPct: Math.round((d.price - avgCost) / avgCost * 10000) / 100,
         };
       }
     });
