@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import SettlementChart from "./SettlementChart";
 import DeliveryList from "./DeliveryList";
@@ -9,113 +8,108 @@ function fmtPct(v: number | null | undefined) {
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 
-function StatCard({ label, value, icon, isHighlight }: { label: string; value: string; icon: string; isHighlight?: boolean }) {
+function RankBadge({ rank }: { rank: number }) {
+  const colors = ["#ffd700","#c0c0c0","#cd7f32","#444"];
+  const bgs = ["#ffd700","#c0c0c0","#cd7f32","#333"];
   return (
-    <div className={"rounded-xl border border-neutral-700/50 bg-black/20 p-3 text-center " + (isHighlight ? "border-yellow-500/30" : "")}>
-      <div className="text-lg mb-0.5">{icon}</div>
-      <div className={"font-black text-base " + (isHighlight ? "text-yellow-400" : "text-white")}>{value}</div>
-      <div className="text-xs text-gray-500">{label}</div>
+    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-black"
+      style={{ background: bgs[Math.min(rank-1,3)], color: rank <= 3 ? "#000" : "#888" }}>
+      {rank}
+    </span>
+  );
+}
+
+function ActionBadge({ order }: { order: any }) {
+  if (!order) return null;
+  return (
+    <span className={"text-xs font-bold " + (order.side === "BUY" ? "text-red-400" : "text-blue-400")}>
+      {order.side === "BUY" ? "买入" : "卖出"} {order.symbol}
+    </span>
+  );
+}
+
+// ─── Agent Row: compact leaderboard row ───────────────────────────────────────
+function AgentRow({ entry, onClick }: { entry: any; onClick: () => void }) {
+  return (
+    <div onClick={onClick} className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-800/60 cursor-pointer border-b border-neutral-800/50 last:border-0 transition-colors">
+      <RankBadge rank={entry.rank} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          {entry.lobsterColor && (
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: entry.lobsterColor }} />
+          )}
+          <span className="font-bold text-white text-sm truncate">{entry.agent?.name ?? "—"}</span>
+          {entry.agent?.model && (
+            <span className="text-xs text-gray-600 shrink-0">{entry.agent.model}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <ActionBadge order={entry.todayOrder} />
+          {entry.positions?.length > 0 && !entry.todayOrder && (
+            <span className="text-xs text-gray-500">
+              持仓：{entry.positions[0].name ?? entry.positions[0].symbol}
+            </span>
+          )}
+          {entry.positions?.length === 0 && !entry.todayOrder && (
+            <span className="text-xs text-gray-600">空仓</span>
+          )}
+        </div>
+      </div>
+      <div className="text-right shrink-0">
+        <div className="text-base font-black" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
+          {fmtPct(entry.returnPct)}
+        </div>
+        <div className="text-xs text-gray-500">累计</div>
+      </div>
     </div>
   );
 }
 
-// ─── Agent Card ───────────────────────────────────────────────────────────────
-function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
-  const { data: priceData } = useQuery({
-    queryKey: ["prices-all"],
-    queryFn: () => fetch("/api/prices").then(r => r.json()),
-  });
-  const nameMap: Record<string, string> = {};
-  (priceData ?? []).forEach((p: any) => { nameMap[p.symbol] = p.name; });
+// ─── Detail Panel ─────────────────────────────────────────────────────────────
+function DetailPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
   const pos = entry.positions?.[0];
   return (
-    <div
-      onClick={onClick}
-      className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 cursor-pointer hover:border-neutral-600 transition-colors"
-    >
-      <div className="flex items-center justify-between mb-2">
+    <div className="rounded-2xl bg-neutral-900 border border-neutral-700 p-5">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          {entry.lobsterColor && (
-            <span className="w-3 h-3 rounded-full" style={{ background: entry.lobsterColor }} />
-          )}
-          <span className="font-black text-white">{entry.agent?.name ?? "—"}</span>
-          {entry.agent?.model && (
-            <span className="text-xs text-gray-500 bg-neutral-800 px-1.5 py-0.5 rounded">{entry.agent.model}</span>
-          )}
+          {entry.lobsterColor && <span className="w-3 h-3 rounded-full" style={{ background: entry.lobsterColor }} />}
+          <span className="font-black text-white text-base">{entry.agent?.name}</span>
+          {entry.agent?.model && <span className="text-xs text-gray-500 bg-neutral-800 px-2 py-0.5 rounded">{entry.agent.model}</span>}
         </div>
-        <div className="text-right">
-          <div className="text-xl font-black" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
-            {fmtPct(entry.returnPct)}
+        <button onClick={onClose} className="text-gray-500 hover:text-white text-lg cursor-pointer">✕</button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        {[
+          { label: "累计收益", value: fmtPct(entry.returnPct), color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" },
+          { label: "持仓收益", value: entry.unrealizedPnL != null ? (entry.unrealizedPnL >= 0 ? "+"+entry.unrealizedPnL : String(entry.unrealizedPnL)) : "—" },
+          { label: "当前持仓", value: pos ? (pos.name ?? pos.symbol) : "空仓" },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="bg-black/30 rounded-xl p-3 text-center">
+            <div className="text-xs text-gray-500 mb-1">{label}</div>
+            <div className="text-sm font-black" style={{ color: color ?? undefined }}>{value}</div>
           </div>
-          <div className="text-xs text-gray-500">累计收益</div>
-        </div>
-      </div>
-      <div className="text-xs text-gray-400">
-        {pos
-          ? <span>{pos.name ?? pos.symbol} 成本¥{pos.avgCost}</span>
-          : <span className="text-gray-600">空仓</span>
-        }
-      </div>
-      {entry.todayOrder && (
-        <div className={"mt-2 text-xs font-bold " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
-          {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol} {nameMap[entry.todayOrder.symbol] ?? ""}
-          {entry.todayOrder.note && <span className="text-gray-500 ml-1">· {entry.todayOrder.note}</span>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Agent Detail Panel ────────────────────────────────────────────────────────
-function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
-  const [showChart, setShowChart] = useState(false);
-  const pos = entry.positions?.[0];
-
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {entry.lobsterColor && (
-            <span className="w-3 h-3 rounded-full" style={{ background: entry.lobsterColor }} />
-          )}
-          <span className="font-black text-white text-lg">{entry.agent?.name}</span>
-          {entry.agent?.model && (
-            <span className="text-xs text-gray-500 bg-neutral-800 px-2 py-0.5 rounded">{entry.agent.model}</span>
-          )}
-        </div>
-        <button onClick={onClose} className="text-gray-500 hover:text-white cursor-pointer text-lg">✕</button>
+        ))}
       </div>
 
       {/* Holdings */}
-      <div>
-        <p className="text-xs font-bold text-gray-500 mb-2">当前持仓</p>
-        {pos
-          ? <div className="space-y-1">
-              <div className="flex justify-between text-sm">
-                <span className="text-white">{pos.name ?? pos.symbol}</span>
-                <span className="text-gray-400">成本 ¥{pos.avgCost} → 现价 ¥{pos.currentPrice}</span>
-              </div>
-              <div className="text-xs text-gray-500">持仓收益 {fmtPct(((pos.currentPrice - pos.avgCost) / pos.avgCost) * 100)}</div>
-            </div>
-          : <div className="text-gray-600 text-sm">空仓</div>
-        }
-      </div>
-
-      {/* Chart */}
-      {entry.agent?.id && (
-        <div>
-          <button
-            onClick={() => setShowChart(v => !v)}
-            className="text-xs text-gray-500 hover:text-white cursor-pointer mb-2 flex items-center gap-1"
-          >
-            <span>{showChart ? "▼" : "▶"}</span> 收益曲线
-          </button>
-          {showChart && <SettlementChart agentId={entry.agent.id} />}
+      {pos && (
+        <div className="mb-4">
+          <p className="text-xs font-bold text-gray-500 mb-2">持仓详情</p>
+          <div className="flex justify-between text-sm bg-black/20 rounded-lg p-3">
+            <span className="text-white">{pos.name ?? pos.symbol}（{pos.symbol}）</span>
+            <span className="text-gray-400">成本 ¥{pos.avgCost} → 现价 ¥{pos.currentPrice}</span>
+          </div>
         </div>
       )}
 
-      {/* Delivery history */}
+      {/* Chart - always visible */}
+      <div className="mb-4">
+        <p className="text-xs font-bold text-gray-500 mb-2">收益曲线</p>
+        <SettlementChart agentId={entry.agent?.id} />
+      </div>
+
+      {/* History */}
       <DeliveryList agentId={entry.agent?.id} />
     </div>
   );
@@ -136,65 +130,72 @@ export default function WatchTab({ onAgentClick, selectedAgent }: WatchTabProps)
   const leaderboard = data?.leaderboard ?? [];
   const top3 = leaderboard.slice(0, 3);
 
-  if (isLoading) {
-    return <div className="text-center py-20 text-gray-500">加载中...</div>;
-  }
+  if (isLoading) return <div className="text-center py-20 text-gray-500">加载中...</div>;
 
   return (
-    <div className="space-y-6">
-      {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 border border-neutral-700 p-6 sm:p-8 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-8 w-48 h-48 rounded-full bg-red-500 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-32 h-32 rounded-full bg-orange-500 blur-2xl" />
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="rounded-2xl bg-neutral-900 border border-neutral-700 p-5 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-red-500/5 blur-3xl pointer-events-none" />
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-2xl">🦞</span>
+          <h1 className="text-xl font-black text-white tracking-tight">Alpha Arena</h1>
+          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">LIVE</span>
         </div>
-        <div className="relative">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-3xl">🦞</span>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Alpha Arena</h1>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">LIVE</span>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="text-center">
+            <div className="text-xl font-black text-white">{leaderboard.length}</div>
+            <div className="text-xs text-gray-500">参赛者</div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <StatCard label="参赛者" value={String(leaderboard.length)} icon="🤖" />
-            <StatCard label="最高收益" value={top3[0] ? fmtPct(top3[0].returnPct) : "—"} icon="🏆" isHighlight />
-            <StatCard label="平均收益" value={leaderboard.length > 0 ? fmtPct(leaderboard.reduce((s: number, e: any) => s + e.returnPct, 0) / leaderboard.length) : "—"} icon="📊" />
-            <StatCard label="今日决策" value={String(leaderboard.filter((e: any) => e.todayOrder).length)} icon="📋" />
+          <div className="text-center border-l border-neutral-700">
+            <div className="text-xl font-black" style={{ color: "#ffd700" }}>
+              {top3[0] ? fmtPct(top3[0].returnPct) : "—"}
+            </div>
+            <div className="text-xs text-gray-500">最高收益</div>
           </div>
-          <div className="flex flex-wrap gap-2 text-xs">
-            {["15:00前下单","收盘价成交","最多1只持仓","卖出不限","T+1限制"].map(r => (
-              <span key={r} className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400">{r}</span>
-            ))}
+          <div className="text-center border-l border-neutral-700">
+            <div className="text-xl font-black text-white">
+              {leaderboard.filter((e: any) => e.todayOrder).length}
+            </div>
+            <div className="text-xs text-gray-500">今日决策</div>
           </div>
         </div>
       </div>
 
-      {/* Top 3 */}
+      {/* Top 3 podium */}
       {top3.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
           {top3.map((entry: any, idx: number) => (
-            <div key={idx} className={"rounded-xl border p-4 text-center " + (idx === 0 ? "bg-yellow-500/10 border-yellow-500/30" : idx === 1 ? "bg-gray-500/10 border-gray-500/20" : "bg-orange-500/10 border-orange-500/20")}>
+            <div key={idx}
+              className={"rounded-xl border p-4 text-center " +
+                (idx === 0 ? "bg-yellow-500/10 border-yellow-500/30" :
+                 idx === 1 ? "bg-gray-500/10 border-gray-500/20" :
+                 "bg-orange-500/10 border-orange-500/20")}
+            >
               <div className="text-2xl mb-1">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}</div>
               <div className="font-black text-white text-sm truncate">{entry.agent?.name ?? "—"}</div>
-              <div className="text-xl font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>{fmtPct(entry.returnPct)}</div>
-              <div className="text-xs text-gray-500 mt-0.5">累计收益</div>
+              <div className="text-lg font-black mt-1" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
+                {fmtPct(entry.returnPct)}
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Selected Agent Detail Panel */}
+      {/* Detail Panel */}
       {selectedAgent && (
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-700 p-6">
-          <AgentPanel entry={selectedAgent} onClose={() => onAgentClick(null)} />
-        </div>
+        <DetailPanel entry={selectedAgent} onClose={() => onAgentClick(null)} />
       )}
 
-      {/* Agent Cards */}
+      {/* Leaderboard */}
       <div>
-        <h3 className="text-sm font-bold text-gray-400 mb-3">全部选手</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-bold text-gray-400">全部选手</h3>
+          <span className="text-xs text-gray-600">点击查看详情</span>
+        </div>
+        <div className="rounded-xl bg-neutral-900 border border-neutral-800 overflow-hidden">
           {leaderboard.map((entry: any) => (
-            <AgentCard
+            <AgentRow
               key={entry.agent?.id ?? Math.random()}
               entry={entry}
               onClick={() => onAgentClick(entry)}

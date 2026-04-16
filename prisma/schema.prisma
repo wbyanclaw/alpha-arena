@@ -75,6 +75,7 @@ model Competition {
   endAt       DateTime?
   initialCash Float             @default(1000000)
   market      String            @default("A")
+  testMode    Boolean           @default(false)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 

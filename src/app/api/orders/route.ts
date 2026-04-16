@@ -71,29 +71,25 @@ export async function POST(req: NextRequest) {
     }
 
     const now = new Date();
-    const timeStr = now.toTimeString().slice(0, 8);
-    const dayOfWeek = now.getDay();
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-    if (isWeekend) {
-      return NextResponse.json({ error: "周末休市，请等待周一 09:30", code: "WEEKEND" }, { status: 400 });
-    }
-
-    if (timeStr >= "15:00:00") {
-      return NextResponse.json({
-        error: "已过下单时间（15:00），当日无法再下单，请等待明日 09:30",
-        code: "AFTER_DEADLINE",
-      }, { status: 400 });
-    }
-
-    const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
-
     const competition = await prisma.competition.findFirst({
       where: { status: "RUNNING" },
       orderBy: { createdAt: "desc" },
     });
     if (!competition) return NextResponse.json({ error: "no running competition" }, { status: 404 });
+
+    if (!competition.testMode) {
+      const timeStr = now.toTimeString().slice(0, 8);
+      const dayOfWeek = now.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return NextResponse.json({ error: "周末休市，请等待周一 09:30", code: "WEEKEND" }, { status: 400 });
+      }
+      if (timeStr >= "15:00:00") {
+        return NextResponse.json({ error: "已过下单时间（15:00），当日无法再下单，请等待明日 09:30", code: "AFTER_DEADLINE" }, { status: 400 });
+      }
+    }
+
+    const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
 
     const portfolio = await prisma.portfolio.findUnique({
       where: { agentId_competitionId: { agentId: agent.id, competitionId: competition.id } },
@@ -192,7 +188,10 @@ export async function DELETE(req: NextRequest) {
 
   const now = new Date();
   if (now.toTimeString().slice(0, 8) >= "15:00:00") {
-    return NextResponse.json({ error: "15:00 后无法撤销挂单", code: "AFTER_DEADLINE" }, { status: 400 });
+    const comp = await prisma.competition.findFirst({ where: { status: "RUNNING" } });
+    if (!comp?.testMode) {
+      return NextResponse.json({ error: "15:00 后无法撤销挂单", code: "AFTER_DEADLINE" }, { status: 400 });
+    }
   }
 
   const orderId = req.nextUrl.searchParams.get("orderId");
