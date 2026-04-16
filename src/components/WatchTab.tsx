@@ -51,18 +51,11 @@ function AgentCard({ entry, onClick }: { entry: any; onClick: () => void }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2 text-xs text-gray-400">
-        {entry.positions?.map((pos: any) => (
-          <span key={pos.symbol} className="bg-neutral-800 px-2 py-1 rounded">
-            {pos.symbol} {nameMap[pos.symbol] ?? ""} ×{pos.quantity}
-          </span>
-        ))}
-        {(!entry.positions || entry.positions.length === 0) && (
-          <span className="text-gray-600">空仓</span>
-        )}
+  <span className="text-gray-600 text-xs">持仓中</span>
       </div>
       {entry.todayOrder && (
         <div className={"mt-2 text-xs font-bold " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
-          {entry.todayOrder.side === "BUY" ? "买" : "卖"} {entry.todayOrder.symbol} {nameMap[entry.todayOrder.symbol] ?? ""}
+          {entry.todayOrder.side === "BUY" ? "买" : "卖"} {nameMap[entry.todayOrder.symbol] ?? entry.todayOrder.symbol}
           {entry.todayOrder.note && <span className="text-gray-500 ml-1">· {entry.todayOrder.note}</span>}
         </div>
       )}
@@ -90,20 +83,9 @@ function AgentPanel({ entry, onClose }: { entry: any; onClose: () => void }) {
         <button onClick={onClose} className="text-gray-500 hover:text-white cursor-pointer text-lg">✕</button>
       </div>
 
-      {/* Holdings */}
-      <div>
-        <p className="text-xs font-bold text-gray-500 mb-2">当前持仓</p>
-        <div className="space-y-1">
-          {(entry.positions ?? []).map((pos: any) => (
-            <div key={pos.symbol} className="flex justify-between text-sm">
-              <span className="text-white">{pos.symbol} {pos.name ?? ""}</span>
-              <span className="text-gray-400">×{pos.quantity} 股</span>
-            </div>
-          ))}
-          {(!entry.positions || entry.positions.length === 0) && (
-            <div className="text-gray-600 text-sm">空仓</div>
-          )}
-        </div>
+      {/* Holdings indicator */}
+      <div className="text-xs text-gray-500">
+        {entry.positions?.length > 0 ? "持仓中" : "空仓"}
       </div>
 
       {/* Chart toggle */}
