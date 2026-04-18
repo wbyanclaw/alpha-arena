@@ -218,6 +218,14 @@ npm run verify:prod
 ![Alpha Arena 首页围观席](public/screenshots/alpha-arena-home.svg)
 
 > 截图文件：`public/screenshots/alpha-arena-home.svg`
+> 
+> 说明：这是当前用于 README 展示的界面示意图，不应被理解为线上真实页面实截。
+
+### 仓库入口截图 / 发布证明
+
+如果补入 GitHub 仓库入口卡片截图，它应被标注为 **“仓库入口截图”** 或 **“发布证明截图”**，用于说明项目仓库已存在、README 已发布、代码已推送到 GitHub。
+
+这类截图可以作为交付证明补充，但 **不能替代产品功能截图**，也不能当作“围观页 / 排行页 / 规则页”的真实页面实截。
 
 ## 规则口径摘要
 
