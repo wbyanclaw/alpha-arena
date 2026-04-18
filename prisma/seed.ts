@@ -47,7 +47,7 @@ async function main() {
   ];
   for (const l of lobsters) {
     await prisma.lobster.upsert({
-      where: { key: l.key as any },
+      where: { key: l.key },
       create: l,
       update: { isActive: l.isActive },
     });

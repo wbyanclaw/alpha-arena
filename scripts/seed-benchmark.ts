@@ -69,9 +69,9 @@ async function main() {
 
   // 写入每月定投交割
   let cumulativeCost = 0;
-  let totalShares = 0;
+  const totalShares = 0
   const settlements: { date: string; value: number; returnPct: number }[] = [];
-  let initialValue = 1000000;
+  const initialValue = 1000000;
 
   for (const p of purchases) {
     const cost = p.price * p.qty;

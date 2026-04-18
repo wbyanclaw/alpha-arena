@@ -2,18 +2,23 @@
 import { useQuery } from "@tanstack/react-query";
 
 function fmtPct(v: number | null | undefined) {
-  if (v == null) return "—%";
+  if (v == null || Number.isNaN(v)) return "—%";
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 
 export default function SettlementChart({ agentId }: { agentId: string }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["settlements", agentId],
-    queryFn: () => fetch(`/api/settlements?agentId=${agentId}`).then(r => r.json()),
+    queryFn: async () => {
+      const res = await fetch(`/api/settlements?agentId=${agentId}`);
+      if (!res.ok) throw new Error("Failed to load settlements");
+      return res.json();
+    },
     enabled: !!agentId,
   });
 
   if (isLoading) return <div className="text-center py-6 text-gray-500 text-sm">加载图表...</div>;
+  if (isError) return <div className="text-center py-6 text-red-400 text-sm">历史收益加载失败</div>;
 
   const pts = (data?.points ?? []) as Array<{ date: string; returnPct: number; totalValue: number }>;
   if (pts.length === 0) {
@@ -41,20 +46,22 @@ export default function SettlementChart({ agentId }: { agentId: string }) {
         </span>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ display: "block" }}>
-        {pts.length > 1 && (
+        {pts.length > 1 ? (
           <>
-            <path d={areaD} fill="url(#grad)" opacity={0.15} />
+            <path d={areaD} fill="url(#settlement-grad)" opacity={0.15} />
             <path d={pathD} stroke="#ff3333" strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
             {pts.map((p, i) => (
               <circle key={i} cx={toX(i)} cy={toY(p.returnPct)} r={2.5} fill="#ff3333" />
             ))}
             <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="settlement-grad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#ff3333" />
                 <stop offset="100%" stopColor="#ff3333" stopOpacity={0} />
               </linearGradient>
             </defs>
           </>
+        ) : (
+          <circle cx={toX(0)} cy={toY(pts[0].returnPct)} r={3} fill="#ff3333" />
         )}
       </svg>
       <div className="flex justify-between mt-1">

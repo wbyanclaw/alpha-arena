@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const lobsters = await prisma.lobster.findMany({ orderBy: { key: "asc" } });
     return NextResponse.json(lobsters);
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "failed" }, { status: 500 });
   }
 }

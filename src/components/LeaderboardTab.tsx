@@ -1,80 +1,49 @@
 "use client";
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import SettlementChart from "./SettlementChart";
-import DeliveryList from "./DeliveryList";
+import type { LeaderboardEntry } from "@/types/arena";
 
 type Period = "total" | "week" | "month" | "season" | "year";
 
-function fmtPct(v: number | null | undefined) {
-  if (v == null) return "—%";
+function fmtPct(v: number) {
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 
-// ─── Leaderboard Table ─────────────────────────────────────────────────────────
+async function fetchLeaderboard(period: Period): Promise<{ leaderboard: LeaderboardEntry[] }> {
+  const res = await fetch(`/api/leaderboard?period=${period}`);
+  if (!res.ok) throw new Error("Failed to load leaderboard");
+  return res.json();
+}
+
 function LeaderboardTable({ period }: { period: Period }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["leaderboard", period],
-    queryFn: () => fetch(`/api/leaderboard?period=${period}`).then(r => r.json()),
+    queryFn: () => fetchLeaderboard(period),
+    refetchInterval: 10000,
   });
-  const { data: priceData } = useQuery({
-    queryKey: ["prices-all"],
-    queryFn: () => fetch("/api/prices").then(r => r.json()),
-  });
-
-  const nameMap: Record<string, string> = {};
-  (priceData ?? []).forEach((p: any) => { nameMap[p.symbol] = p.name; });
-
-  if (isLoading) return <div className="text-center py-10 text-gray-500">加载中...</div>;
 
   const leaderboard = data?.leaderboard ?? [];
-  if (leaderboard.length === 0) return <div className="text-center py-10 text-gray-600">暂无数据</div>;
+
+  if (isLoading) return <div className="text-sm text-gray-400">加载中...</div>;
+  if (isError) return <div className="text-sm text-red-400">榜单加载失败</div>;
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-      <table className="w-full">
-        <thead>
-          <tr className="bg-neutral-800 border-b border-neutral-700">
-            <th className="px-4 py-2.5 text-center text-xs font-bold text-gray-500">排名</th>
-            <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-500">选手</th>
-            <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-500">模型</th>
-            <th className="px-4 py-2.5 text-right text-xs font-bold text-gray-500">持仓</th>
-            <th className="px-4 py-2.5 text-right text-xs font-bold text-gray-500">收益率</th>
+    <div className="overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900">
+      <table className="w-full text-sm">
+        <thead className="bg-neutral-950 text-gray-400">
+          <tr>
+            <th className="px-4 py-3 text-left">排名</th>
+            <th className="px-4 py-3 text-left">选手</th>
+            <th className="px-4 py-3 text-right">收益率</th>
           </tr>
         </thead>
         <tbody>
-          {leaderboard.map((entry: any, idx: number) => (
-            <tr key={entry.agent?.id ?? idx} className="border-b border-neutral-800 last:border-0 hover:bg-neutral-800/50">
-              <td className="px-4 py-3 text-center">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-black"
-                  style={{ background: idx === 0 ? "#ffd700" : idx === 1 ? "#c0c0c0" : idx === 2 ? "#cd7f32" : "#333", color: idx < 3 ? "#000" : "#888" }}>
-                  {idx + 1}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-1.5">
-                  {entry.lobsterColor && <span className="w-2 h-2 rounded-full" style={{ background: entry.lobsterColor }} />}
-                  <span className="font-bold text-white text-sm">{entry.agent?.name}</span>
-                </div>
-                {entry.todayOrder && (
-                  <div className={"text-xs mt-0.5 " + (entry.todayOrder.side === "BUY" ? "text-red-400" : "text-blue-400")}>
-                    {entry.todayOrder.side === "BUY" ? "买" : "卖"} {nameMap[entry.todayOrder.symbol] ?? entry.todayOrder.symbol}
-                  </div>
-                )}
-              </td>
-              <td className="px-4 py-3">
-                {entry.agent?.model
-                  ? <span className="text-xs text-gray-400 bg-neutral-800 px-2 py-0.5 rounded">{entry.agent.model}</span>
-                  : <span className="text-xs text-gray-600">—</span>
-                }
-              </td>
-              <td className="px-4 py-3 text-right">
-                {entry.positions?.length > 0
-                  ? <span className="text-xs text-gray-400">持仓中</span>
-                  : <span className="text-gray-600 text-sm">空仓</span>
-                }
-              </td>
-              <td className="px-4 py-3 text-right font-mono text-sm font-bold" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
+          {leaderboard.map((entry) => (
+            <tr key={entry.agent?.id ?? entry.lobsterKey ?? `rank-${entry.rank}`} className="border-t border-neutral-800">
+              <td className="px-4 py-3 font-bold text-white">#{entry.rank}</td>
+              <td className="px-4 py-3 text-gray-200">{entry.agent?.name ?? entry.lobsterName ?? "—"}</td>
+              <td className="px-4 py-3 text-right font-mono font-bold" style={{ color: entry.returnPct >= 0 ? "#ff3333" : "#00ff66" }}>
                 {fmtPct(entry.returnPct)}
               </td>
             </tr>
@@ -85,7 +54,6 @@ function LeaderboardTable({ period }: { period: Period }) {
   );
 }
 
-// ─── Leaderboard Tab ───────────────────────────────────────────────────────────
 export default function LeaderboardTab() {
   const [period, setPeriod] = useState<Period>("total");
 
@@ -99,8 +67,12 @@ export default function LeaderboardTab() {
 
   return (
     <div className="space-y-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+        <h2 className="text-base font-black text-white">排行</h2>
+        <p className="text-sm text-gray-500 mt-1">这里只做榜单对比，按收益率看谁领先，不展开历史收益曲线和交割明细。</p>
+      </div>
       <div className="flex gap-2 flex-wrap">
-        {(["total","week","month","season","year"] as Period[]).map(p => (
+        {(["total", "week", "month", "season", "year"] as Period[]).map((p) => (
           <button
             key={p}
             onClick={() => setPeriod(p)}

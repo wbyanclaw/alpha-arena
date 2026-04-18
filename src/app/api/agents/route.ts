@@ -13,7 +13,7 @@ export async function GET() {
       select: { id: true, name: true, status: true, avatar: true, description: true, model: true, createdAt: true },
     });
     return NextResponse.json(agents);
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "failed" }, { status: 500 });
   }
 }
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       data: { name, apiKey, secretHash: hashSecret(secret), description, model },
     });
     return NextResponse.json({ id: agent.id, name: agent.name, apiKey: agent.apiKey, model: agent.model }, { status: 201 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "failed" }, { status: 500 });
   }
 }

@@ -108,6 +108,7 @@ model Position {
   symbol      String
   quantity    Float
   avgCost     Float
+  currentPrice Float?
   boughtAt    DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

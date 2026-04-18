@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
     const deliveries = await prisma.delivery.findMany({
       where: { agentId, ...(periodStart ? { deliveredAt: { gte: periodStart } } : {}) },
-      orderBy: { deliveredAt: "asc" },
+      orderBy: { deliveredAt: "desc" },
       take: limit,
     });
 
@@ -35,12 +35,11 @@ export async function GET(req: NextRequest) {
     }
 
     const prices = await prisma.price.findMany();
-    const priceMap = new Map(prices.map(p => [p.symbol, p]));
-
-    // FIFO queue per symbol
+    const priceMap = new Map(prices.map((p) => [p.symbol, p]));
+    const chronological = [...deliveries].sort((a, b) => a.deliveredAt.getTime() - b.deliveredAt.getTime());
     const buyQueue = new Map<string, Array<{ price: number; qty: number }>>();
 
-    const result = deliveries.map(d => {
+    const enriched = chronological.map((d) => {
       const curPrice = priceMap.get(d.symbol)?.price ?? d.price;
 
       if (d.side === "BUY") {
@@ -48,41 +47,48 @@ export async function GET(req: NextRequest) {
         q.push({ price: d.price, qty: d.quantity });
         buyQueue.set(d.symbol, q);
         return {
-          ...d,
+          symbol: d.symbol,
           name: priceMap.get(d.symbol)?.name ?? d.symbol,
+          side: d.side,
+          price: d.price,
+          quantity: d.quantity,
+          deliveredAt: d.deliveredAt,
           cost: Math.round(d.price * 100) / 100,
           settlePrice: Math.round(curPrice * 100) / 100,
-          returnPct: null,
-        };
-      } else {
-        // SELL: FIFO match within same symbol
-        const q = buyQueue.get(d.symbol) ?? [];
-        let remain = d.quantity;
-        const matched: Array<{ price: number; qty: number }> = [];
-        while (remain > 0 && q.length > 0) {
-          const b = q[0];
-          const m = Math.min(remain, b.qty);
-          matched.push({ price: b.price, qty: m });
-          b.qty -= m;
-          remain -= m;
-          if (b.qty <= 0) q.shift();
-        }
-        buyQueue.set(d.symbol, q);
-        const totalCost = matched.reduce((s, x) => s + x.price * x.qty, 0);
-        const totalQty = matched.reduce((s, x) => s + x.qty, 0);
-        const avgCost = totalQty > 0 ? totalCost / totalQty : d.price;
-
-        return {
-          ...d,
-          name: priceMap.get(d.symbol)?.name ?? d.symbol,
-          cost: Math.round(avgCost * 100) / 100,
-          settlePrice: Math.round(d.price * 100) / 100,
-          returnPct: Math.round((d.price - avgCost) / avgCost * 10000) / 100,
+          returnPct: curPrice > 0 ? Math.round(((curPrice - d.price) / d.price) * 10000) / 100 : null,
         };
       }
-    });
 
-    return NextResponse.json({ agentId, period, deliveries: result });
+      const q = buyQueue.get(d.symbol) ?? [];
+      let remain = d.quantity;
+      const matched: Array<{ price: number; qty: number }> = [];
+      while (remain > 0 && q.length > 0) {
+        const b = q[0];
+        const m = Math.min(remain, b.qty);
+        matched.push({ price: b.price, qty: m });
+        b.qty -= m;
+        remain -= m;
+        if (b.qty <= 0) q.shift();
+      }
+      buyQueue.set(d.symbol, q);
+      const totalCost = matched.reduce((s, x) => s + x.price * x.qty, 0);
+      const totalQty = matched.reduce((s, x) => s + x.qty, 0);
+      const avgCost = totalQty > 0 ? totalCost / totalQty : d.price;
+
+      return {
+        symbol: d.symbol,
+        name: priceMap.get(d.symbol)?.name ?? d.symbol,
+        side: d.side,
+        price: d.price,
+        quantity: d.quantity,
+        deliveredAt: d.deliveredAt,
+        cost: Math.round(avgCost * 100) / 100,
+        settlePrice: Math.round(d.price * 100) / 100,
+        returnPct: avgCost > 0 ? Math.round(((d.price - avgCost) / avgCost) * 10000) / 100 : null,
+      };
+    }).reverse();
+
+    return NextResponse.json({ agentId, period, deliveries: enriched });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "failed" }, { status: 500 });
