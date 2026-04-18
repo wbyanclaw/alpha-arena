@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1100" viewBox="0 0 1440 1100">
+  <rect width="1440" height="1100" fill="#050505"/>
+  <rect x="80" y="90" width="1280" height="90" rx="24" fill="#121212" stroke="#2a2a2a"/>
+  <rect x="80" y="240" width="1280" height="80" rx="24" fill="#121212" stroke="#2a2a2a"/>
+  <rect x="80" y="360" width="1280" height="90" rx="24" fill="#121212" stroke="#2a2a2a"/>
+  <rect x="80" y="480" width="1280" height="160" rx="24" fill="#121212" stroke="#2a2a2a"/>
+  <rect x="80" y="670" width="1280" height="320" rx="24" fill="#121212" stroke="#2a2a2a"/>
+  <text x="90" y="52" fill="#f5f5f5" font-size="26" font-family="Arial, sans-serif" font-weight="700">Alpha Arena</text>
+  <text x="1180" y="48" fill="#8c8c8c" font-size="18" font-family="Arial, sans-serif">Status: Closed</text>
+  <rect x="900" y="28" width="96" height="34" rx="12" fill="#ef4444"/>
+  <rect x="1020" y="28" width="96" height="34" rx="12" fill="#262626"/>
+  <rect x="1140" y="28" width="96" height="34" rx="12" fill="#262626"/>
+  <text x="927" y="50" fill="#fff" font-size="16" font-family="Arial, sans-serif">Watch</text>
+  <text x="1053" y="50" fill="#a3a3a3" font-size="16" font-family="Arial, sans-serif">Rank</text>
+  <text x="1170" y="50" fill="#a3a3a3" font-size="16" font-family="Arial, sans-serif">Rules</text>
+  <text x="110" y="128" fill="#fff" font-size="28" font-family="Arial, sans-serif" font-weight="700">Watch Panel</text>
+  <text x="110" y="158" fill="#8c8c8c" font-size="18" font-family="Arial, sans-serif">Observe agents, positions, settlement curve and deliveries.</text>
+  <rect x="100" y="240" width="380" height="80" rx="18" fill="#141414" stroke="#2d2d2d"/>
+  <rect x="520" y="240" width="380" height="80" rx="18" fill="#141414" stroke="#2d2d2d"/>
+  <rect x="940" y="240" width="380" height="80" rx="18" fill="#141414" stroke="#2d2d2d"/>
+  <text x="122" y="272" fill="#fff" font-size="26" font-family="Arial, sans-serif" font-weight="700">12</text>
+  <text x="122" y="300" fill="#8c8c8c" font-size="17" font-family="Arial, sans-serif">Agents</text>
+  <text x="542" y="272" fill="#fff" font-size="26" font-family="Arial, sans-serif" font-weight="700">7</text>
+  <text x="542" y="300" fill="#8c8c8c" font-size="17" font-family="Arial, sans-serif">Holding</text>
+  <text x="962" y="272" fill="#fff" font-size="26" font-family="Arial, sans-serif" font-weight="700">3</text>
+  <text x="962" y="300" fill="#8c8c8c" font-size="17" font-family="Arial, sans-serif">Pending Orders</text>
+  <rect x="100" y="360" width="380" height="90" rx="18" fill="#161616" stroke="#facc15"/>
+  <rect x="520" y="360" width="380" height="90" rx="18" fill="#161616" stroke="#d4d4d4"/>
+  <rect x="940" y="360" width="380" height="90" rx="18" fill="#161616" stroke="#fdba74"/>
+  <text x="122" y="396" fill="#fff" font-size="20" font-family="Arial, sans-serif">Agent A</text>
+  <text x="122" y="426" fill="#ff6b6b" font-size="28" font-family="Arial, sans-serif" font-weight="700">+12.38%</text>
+  <text x="542" y="396" fill="#fff" font-size="20" font-family="Arial, sans-serif">Agent B</text>
+  <text x="542" y="426" fill="#ff6b6b" font-size="28" font-family="Arial, sans-serif" font-weight="700">+8.41%</text>
+  <text x="962" y="396" fill="#fff" font-size="20" font-family="Arial, sans-serif">Agent C</text>
+  <text x="962" y="426" fill="#ff6b6b" font-size="28" font-family="Arial, sans-serif" font-weight="700">+5.92%</text>
+  <text x="110" y="516" fill="#fff" font-size="28" font-family="Arial, sans-serif" font-weight="700">Agent Detail</text>
+  <text x="110" y="546" fill="#8c8c8c" font-size="18" font-family="Arial, sans-serif">Current holding, PnL, settlement curve, delivery records</text>
+  <rect x="110" y="570" width="150" height="60" rx="14" fill="#0a0a0a" stroke="#2d2d2d"/>
+  <rect x="290" y="570" width="150" height="60" rx="14" fill="#0a0a0a" stroke="#2d2d2d"/>
+  <rect x="470" y="570" width="150" height="60" rx="14" fill="#0a0a0a" stroke="#2d2d2d"/>
+  <text x="124" y="592" fill="#8c8c8c" font-size="14" font-family="Arial, sans-serif">Return</text>
+  <text x="124" y="615" fill="#fff" font-size="18" font-family="Arial, sans-serif">+12.38%</text>
+  <text x="304" y="592" fill="#8c8c8c" font-size="14" font-family="Arial, sans-serif">PnL</text>
+  <text x="304" y="615" fill="#fff" font-size="18" font-family="Arial, sans-serif">+3240.00</text>
+  <text x="484" y="592" fill="#8c8c8c" font-size="14" font-family="Arial, sans-serif">Position</text>
+  <text x="484" y="615" fill="#fff" font-size="18" font-family="Arial, sans-serif">600036</text>
+  <rect x="110" y="700" width="540" height="250" rx="14" fill="#0a0a0a" stroke="#2d2d2d"/>
+  <text x="130" y="730" fill="#fff" font-size="22" font-family="Arial, sans-serif">Settlement Curve</text>
+  <polyline points="150,900 240,860 330,870 420,800 510,750 600,790" fill="none" stroke="#ef4444" stroke-width="4"/>
+  <circle cx="150" cy="900" r="5" fill="#ef4444"/>
+  <circle cx="240" cy="860" r="5" fill="#ef4444"/>
+  <circle cx="330" cy="870" r="5" fill="#ef4444"/>
+  <circle cx="420" cy="800" r="5" fill="#ef4444"/>
+  <circle cx="510" cy="750" r="5" fill="#ef4444"/>
+  <circle cx="600" cy="790" r="5" fill="#ef4444"/>
+  <rect x="690" y="700" width="640" height="250" rx="14" fill="#0a0a0a" stroke="#2d2d2d"/>
+  <text x="710" y="730" fill="#fff" font-size="22" font-family="Arial, sans-serif">Deliveries</text>
+  <rect x="710" y="760" width="600" height="48" rx="12" fill="#141414" stroke="#262626"/>
+  <rect x="710" y="824" width="600" height="48" rx="12" fill="#141414" stroke="#262626"/>
+  <rect x="710" y="888" width="600" height="48" rx="12" fill="#141414" stroke="#262626"/>
+  <text x="728" y="790" fill="#fff" font-size="16" font-family="Arial, sans-serif">600036 BUY</text>
+  <text x="980" y="790" fill="#d4d4d4" font-size="15" font-family="Arial, sans-serif">Price 38.50 Qty 100</text>
+  <text x="728" y="854" fill="#fff" font-size="16" font-family="Arial, sans-serif">600036 SELL</text>
+  <text x="980" y="854" fill="#d4d4d4" font-size="15" font-family="Arial, sans-serif">Price 39.20 Qty 100</text>
+  <text x="728" y="918" fill="#fff" font-size="16" font-family="Arial, sans-serif">000001 BUY</text>
+  <text x="980" y="918" fill="#d4d4d4" font-size="15" font-family="Arial, sans-serif">Price 12.88 Qty 100</text>
+</svg>

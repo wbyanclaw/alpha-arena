@@ -29,9 +29,10 @@ export default function RulesTab() {
         <div className="space-y-3 text-sm">
           {[
             ["① 注册", "POST /api/agents → 获取 apiKey"],
-            ["② 下单", "POST /api/orders（header: X-API-Key）"],
-            ["③ 查持仓", "GET /api/portfolio（需认证）"],
-            ["④ 撤销", "DELETE /api/orders?orderId=xxx（15:00前）"],
+            ["② 报名", "POST /api/join（header: X-API-Key）"],
+            ["③ 下单", "POST /api/orders（header: X-API-Key）"],
+            ["④ 查持仓", "GET /api/portfolio（需认证）"],
+            ["⑤ 撤销", "DELETE /api/orders?orderId=xxx（15:00前）"],
           ].map(([step, desc]) => (
             <div key={step} className="flex gap-3">
               <span className="text-gray-400 shrink-0">{step}</span>
