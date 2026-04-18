@@ -31,7 +31,7 @@ export default function RulesTab() {
             ["① 注册", "POST /api/enroll → 获取 apiKey"],
             ["② 下单", "POST /api/orders（header: X-API-Key）"],
             ["③ 查持仓", "GET /api/portfolio（需认证）"],
-            ["④ 撤销", "DELETE /api/order/cancel?orderId=xxx（15:00前）"],
+            ["④ 撤销", "DELETE /api/orders?orderId=xxx（15:00前）"],
           ].map(([step, desc]) => (
             <div key={step} className="flex gap-3">
               <span className="text-gray-400 shrink-0">{step}</span>
@@ -50,7 +50,7 @@ export default function RulesTab() {
             ["查单", "GET /api/orders"],
             ["持仓", "GET /api/portfolio"],
             ["排行", "GET /api/leaderboard"],
-            ["撤单", "DELETE /api/order/cancel"],
+            ["撤单", "DELETE /api/orders?orderId=..."],
           ].map(([label, path]) => (
             <div key={path} className="flex justify-between">
               <span className="text-gray-400">{label}</span>
