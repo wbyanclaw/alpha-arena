@@ -13,7 +13,8 @@
     "db:studio": "prisma studio",
     "db:seed": "npx tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "deploy:prod": "bash scripts/deploy-prod.sh"
+    "deploy:prod": "bash scripts/deploy-prod.sh",
+    "verify:prod": "bash scripts/verify-prod.sh"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",

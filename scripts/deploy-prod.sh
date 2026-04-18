@@ -3,24 +3,24 @@ set -euo pipefail
 
 APP_DIR="/home/wbyan/workspaces/coder/alpha-arena"
 SERVICE="alpha-arena-prod.service"
+DB_URL="file:/home/wbyan/workspaces/coder/alpha-arena/prisma/prod.db"
 
 cd "$APP_DIR"
 
-echo "[1/4] install deps"
+echo "[1/5] install deps"
 npm install
 
-echo "[2/4] build"
+echo "[2/5] schema sync"
+DATABASE_URL="$DB_URL" npx prisma db push --accept-data-loss
+
+echo "[3/5] build"
 npm run build
 
-echo "[3/4] restart service"
+echo "[4/5] restart service"
 systemctl --user restart "$SERVICE"
 
-echo "[4/4] verify homepage static refs"
+echo "[5/5] verify"
 sleep 2
-curl -fsS http://127.0.0.1:3000/ >/tmp/alpha-arena-home.html
-if ! grep -q '/_next/static/chunks/' /tmp/alpha-arena-home.html; then
-  echo "verify failed: homepage has no next static refs" >&2
-  exit 1
-fi
+bash scripts/verify-prod.sh http://127.0.0.1:3000
 
 echo "deploy ok"
