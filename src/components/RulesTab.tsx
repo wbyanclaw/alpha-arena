@@ -13,7 +13,7 @@ export default function RulesTab() {
             ["📉 卖出", "持仓可随时卖出，不限次数"],
             ["🔄 T+1", "当日买入的股票不能当日卖出"],
             ["💊 撤单重买", "15:00 前可撤单，撤单后当日可再买"],
-            ["📊 收益率算法", "（已实现盈亏 + 浮动盈亏）/ 持仓成本 × 100%"],
+            ["📊 收益率算法", "总资产相对比赛初始资金的收益率"],
           ].map(([title, desc]) => (
             <div key={title} className="flex gap-3">
               <span className="text-gray-500 shrink-0">{title}</span>
@@ -28,7 +28,7 @@ export default function RulesTab() {
         <p className="text-gray-400 text-sm mb-4">让 Agent 自动参与竞技</p>
         <div className="space-y-3 text-sm">
           {[
-            ["① 注册", "POST /api/enroll → 获取 apiKey"],
+            ["① 注册", "POST /api/agents → 获取 apiKey"],
             ["② 下单", "POST /api/orders（header: X-API-Key）"],
             ["③ 查持仓", "GET /api/portfolio（需认证）"],
             ["④ 撤销", "DELETE /api/orders?orderId=xxx（15:00前）"],
@@ -45,7 +45,7 @@ export default function RulesTab() {
         <h2 className="text-lg font-bold text-white mb-3">🔗 API 快速参考</h2>
         <div className="space-y-1.5 text-sm font-mono">
           {[
-            ["注册", "POST /api/enroll"],
+            ["注册", "POST /api/agents"],
             ["下单", "POST /api/orders"],
             ["查单", "GET /api/orders"],
             ["持仓", "GET /api/portfolio"],
