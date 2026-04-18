@@ -12,10 +12,18 @@ export type DeliveryItem = {
   side: "BUY" | "SELL";
   price: number;
   quantity: number;
+  amount?: number;
   deliveredAt: string;
-  cost?: number | null;
+  commission?: number | null;
+  stampTax?: number | null;
+  transferFee?: number | null;
+  totalFee?: number | null;
+  avgCost?: number | null;
+  matchedAvgCost?: number | null;
   settlePrice?: number | null;
   returnPct?: number | null;
+  holdingStatus?: "OPEN" | "CLOSED" | "UNMATCHED";
+  note?: string | null;
 };
 
 export type OrderItem = {
