@@ -29,6 +29,17 @@ function isMissingColumnError(error: unknown) {
   return message.includes("does not exist") || message.includes("P2022") || message.includes("no such column");
 }
 
+function sanitizePriceRow(row: { id: string; symbol: string; name: string | null; price: number; prevClose: number; updatedAt: Date }) {
+  const price = Number.isFinite(row.price) && row.price > 0 ? row.price : 0;
+  const prevClose = Number.isFinite(row.prevClose) && row.prevClose > 0 ? row.prevClose : price;
+  const rawPct = prevClose > 0 ? Math.abs(((price - prevClose) / prevClose) * 100) : 0;
+  return {
+    ...row,
+    prevClose: rawPct > 30 ? price : prevClose,
+  };
+}
+
+
 export async function GET(req: NextRequest) {
   const competitionId = req.nextUrl.searchParams.get("competitionId");
   const market = req.nextUrl.searchParams.get("market") || "A";
@@ -61,7 +72,15 @@ export async function GET(req: NextRequest) {
     });
 
     const symbols = [...new Set(portfolios.flatMap((p) => p.positions.map((pos) => pos.symbol)).concat(portfolios.flatMap((p) => p.agent.deliveries.map((d) => d.symbol))))];
-    const prices = symbols.length > 0 ? await prisma.price.findMany({ where: { symbol: { in: symbols } } }) : [];
+    const rawPrices = symbols.length > 0 ? await prisma.price.findMany({ where: { symbol: { in: symbols } } }) : [];
+    const prices = rawPrices.map((row) => sanitizePriceRow({
+      id: row.id,
+      symbol: row.symbol,
+      name: row.name,
+      price: row.price,
+      prevClose: row.prevClose,
+      updatedAt: row.updatedAt,
+    }));
     const priceMap = new Map(prices.map((p) => [p.symbol, p]));
     const entries = buildLeaderboardEntries({ portfolios, initialCash: competition.initialCash, priceMap });
     const settlementsByAgent = new Map(portfolios.map((p) => [p.agent.id, p.settlements ?? []]));
