@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "sqlite"
+}
+
+enum LobsterKey {
+  RED
+  BLUE
+  GOLD
+}
+
+enum DeliverySide {
+  BUY
+  SELL
+}
+
+enum TradeSide {
+  BUY
+  SELL
+}
+
+enum TradeStatus {
+  PENDING
+  FILLED
+  CANCELLED
+  REJECTED
+}
+
+enum AgentStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+enum CompetitionStatus {
+  PENDING
+  RUNNING
+  FINISHED
+}
+
+model Agent {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  apiKey      String      @unique
+  secretHash  String
+  status      AgentStatus @default(ACTIVE)
+  avatar      String?
+  description String?
+  model       String?
+  market      String      @default("A")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  trades     Trade[]
+  portfolios Portfolio[]
+  orders     Order[]
+  logs       LogEntry[]
+  comments   Comment[]
+  deliveries Delivery[]
+
+  @@index([apiKey])
+}
+
+model Competition {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  status      CompetitionStatus @default(PENDING)
+  startAt     DateTime?
+  endAt       DateTime?
+  initialCash Float             @default(1000000)
+  market      String            @default("A")
+  testMode    Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  portfolios Portfolio[]
+  orders     Order[]
+}
+
+model Portfolio {
+  id            String   @id @default(cuid())
+  agentId       String
+  competitionId String
+  cash          Float    @default(1000000)
+  totalValue    Float    @default(1000000)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  agent       Agent             @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition Competition       @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  positions   Position[]
+  orders      Order[]
+  settlements DailySettlement[]
+
+  @@unique([agentId, competitionId])
+  @@index([competitionId])
+}
+
+model Position {
+  id           String   @id @default(cuid())
+  portfolioId  String
+  symbol       String
+  quantity     Float
+  avgCost      Float
+  currentPrice Float?
+  boughtAt     DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, symbol])
+  @@index([portfolioId])
+}
+
+model Trade {
+  id            String      @id @default(cuid())
+  agentId       String
+  symbol        String
+  side          TradeSide
+  quantity      Float
+  price         Float
+  status        TradeStatus @default(PENDING)
+  filledAt      DateTime?
+  executedPrice Float?
+  note          String?
+  commission    Float?
+  stampTax      Float?
+  transferFee   Float?
+  netAmount     Float?
+  createdAt     DateTime    @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt])
+  @@index([symbol, createdAt])
+}
+
+model Price {
+  id        String   @id @default(cuid())
+  symbol    String   @unique
+  name      String?
+  price     Float
+  prevClose Float
+  updatedAt DateTime @updatedAt
+
+  @@index([symbol])
+}
+
+model Lobster {
+  id          String     @id @default(cuid())
+  key         LobsterKey @unique
+  name        String
+  description String?
+  color       String?
+  isActive    Boolean    @default(false)
+  agentId     String?    @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  deliveries Delivery[]
+  comments   Comment[]
+  logs       LogEntry[]
+}
+
+model Delivery {
+  id          String       @id @default(cuid())
+  agentId     String
+  lobsterId   String?
+  symbol      String
+  side        DeliverySide
+  quantity    Float
+  price       Float
+  deliveredAt DateTime
+  note        String?
+  createdAt   DateTime     @default(now())
+
+  agent   Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  lobster Lobster? @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, deliveredAt])
+  @@index([lobsterId, deliveredAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  author    String
+  content   String
+  sentiment Int?
+  lobsterId String?
+  agentId   String?
+  createdAt DateTime @default(now())
+
+  lobster Lobster? @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agent   Agent?   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([lobsterId, createdAt])
+  @@index([agentId, createdAt])
+}
+
+model LogEntry {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  level     String   @default("INFO")
+  lobsterId String?
+  agentId   String?
+  createdAt DateTime @default(now())
+
+  lobster Lobster? @relation(fields: [lobsterId], references: [id], onDelete: Cascade)
+  agent   Agent?   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([lobsterId, createdAt])
+  @@index([agentId, createdAt])
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  agentId       String
+  competitionId String
+  portfolioId   String
+  symbol        String
+  side          TradeSide
+  quantity      Float
+  note          String?
+  status        String    @default("PENDING")
+  rejectReason  String?
+  submittedAt   DateTime  @default(now())
+  matchedAt     DateTime?
+
+  agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  portfolio   Portfolio   @relation(fields: [portfolioId], references: [id])
+
+  @@index([agentId, submittedAt])
+  @@index([competitionId, status])
+  @@index([portfolioId])
+}
+
+model DailySettlement {
+  id           String   @id @default(cuid())
+  portfolioId  String
+  date         String
+  cash         Float
+  positionJson String?
+  positionDays Int      @default(0)
+  totalValue   Float
+  returnPct    Float
+  createdAt    DateTime @default(now())
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, date])
+  @@index([portfolioId])
+}

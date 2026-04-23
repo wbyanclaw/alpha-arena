@@ -1,0 +1,47 @@
+{
+  "name": "alpha-arena",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "postinstall": "prisma generate",
+    "deploy:prod": "bash scripts/deploy-prod.sh",
+    "verify:prod": "bash scripts/verify-prod.sh"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "@tanstack/react-query": "^5.97.0",
+    "better-sqlite3": "^11.9.0",
+    "next": "16.2.3",
+    "prisma": "6.19.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.0",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts",
+    "version": "^6.0.0"
+  },
+  "@prisma/client": {
+    "version": "^6.0.0"
+  }
+}
