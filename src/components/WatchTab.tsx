@@ -40,15 +40,18 @@ function relativeTag(ts?: string | null) {
 
 function StockCard({ item, rank, onOpen }: { item: StockWatchItem; rank: number; onOpen: () => void }) {
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-lg font-black text-white">#{rank} {item.name} <span className="text-sm text-gray-500">{item.symbol}</span></div>
-          <div className={`mt-1 text-sm font-bold ${item.changePct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(item.changePct)} · 热度 {item.heat}</div>
+    <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="text-lg font-black text-white sm:text-xl">#{rank} {item.name} <span className="text-sm text-gray-500">{item.symbol}</span></div>
+          <div className={`mt-1 text-base font-bold ${item.changePct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(item.changePct)} <span className="text-sm text-gray-400">· 热度 {item.heat}</span></div>
         </div>
-        <button onClick={onOpen} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-1 text-xs text-gray-300 hover:border-red-500 hover:text-white">查看该股全部Agent动作</button>
+        <button onClick={onOpen} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-2 text-sm text-gray-300 hover:border-red-500 hover:text-white">查看该股全部Agent动作</button>
       </div>
-      <div className="mt-3 text-sm text-gray-300">Agent动作: 买 {item.buyCount} / 卖 {item.sellCount} / 持有 {item.holdCount}，净多 {item.netBullish >= 0 ? `+${item.netBullish}` : item.netBullish}</div>
+      <div className="mt-3 grid gap-2 text-sm text-gray-300 sm:grid-cols-2">
+        <div>买 {item.buyCount} / 卖 {item.sellCount} / 持有 {item.holdCount}</div>
+        <div>净多 {item.netBullish >= 0 ? `+${item.netBullish}` : item.netBullish}</div>
+      </div>
       <div className="mt-2 text-sm text-gray-400">头部Agent: {item.topAgents.slice(0, 2).map((a) => `${a.agentName} ${a.action === "BUY" ? "买入" : a.action === "SELL" ? "卖出" : "持有"}`).join("，") || "暂无"}</div>
       <div className="mt-3 flex flex-wrap gap-2">
         {item.tags.concat(relativeTag(item.latestActionAt)).map((tag) => <span key={tag} className="rounded-full bg-black/40 px-2 py-1 text-xs text-gray-300">{tag}</span>)}
@@ -75,14 +78,14 @@ function AgentDetailPanel({ agentId, fromSymbol, onBackToStock }: { agentId: str
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-black text-white">Agent详情 | {entry.agent?.name ?? "—"}</h2>
           <p className="text-sm text-gray-500">历史收益、当前持仓、当日交易链路</p>
         </div>
         {fromSymbol && <button onClick={onBackToStock} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-2 text-sm text-gray-300 hover:text-white">回围观相关股票</button>}
       </div>
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4"><div className="text-xs text-gray-500">累计收益</div><div className={`mt-1 text-lg font-black ${entry.returnPct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(entry.returnPct)}</div></div>
         <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4"><div className="text-xs text-gray-500">胜率</div><div className="mt-1 text-lg font-black text-white">{detail.winRate.toFixed(1)}%</div></div>
         <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4"><div className="text-xs text-gray-500">最大回撤</div><div className="mt-1 text-lg font-black text-white">{detail.maxDrawdown.toFixed(1)}%</div></div>
@@ -114,18 +117,18 @@ function StockDetailPanel({ symbol, overview, onOpenAgent }: { symbol: string; o
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-black text-white">{stock.name} <span className="text-sm text-gray-500">{stock.symbol}</span></h2>
             <div className={`mt-1 text-sm font-bold ${stock.changePct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(stock.changePct)} · 热度 {stock.heat} · 分歧指数 {stock.divergence.toFixed(1)}</div>
           </div>
-          <div className="text-right text-xs text-gray-500">最新动作 {fmtTime(stock.latestActionAt)}</div>
+          <div className="text-xs text-gray-500">最新动作 {fmtTime(stock.latestActionAt)}</div>
         </div>
       </div>
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
         <div className="mb-3 text-sm font-bold text-gray-400">所有 Agent 买卖</div>
         <div className="space-y-2">
-          {stock.actions.map((action, idx) => (
+          {stock.actions.length === 0 ? <div className="text-sm text-gray-500">暂无 Agent 动作</div> : stock.actions.map((action, idx) => (
             <button key={`${action.agentId ?? action.agentName}-${idx}`} onClick={() => action.agentId && onOpenAgent(action.agentId)} className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50">
               <div>
                 <div className="font-bold text-white">{action.agentName}</div>
@@ -138,6 +141,26 @@ function StockDetailPanel({ symbol, overview, onOpenAgent }: { symbol: string; o
             </button>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function DivergenceCard({ item, onOpen }: { item: StockWatchItem; onOpen: () => void }) {
+  return (
+    <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:hidden">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="font-bold text-white">{item.name}</div>
+          <div className="text-xs text-gray-500">{item.symbol}</div>
+        </div>
+        <button onClick={onOpen} className="rounded-lg border border-neutral-700 px-3 py-1 text-xs text-gray-300">查看</button>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-300">
+        <div>买卖比 {item.buyCount}:{item.sellCount}</div>
+        <div>分歧 {item.divergence.toFixed(1)}</div>
+        <div>最新动作</div>
+        <div>{fmtTime(item.latestActionAt)}</div>
       </div>
     </div>
   );
@@ -179,15 +202,20 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-        <h2 className="text-xl font-black text-white">围观 | 今日热点股票观察</h2>
-        <p className="mt-1 text-sm text-gray-500">日期：{data.date} 市场：{data.market === "A" ? "A股" : data.market} 更新时间：{fmtTime(data.updatedAt)}</p>
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 sm:p-5">
+        <h2 className="text-2xl font-black text-white sm:text-3xl">围观 | 今日热点股票观察</h2>
+        <p className="mt-2 text-sm leading-6 text-gray-400">日期：{data.date} 市场：{data.market === "A" ? "A股" : data.market} 更新时间：{fmtTime(data.updatedAt)}</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-sm">
-        <div className="flex items-center gap-2"><span className="text-gray-500">时间范围:</span>{(["day", "hour"] as Range[]).map((item) => <button key={item} onClick={() => setRange(item)} className={`cursor-pointer rounded-full px-3 py-1 ${range === item ? "bg-red-500 text-white" : "bg-black/30 text-gray-300"}`}>{rangeLabels[item]}</button>)}</div>
-        <div className="text-gray-500">市场: <span className="text-white">全部</span></div>
-        <div className="flex items-center gap-2"><span className="text-gray-500">排序:</span>{(["heat", "divergence", "latest"] as SortKey[]).map((item) => <button key={item} onClick={() => setSortKey(item)} className={`cursor-pointer rounded-full px-3 py-1 ${sortKey === item ? "bg-red-500 text-white" : "bg-black/30 text-gray-300"}`}>{sortLabels[item]}</button>)}</div>
+      <div className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+        <div className="space-y-2">
+          <div className="text-sm font-bold text-gray-400">时间范围</div>
+          <div className="flex flex-wrap gap-2">{(["day", "hour"] as Range[]).map((item) => <button key={item} onClick={() => setRange(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${range === item ? "bg-red-500 text-white" : "bg-black/30 text-gray-300"}`}>{rangeLabels[item]}</button>)}</div>
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-bold text-gray-400">排序</div>
+          <div className="flex flex-wrap gap-2">{(["heat", "divergence", "latest"] as SortKey[]).map((item) => <button key={item} onClick={() => setSortKey(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${sortKey === item ? "bg-red-500 text-white" : "bg-black/30 text-gray-300"}`}>{sortLabels[item]}</button>)}</div>
+        </div>
       </div>
 
       <section className="space-y-3">
@@ -195,9 +223,10 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
         <div className="grid gap-3 lg:grid-cols-2">{sortedStocks.slice(0, 4).map((item, index) => <StockCard key={item.symbol} item={item} rank={index + 1} onOpen={() => onNavigate({ type: "stock-detail", symbol: item.symbol })} />)}</div>
       </section>
 
-      <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <div className="mb-3 text-sm font-bold text-gray-400">模块B · 分歧最大（最值得围观）</div>
-        <div className="overflow-x-auto">
+      <section className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+        <div className="text-sm font-bold text-gray-400">模块B · 分歧最大（最值得围观）</div>
+        <div className="space-y-3 sm:hidden">{[...sortedStocks].sort((a, b) => b.divergence - a.divergence).slice(0, 8).map((item) => <DivergenceCard key={item.symbol} item={item} onOpen={() => onNavigate({ type: "stock-detail", symbol: item.symbol })} />)}</div>
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="text-left text-gray-500"><tr><th className="pb-2">股票</th><th className="pb-2">买卖比</th><th className="pb-2">分歧指数</th><th className="pb-2">最新动作时间</th><th className="pb-2">入口</th></tr></thead>
             <tbody>
@@ -217,14 +246,12 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
 
       <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
         <div className="mb-3 text-sm font-bold text-gray-400">模块C · 头部Agent最新交易流</div>
-        <div className="space-y-2">
-          {data.latestFlows.slice(0, 10).map((flow, idx) => (
-            <button key={`${flow.agentId ?? flow.agentName}-${idx}`} onClick={() => flow.agentId && onNavigate({ type: "agent-detail", agentId: flow.agentId, fromSymbol: flow.symbol })} className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50">
-              <div className="text-sm text-gray-300">{fmtTime(flow.deliveredAt)} {flow.agentName} {flow.action} {flow.symbol}</div>
-              <div className="text-xs text-gray-500">{flow.stockName ?? flow.symbol}</div>
-            </button>
-          ))}
-        </div>
+        {data.latestFlows.length === 0 ? <div className="text-sm text-gray-500">当前暂无最新交易流</div> : <div className="space-y-2">{data.latestFlows.slice(0, 10).map((flow, idx) => (
+          <button key={`${flow.agentId ?? flow.agentName}-${idx}`} onClick={() => flow.agentId && onNavigate({ type: "agent-detail", agentId: flow.agentId, fromSymbol: flow.symbol })} className="flex w-full cursor-pointer flex-col gap-1 rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-gray-300">{fmtTime(flow.deliveredAt)} {flow.agentName} {flow.action} {flow.symbol}</div>
+            <div className="text-xs text-gray-500">{flow.stockName ?? flow.symbol}</div>
+          </button>
+        ))}</div>}
       </section>
     </div>
   );

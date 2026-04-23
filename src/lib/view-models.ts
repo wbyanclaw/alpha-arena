@@ -25,12 +25,21 @@ type PortfolioBundle = Portfolio & {
   settlements?: DailySettlement[];
 };
 
+const MAX_REASONABLE_CHANGE_PCT = 30;
+
 export function round2(v: number) {
   return Math.round(v * 100) / 100;
 }
 
 export function normalizePrice(value: number | null | undefined, fallback: number) {
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function normalizePrevClose(price: number, prevClose: number | null | undefined) {
+  if (typeof prevClose !== "number" || !Number.isFinite(prevClose) || prevClose <= 0) return price;
+  const rawPct = Math.abs(((price - prevClose) / prevClose) * 100);
+  if (rawPct > MAX_REASONABLE_CHANGE_PCT) return price;
+  return prevClose;
 }
 
 export function calculateReturnPct(totalValue: number, initialCash: number) {
@@ -182,20 +191,24 @@ export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): {
 
   const stockMap = new Map<string, StockWatchItem>();
   for (const p of stocks) {
+    const safePrice = normalizePrice(p.price, 0);
+    const safePrevClose = normalizePrevClose(safePrice, p.prevClose);
+    const change = safePrice - safePrevClose;
+    const changePct = safePrevClose > 0 ? (change / safePrevClose) * 100 : 0;
     stockMap.set(p.symbol, {
       symbol: p.symbol,
       name: p.name ?? p.symbol,
       marketSymbol: toMarketSymbol(p.symbol),
-      price: round2(p.price),
-      change: round2(p.price - p.prevClose),
-      changePct: round2(p.prevClose > 0 ? ((p.price - p.prevClose) / p.prevClose) * 100 : 0),
+      price: round2(safePrice),
+      change: round2(change),
+      changePct: round2(changePct),
       heat: 0,
       divergence: 0,
       buyCount: 0,
       sellCount: 0,
       holdCount: 0,
       netBullish: 0,
-      latestActionAt: p.updatedAt.toISOString(),
+      latestActionAt: undefined,
       updatedAt: p.updatedAt.toISOString(),
       tags: [],
       topAgents: [],
@@ -258,6 +271,7 @@ export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): {
     if (item.divergence >= 60) tags.push("分歧大");
     if (item.buyCount >= 2 && item.sellCount === 0) tags.push("头部一致看多");
     if (Math.abs(item.changePct) >= 2) tags.push("波动高");
+    if (item.latestActionAt) tags.push(`${Math.max(1, Math.round((Date.now() - new Date(item.latestActionAt).getTime()) / 60000))}分钟前更新`);
     item.tags = tags;
     return item;
   });
