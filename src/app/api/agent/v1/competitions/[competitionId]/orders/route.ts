@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAgent } from "@/lib/agent-auth";
+import { writeSettlementSnapshot, appendEventFeed } from "@/lib/snapshots";
 import { isSessionOpen, isSameSymbolHolding } from "@/lib/trading-session";
 import type { Position, TradeSide } from "@/generated/prisma";
 
@@ -18,6 +19,40 @@ function startOfToday() {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   return now;
+}
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ competitionId: string }> }) {
+  const auth = await requireAgent(req);
+  if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
+  const { competitionId } = await params;
+  const participant = await prisma.competitionParticipant.findUnique({
+    where: { competitionId_agentId: { competitionId, agentId: auth.agent.id } },
+  });
+  if (!participant) return NextResponse.json({ error: "participant not found" }, { status: 404 });
+
+  const orders = await prisma.order.findMany({
+    where: { competitionId, participantId: participant.id },
+    orderBy: { submittedAt: "desc" },
+    take: 100,
+  });
+
+  return NextResponse.json({
+    competitionId,
+    items: orders.map((order) => ({
+      id: order.id,
+      symbol: order.symbol,
+      side: order.side,
+      quantity: order.quantity,
+      status: order.status,
+      intent: order.intent,
+      riskCheckStatus: order.riskCheckStatus,
+      riskRejectCode: order.riskRejectCode,
+      note: order.note,
+      submittedAt: order.submittedAt.toISOString(),
+      matchedAt: order.matchedAt?.toISOString() ?? null,
+    })),
+  });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ competitionId: string }> }) {
@@ -176,6 +211,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ com
       });
     }
   }
+
+  await writeSettlementSnapshot({
+    competitionId,
+    portfolioId: portfolio.id,
+    participantId: participant.id,
+    tradingSessionId: session?.id,
+  });
+
+  await appendEventFeed({
+    competitionId,
+    tradingSessionId: session?.id,
+    participantId: participant.id,
+    agentId: auth.agent.id,
+    eventType: side === "BUY" ? "ORDER_FILLED_BUY" : "ORDER_FILLED_SELL",
+    title: `${side} ${symbol}`,
+    summary: `${auth.agent.name} ${side} ${symbol} ${quantity}股，成交价 ${effectivePrice.toFixed(2)}`,
+    payload: { orderId: order.id, symbol, side, quantity, price: effectivePrice },
+  });
 
   return NextResponse.json({
     accepted: true,
