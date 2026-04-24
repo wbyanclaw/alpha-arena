@@ -40,13 +40,13 @@ function relativeTag(ts?: string | null) {
 
 function StockCard({ item, rank, onOpen }: { item: StockWatchItem; rank: number; onOpen: () => void }) {
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 sm:p-5">
+    <div className="rounded-[24px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black p-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="text-lg font-black text-white sm:text-xl">#{rank} {item.name} <span className="text-sm text-gray-500">{item.symbol}</span></div>
           <div className={`mt-1 text-base font-bold ${item.changePct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(item.changePct)} <span className="text-sm text-gray-400">· 热度 {item.heat}</span></div>
         </div>
-        <button onClick={onOpen} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-2 text-sm text-gray-300 hover:border-red-500 hover:text-white">查看该股全部Agent动作</button>
+        <button onClick={onOpen} className="cursor-pointer rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm font-bold text-red-200 hover:border-red-400 hover:bg-red-500/20 hover:text-white">查看该股全部Agent动作</button>
       </div>
       <div className="mt-3 grid gap-2 text-sm text-gray-300 sm:grid-cols-2">
         <div>买 {item.buyCount} / 卖 {item.sellCount} / 持有 {item.holdCount}</div>
@@ -116,7 +116,7 @@ function StockDetailPanel({ symbol, overview, onOpenAgent }: { symbol: string; o
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <div className="rounded-[28px] border border-white/8 bg-gradient-to-br from-white/[0.08] via-white/[0.05] to-transparent p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-black text-white">{stock.name} <span className="text-sm text-gray-500">{stock.symbol}</span></h2>
@@ -207,7 +207,7 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
         <p className="mt-2 text-sm leading-6 text-gray-400">日期：{data.date} 市场：{data.market === "A" ? "A股" : data.market} 更新时间：{fmtTime(data.updatedAt)}</p>
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-900/95 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+      <div className="space-y-3 rounded-[28px] border border-white/8 bg-white/[0.04] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur">
         <div className="space-y-2">
           <div className="text-sm font-bold text-gray-400">时间范围</div>
           <div className="flex flex-wrap gap-2">{(["day", "hour"] as Range[]).map((item) => <button key={item} onClick={() => setRange(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${range === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-black/30 text-gray-300 hover:bg-black/50"}`}>{rangeLabels[item]}</button>)}</div>
@@ -223,7 +223,7 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
         <div className="grid gap-3 lg:grid-cols-2">{sortedStocks.slice(0, 4).map((item, index) => <StockCard key={item.symbol} item={item} rank={index + 1} onOpen={() => onNavigate({ type: "stock-detail", symbol: item.symbol })} />)}</div>
       </section>
 
-      <section className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <section className="space-y-3 rounded-[28px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black p-4 shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
         <div className="text-sm font-bold text-gray-400">模块B · 分歧最大（最值得围观）</div>
         <div className="space-y-3 sm:hidden">{[...sortedStocks].sort((a, b) => b.divergence - a.divergence).slice(0, 8).map((item) => <DivergenceCard key={item.symbol} item={item} onOpen={() => onNavigate({ type: "stock-detail", symbol: item.symbol })} />)}</div>
         <div className="hidden overflow-x-auto sm:block">
@@ -244,7 +244,7 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 pb-24 sm:pb-4">
+      <section className="rounded-[28px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black p-4 pb-24 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:pb-4">
         <div className="mb-3 text-sm font-bold text-gray-400">模块C · 头部Agent最新交易流</div>
         {data.latestFlows.length === 0 ? <div className="text-sm text-gray-500">当前暂无最新交易流</div> : <div className="space-y-2">{data.latestFlows.slice(0, 10).map((flow, idx) => (
           <button key={`${flow.agentId ?? flow.agentName}-${idx}`} onClick={() => flow.agentId && onNavigate({ type: "agent-detail", agentId: flow.agentId, fromSymbol: flow.symbol })} className="flex w-full cursor-pointer flex-col gap-1 rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50 sm:flex-row sm:items-center sm:justify-between">

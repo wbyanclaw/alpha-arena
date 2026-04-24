@@ -35,11 +35,11 @@ export default function DeliveryList({ agentId }: { agentId: string }) {
   if (deliveries.length === 0) return <div className="text-sm text-gray-500">暂无交割</div>;
 
   return (
-    <div>
-      <p className="mb-2 text-xs font-bold text-gray-500">交割记录</p>
-      <div className="space-y-2">
+    <div className="rounded-[24px] border border-white/8 bg-white/[0.04] p-4 backdrop-blur">
+      <p className="mb-3 text-xs font-bold tracking-[0.18em] text-gray-500 uppercase">交割记录</p>
+      <div className="space-y-3">
         {deliveries.map((item) => (
-          <div key={`${item.symbol}-${item.deliveredAt}-${item.side}`} className="rounded-lg border border-neutral-800 bg-neutral-900 p-3 text-sm">
+          <div key={`${item.symbol}-${item.deliveredAt}-${item.side}`} className="rounded-[20px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black p-4 text-sm shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="font-bold text-white">{item.name ?? item.symbol}</div>
@@ -47,7 +47,7 @@ export default function DeliveryList({ agentId }: { agentId: string }) {
               </div>
               <div className={item.side === "BUY" ? "font-bold text-red-400" : "font-bold text-green-400"}>{item.side}</div>
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-gray-300">
+            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-gray-300">
               <span>成交价 {fmtMoney(item.price)}</span>
               <span>成交额 {fmtMoney(item.amount)}</span>
               <span>数量 {item.quantity} 股</span>

@@ -16,7 +16,7 @@ function fmtPct(v: number) {
 
 function RankRow({ entry, detail, onOpen }: { entry: LeaderboardEntry; detail?: AgentDetail; onOpen: () => void }) {
   return (
-    <tr className="border-t border-neutral-800 text-sm text-gray-300">
+    <tr className="border-t border-white/8 text-sm text-gray-300 transition hover:bg-white/[0.03]">
       <td className="px-4 py-3 font-bold text-white">#{entry.rank}</td>
       <td className="px-4 py-3"><button onClick={onOpen} className="cursor-pointer font-bold text-white hover:text-red-400">{entry.agent?.name ?? entry.lobsterName ?? "—"}</button></td>
       <td className={`px-4 py-3 text-right font-mono font-bold ${entry.returnPct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(entry.returnPct)}</td>
@@ -81,19 +81,19 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+      <div className="rounded-[28px] border border-white/8 bg-gradient-to-br from-white/[0.08] via-white/[0.05] to-transparent p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur">
         <h2 className="text-xl font-black text-white">排行 | Agent盈利能力榜</h2>
         <p className="mt-1 text-sm text-gray-500">统计区间：近{period === "month" ? "30天" : periodLabels[period]}（可切换 今日/7天/30天/全部）</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">{(["day", "week", "month", "total"] as Period[]).map((item) => <button key={item} onClick={() => setPeriod(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${period === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>{periodLabels[item]}</button>)}</div>
-      <div className="flex flex-wrap gap-2">{(["overall", "daily", "steady", "rising"] as RankMode[]).map((item) => <button key={item} onClick={() => setMode(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${mode === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>{modeLabels[item]}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{(["day", "week", "month", "total"] as Period[]).map((item) => <button key={item} onClick={() => setPeriod(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${period === item ? "bg-gradient-to-r from-red-500 to-orange-400 text-white shadow-[0_12px_30px_rgba(239,68,68,0.32)]" : "bg-white/[0.04] text-gray-400 hover:bg-white/[0.06] hover:text-white"}`}>{periodLabels[item]}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{(["overall", "daily", "steady", "rising"] as RankMode[]).map((item) => <button key={item} onClick={() => setMode(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${mode === item ? "bg-gradient-to-r from-red-500 to-orange-400 text-white shadow-[0_12px_30px_rgba(239,68,68,0.32)]" : "bg-white/[0.04] text-gray-400 hover:bg-white/[0.06] hover:text-white"}`}>{modeLabels[item]}</button>)}</div>
 
       <div className="grid gap-3 md:grid-cols-3">
         {top3.map((entry, idx) => {
           const detail = detailMap.get(entry.agent?.id ?? "");
           return (
-            <button key={entry.agent?.id ?? idx} onClick={() => entry.agent?.id && onNavigateAgent(entry.agent.id)} className="cursor-pointer rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-left hover:border-red-500/50">
+            <button key={entry.agent?.id ?? idx} onClick={() => entry.agent?.id && onNavigateAgent(entry.agent.id)} className="cursor-pointer rounded-[24px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black p-4 text-left shadow-[0_18px_48px_rgba(0,0,0,0.24)] hover:border-red-500/40">
               <div className="text-2xl">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}</div>
               <div className="mt-2 font-black text-white">#{idx + 1} {entry.agent?.name ?? "—"}</div>
               <div className={`mt-2 text-lg font-black ${entry.returnPct >= 0 ? "text-red-400" : "text-green-400"}`}>累计收益 {fmtPct(entry.returnPct)}</div>
@@ -103,16 +103,16 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
         })}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900">
+      <div className="overflow-hidden rounded-[28px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
         <div className="overflow-x-auto">
         <table className="w-full min-w-[1000px] text-sm">
-          <thead className="bg-neutral-950 text-gray-400"><tr><th className="px-4 py-3 text-left">排名</th><th className="px-4 py-3 text-left">Agent</th><th className="px-4 py-3 text-right">累计收益率</th><th className="px-4 py-3 text-right">今日收益</th><th className="px-4 py-3 text-right">胜率</th><th className="px-4 py-3 text-right">最大回撤</th><th className="px-4 py-3 text-right">趋势(7天)</th><th className="px-4 py-3 text-right">最近动作</th></tr></thead>
+          <thead className="bg-white/[0.04] text-gray-400"><tr><th className="px-4 py-3 text-left">排名</th><th className="px-4 py-3 text-left">Agent</th><th className="px-4 py-3 text-right">累计收益率</th><th className="px-4 py-3 text-right">今日收益</th><th className="px-4 py-3 text-right">胜率</th><th className="px-4 py-3 text-right">最大回撤</th><th className="px-4 py-3 text-right">趋势(7天)</th><th className="px-4 py-3 text-right">最近动作</th></tr></thead>
           <tbody>{sorted.map((entry) => <RankRow key={entry.agent?.id ?? entry.rank} entry={entry} detail={detailMap.get(entry.agent?.id ?? "")} onOpen={() => entry.agent?.id && onNavigateAgent(entry.agent.id)} />)}</tbody>
         </table>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-gray-400">
+      <div className="rounded-[24px] border border-white/8 bg-white/[0.04] p-4 text-sm text-gray-400 backdrop-blur">
         <div>榜单说明</div>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>收益口径：已实现 + 未实现。</li>
