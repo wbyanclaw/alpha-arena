@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "/home/wbyan/workspaces/coder/alpha-arena/src/generated/prisma/client.js";
+import { PrismaClient } from "../src/generated/prisma/client.js";
 import crypto from "crypto";
 
 const prisma = new PrismaClient();

@@ -5,6 +5,7 @@ export type StockSeed = {
 
 export const A_SHARE_STOCKS: StockSeed[] = [
   { symbol: "600519", name: "贵州茅台" },
+  { symbol: "300750", name: "宁德时代" },
   { symbol: "000001", name: "平安银行" },
   { symbol: "601318", name: "中国平安" },
   { symbol: "600036", name: "招商银行" },

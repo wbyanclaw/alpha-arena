@@ -4,6 +4,7 @@ export type PositionItem = {
   quantity: number;
   avgCost: number;
   currentPrice?: number;
+  boughtAt?: string;
 };
 
 export type DeliveryItem = {
@@ -35,14 +36,16 @@ export type OrderItem = {
   status?: string;
 };
 
+export type AgentSummary = {
+  id?: string;
+  name?: string;
+  avatar?: string | null;
+  model?: string | null;
+};
+
 export type LeaderboardEntry = {
   rank: number;
-  agent?: {
-    id?: string;
-    name?: string;
-    avatar?: string | null;
-    model?: string | null;
-  };
+  agent?: AgentSummary;
   lobsterKey?: string | null;
   lobsterName?: string | null;
   lobsterColor?: string | null;
@@ -57,4 +60,64 @@ export type LeaderboardEntry = {
   todayOrder?: OrderItem | null;
   todayBought?: number;
   positions?: PositionItem[];
+};
+
+export type StockAgentAction = {
+  agentId?: string;
+  agentName: string;
+  action: "BUY" | "SELL" | "HOLD";
+  quantity: number;
+  price?: number | null;
+  returnPct?: number | null;
+  deliveredAt?: string | null;
+  hasPosition?: boolean;
+  positionQty?: number;
+};
+
+export type StockWatchItem = {
+  symbol: string;
+  name: string;
+  marketSymbol?: string;
+  price: number;
+  change: number;
+  changePct: number;
+  heat: number;
+  divergence: number;
+  buyCount: number;
+  sellCount: number;
+  holdCount: number;
+  netBullish: number;
+  latestActionAt?: string | null;
+  updatedAt?: string | null;
+  tags: string[];
+  topAgents: StockAgentAction[];
+  actions: StockAgentAction[];
+};
+
+export type AgentRecentAction = {
+  agentId?: string;
+  agentName: string;
+  symbol: string;
+  stockName?: string | null;
+  action: string;
+  quantity: number;
+  deliveredAt: string;
+};
+
+export type WatchOverviewResponse = {
+  date: string;
+  market: string;
+  updatedAt: string;
+  range: string;
+  stocks: StockWatchItem[];
+  latestFlows: AgentRecentAction[];
+};
+
+export type AgentDetail = {
+  entry: LeaderboardEntry;
+  deliveries: DeliveryItem[];
+  dailyReturns: number[];
+  winRate: number;
+  maxDrawdown: number;
+  trend7d: number;
 };

@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${1:-http://127.0.0.1:3000}"
-TMP_HTML="/tmp/alpha-arena-home.html"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
 
-curl -fsS "$BASE_URL/" > "$TMP_HTML"
-if ! grep -q '/_next/static/chunks/' "$TMP_HTML"; then
-  echo "verify failed: homepage has no next static refs" >&2
-  exit 1
+if [[ ! -f .env.local && ! -n "${DATABASE_URL:-}" ]]; then
+  echo "WARN: DATABASE_URL 未配置，默认运行时将回退到 file:./prisma/prod.db"
 fi
 
-STATUS=$(curl -sS -o /tmp/alpha-arena-leaderboard.json -w '%{http_code}' "$BASE_URL/api/leaderboard?period=total")
-if [ "$STATUS" != "200" ]; then
-  echo "verify failed: leaderboard status=$STATUS" >&2
-  sed -n '1,80p' /tmp/alpha-arena-leaderboard.json >&2 || true
-  exit 1
-fi
+echo "node=$(node -v)"
+echo "npm=$(npm -v)"
+echo "nvmrc=$(cat .nvmrc 2>/dev/null || echo missing)"
 
-echo "verify ok"
+echo "[1/3] prisma generate"
+npm run db:generate >/dev/null
+
+echo "[2/3] next build"
+npm run build >/dev/null
+
+echo "[3/3] lint"
+npm run lint >/dev/null
+
+echo "OK: build/lint/prisma passed"

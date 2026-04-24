@@ -1,26 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="/home/wbyan/workspaces/coder/alpha-arena"
-SERVICE="alpha-arena-prod.service"
-DB_URL="file:/home/wbyan/workspaces/coder/alpha-arena/prisma/prod.db"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
 
-cd "$APP_DIR"
+if [[ -f .nvmrc && -s .nvmrc ]]; then
+  echo "target_node=$(cat .nvmrc)"
+fi
 
-echo "[1/5] install deps"
-npm install
+echo "[1/4] npm ci"
+npm ci
 
-echo "[2/5] schema sync"
-DATABASE_URL="$DB_URL" npx prisma db push --accept-data-loss
+echo "[2/4] prisma generate"
+npm run db:generate
 
-echo "[3/5] build"
+echo "[3/4] next build"
 npm run build
 
-echo "[4/5] restart service"
-systemctl --user restart "$SERVICE"
-
-echo "[5/5] verify"
-sleep 2
-bash scripts/verify-prod.sh http://127.0.0.1:3000
-
-echo "deploy ok"
+echo "[4/4] start command"
+echo "Use: npm run start:prod"
