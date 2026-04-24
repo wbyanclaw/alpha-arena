@@ -73,6 +73,21 @@ export type Order = $Result.DefaultSelection<Prisma.$OrderPayload>
  * 
  */
 export type DailySettlement = $Result.DefaultSelection<Prisma.$DailySettlementPayload>
+/**
+ * Model CompetitionParticipant
+ * 
+ */
+export type CompetitionParticipant = $Result.DefaultSelection<Prisma.$CompetitionParticipantPayload>
+/**
+ * Model TradingSession
+ * 
+ */
+export type TradingSession = $Result.DefaultSelection<Prisma.$TradingSessionPayload>
+/**
+ * Model SettlementSnapshot
+ * 
+ */
+export type SettlementSnapshot = $Result.DefaultSelection<Prisma.$SettlementSnapshotPayload>
 
 /**
  * Enums
@@ -125,10 +140,62 @@ export type AgentStatus = (typeof AgentStatus)[keyof typeof AgentStatus]
 export const CompetitionStatus: {
   PENDING: 'PENDING',
   RUNNING: 'RUNNING',
+  PAUSED: 'PAUSED',
   FINISHED: 'FINISHED'
 };
 
 export type CompetitionStatus = (typeof CompetitionStatus)[keyof typeof CompetitionStatus]
+
+
+export const ParticipantStatus: {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  ACTIVE: 'ACTIVE',
+  ELIMINATED: 'ELIMINATED',
+  QUIT: 'QUIT'
+};
+
+export type ParticipantStatus = (typeof ParticipantStatus)[keyof typeof ParticipantStatus]
+
+
+export const TradingSessionType: {
+  CALL_AUCTION_OPEN: 'CALL_AUCTION_OPEN',
+  MORNING: 'MORNING',
+  AFTERNOON: 'AFTERNOON',
+  CALL_AUCTION_CLOSE: 'CALL_AUCTION_CLOSE',
+  CLOSED: 'CLOSED'
+};
+
+export type TradingSessionType = (typeof TradingSessionType)[keyof typeof TradingSessionType]
+
+
+export const TradingSessionStatus: {
+  PENDING: 'PENDING',
+  OPEN: 'OPEN',
+  PAUSED: 'PAUSED',
+  CLOSED: 'CLOSED'
+};
+
+export type TradingSessionStatus = (typeof TradingSessionStatus)[keyof typeof TradingSessionStatus]
+
+
+export const OrderIntent: {
+  OPEN: 'OPEN',
+  CLOSE: 'CLOSE',
+  SWITCH: 'SWITCH'
+};
+
+export type OrderIntent = (typeof OrderIntent)[keyof typeof OrderIntent]
+
+
+export const RiskCheckStatus: {
+  PENDING: 'PENDING',
+  PASSED: 'PASSED',
+  REJECTED: 'REJECTED'
+};
+
+export type RiskCheckStatus = (typeof RiskCheckStatus)[keyof typeof RiskCheckStatus]
 
 }
 
@@ -155,6 +222,26 @@ export const AgentStatus: typeof $Enums.AgentStatus
 export type CompetitionStatus = $Enums.CompetitionStatus
 
 export const CompetitionStatus: typeof $Enums.CompetitionStatus
+
+export type ParticipantStatus = $Enums.ParticipantStatus
+
+export const ParticipantStatus: typeof $Enums.ParticipantStatus
+
+export type TradingSessionType = $Enums.TradingSessionType
+
+export const TradingSessionType: typeof $Enums.TradingSessionType
+
+export type TradingSessionStatus = $Enums.TradingSessionStatus
+
+export const TradingSessionStatus: typeof $Enums.TradingSessionStatus
+
+export type OrderIntent = $Enums.OrderIntent
+
+export const OrderIntent: typeof $Enums.OrderIntent
+
+export type RiskCheckStatus = $Enums.RiskCheckStatus
+
+export const RiskCheckStatus: typeof $Enums.RiskCheckStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -393,6 +480,36 @@ export class PrismaClient<
     * ```
     */
   get dailySettlement(): Prisma.DailySettlementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.competitionParticipant`: Exposes CRUD operations for the **CompetitionParticipant** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CompetitionParticipants
+    * const competitionParticipants = await prisma.competitionParticipant.findMany()
+    * ```
+    */
+  get competitionParticipant(): Prisma.CompetitionParticipantDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.tradingSession`: Exposes CRUD operations for the **TradingSession** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TradingSessions
+    * const tradingSessions = await prisma.tradingSession.findMany()
+    * ```
+    */
+  get tradingSession(): Prisma.TradingSessionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.settlementSnapshot`: Exposes CRUD operations for the **SettlementSnapshot** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SettlementSnapshots
+    * const settlementSnapshots = await prisma.settlementSnapshot.findMany()
+    * ```
+    */
+  get settlementSnapshot(): Prisma.SettlementSnapshotDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -845,7 +962,10 @@ export namespace Prisma {
     Comment: 'Comment',
     LogEntry: 'LogEntry',
     Order: 'Order',
-    DailySettlement: 'DailySettlement'
+    DailySettlement: 'DailySettlement',
+    CompetitionParticipant: 'CompetitionParticipant',
+    TradingSession: 'TradingSession',
+    SettlementSnapshot: 'SettlementSnapshot'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -864,7 +984,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "agent" | "competition" | "portfolio" | "position" | "trade" | "price" | "lobster" | "delivery" | "comment" | "logEntry" | "order" | "dailySettlement"
+      modelProps: "agent" | "competition" | "portfolio" | "position" | "trade" | "price" | "lobster" | "delivery" | "comment" | "logEntry" | "order" | "dailySettlement" | "competitionParticipant" | "tradingSession" | "settlementSnapshot"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1756,6 +1876,228 @@ export namespace Prisma {
           }
         }
       }
+      CompetitionParticipant: {
+        payload: Prisma.$CompetitionParticipantPayload<ExtArgs>
+        fields: Prisma.CompetitionParticipantFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CompetitionParticipantFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CompetitionParticipantFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>
+          }
+          findFirst: {
+            args: Prisma.CompetitionParticipantFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CompetitionParticipantFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>
+          }
+          findMany: {
+            args: Prisma.CompetitionParticipantFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>[]
+          }
+          create: {
+            args: Prisma.CompetitionParticipantCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>
+          }
+          createMany: {
+            args: Prisma.CompetitionParticipantCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CompetitionParticipantCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>[]
+          }
+          delete: {
+            args: Prisma.CompetitionParticipantDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>
+          }
+          update: {
+            args: Prisma.CompetitionParticipantUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>
+          }
+          deleteMany: {
+            args: Prisma.CompetitionParticipantDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CompetitionParticipantUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CompetitionParticipantUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>[]
+          }
+          upsert: {
+            args: Prisma.CompetitionParticipantUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CompetitionParticipantPayload>
+          }
+          aggregate: {
+            args: Prisma.CompetitionParticipantAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCompetitionParticipant>
+          }
+          groupBy: {
+            args: Prisma.CompetitionParticipantGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CompetitionParticipantGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CompetitionParticipantCountArgs<ExtArgs>
+            result: $Utils.Optional<CompetitionParticipantCountAggregateOutputType> | number
+          }
+        }
+      }
+      TradingSession: {
+        payload: Prisma.$TradingSessionPayload<ExtArgs>
+        fields: Prisma.TradingSessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TradingSessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TradingSessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>
+          }
+          findFirst: {
+            args: Prisma.TradingSessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TradingSessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>
+          }
+          findMany: {
+            args: Prisma.TradingSessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>[]
+          }
+          create: {
+            args: Prisma.TradingSessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>
+          }
+          createMany: {
+            args: Prisma.TradingSessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TradingSessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>[]
+          }
+          delete: {
+            args: Prisma.TradingSessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>
+          }
+          update: {
+            args: Prisma.TradingSessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.TradingSessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TradingSessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TradingSessionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>[]
+          }
+          upsert: {
+            args: Prisma.TradingSessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TradingSessionPayload>
+          }
+          aggregate: {
+            args: Prisma.TradingSessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTradingSession>
+          }
+          groupBy: {
+            args: Prisma.TradingSessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TradingSessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TradingSessionCountArgs<ExtArgs>
+            result: $Utils.Optional<TradingSessionCountAggregateOutputType> | number
+          }
+        }
+      }
+      SettlementSnapshot: {
+        payload: Prisma.$SettlementSnapshotPayload<ExtArgs>
+        fields: Prisma.SettlementSnapshotFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SettlementSnapshotFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SettlementSnapshotFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>
+          }
+          findFirst: {
+            args: Prisma.SettlementSnapshotFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SettlementSnapshotFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>
+          }
+          findMany: {
+            args: Prisma.SettlementSnapshotFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>[]
+          }
+          create: {
+            args: Prisma.SettlementSnapshotCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>
+          }
+          createMany: {
+            args: Prisma.SettlementSnapshotCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SettlementSnapshotCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>[]
+          }
+          delete: {
+            args: Prisma.SettlementSnapshotDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>
+          }
+          update: {
+            args: Prisma.SettlementSnapshotUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>
+          }
+          deleteMany: {
+            args: Prisma.SettlementSnapshotDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SettlementSnapshotUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SettlementSnapshotUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>[]
+          }
+          upsert: {
+            args: Prisma.SettlementSnapshotUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettlementSnapshotPayload>
+          }
+          aggregate: {
+            args: Prisma.SettlementSnapshotAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSettlementSnapshot>
+          }
+          groupBy: {
+            args: Prisma.SettlementSnapshotGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SettlementSnapshotGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SettlementSnapshotCountArgs<ExtArgs>
+            result: $Utils.Optional<SettlementSnapshotCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1864,6 +2206,9 @@ export namespace Prisma {
     logEntry?: LogEntryOmit
     order?: OrderOmit
     dailySettlement?: DailySettlementOmit
+    competitionParticipant?: CompetitionParticipantOmit
+    tradingSession?: TradingSessionOmit
+    settlementSnapshot?: SettlementSnapshotOmit
   }
 
   /* Types for Logging */
@@ -1946,6 +2291,7 @@ export namespace Prisma {
   export type AgentCountOutputType = {
     trades: number
     portfolios: number
+    participants: number
     orders: number
     logs: number
     comments: number
@@ -1955,6 +2301,7 @@ export namespace Prisma {
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     trades?: boolean | AgentCountOutputTypeCountTradesArgs
     portfolios?: boolean | AgentCountOutputTypeCountPortfoliosArgs
+    participants?: boolean | AgentCountOutputTypeCountParticipantsArgs
     orders?: boolean | AgentCountOutputTypeCountOrdersArgs
     logs?: boolean | AgentCountOutputTypeCountLogsArgs
     comments?: boolean | AgentCountOutputTypeCountCommentsArgs
@@ -1984,6 +2331,13 @@ export namespace Prisma {
    */
   export type AgentCountOutputTypeCountPortfoliosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PortfolioWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountParticipantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CompetitionParticipantWhereInput
   }
 
   /**
@@ -2020,13 +2374,19 @@ export namespace Prisma {
    */
 
   export type CompetitionCountOutputType = {
+    participants: number
     portfolios: number
     orders: number
+    tradingSessions: number
+    snapshots: number
   }
 
   export type CompetitionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    participants?: boolean | CompetitionCountOutputTypeCountParticipantsArgs
     portfolios?: boolean | CompetitionCountOutputTypeCountPortfoliosArgs
     orders?: boolean | CompetitionCountOutputTypeCountOrdersArgs
+    tradingSessions?: boolean | CompetitionCountOutputTypeCountTradingSessionsArgs
+    snapshots?: boolean | CompetitionCountOutputTypeCountSnapshotsArgs
   }
 
   // Custom InputTypes
@@ -2043,6 +2403,13 @@ export namespace Prisma {
   /**
    * CompetitionCountOutputType without action
    */
+  export type CompetitionCountOutputTypeCountParticipantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CompetitionParticipantWhereInput
+  }
+
+  /**
+   * CompetitionCountOutputType without action
+   */
   export type CompetitionCountOutputTypeCountPortfoliosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PortfolioWhereInput
   }
@@ -2054,6 +2421,20 @@ export namespace Prisma {
     where?: OrderWhereInput
   }
 
+  /**
+   * CompetitionCountOutputType without action
+   */
+  export type CompetitionCountOutputTypeCountTradingSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TradingSessionWhereInput
+  }
+
+  /**
+   * CompetitionCountOutputType without action
+   */
+  export type CompetitionCountOutputTypeCountSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettlementSnapshotWhereInput
+  }
+
 
   /**
    * Count Type PortfolioCountOutputType
@@ -2063,12 +2444,14 @@ export namespace Prisma {
     positions: number
     orders: number
     settlements: number
+    snapshots: number
   }
 
   export type PortfolioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     positions?: boolean | PortfolioCountOutputTypeCountPositionsArgs
     orders?: boolean | PortfolioCountOutputTypeCountOrdersArgs
     settlements?: boolean | PortfolioCountOutputTypeCountSettlementsArgs
+    snapshots?: boolean | PortfolioCountOutputTypeCountSnapshotsArgs
   }
 
   // Custom InputTypes
@@ -2101,6 +2484,13 @@ export namespace Prisma {
    */
   export type PortfolioCountOutputTypeCountSettlementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DailySettlementWhereInput
+  }
+
+  /**
+   * PortfolioCountOutputType without action
+   */
+  export type PortfolioCountOutputTypeCountSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettlementSnapshotWhereInput
   }
 
 
@@ -2150,6 +2540,86 @@ export namespace Prisma {
    */
   export type LobsterCountOutputTypeCountLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LogEntryWhereInput
+  }
+
+
+  /**
+   * Count Type CompetitionParticipantCountOutputType
+   */
+
+  export type CompetitionParticipantCountOutputType = {
+    orders: number
+    snapshots: number
+  }
+
+  export type CompetitionParticipantCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | CompetitionParticipantCountOutputTypeCountOrdersArgs
+    snapshots?: boolean | CompetitionParticipantCountOutputTypeCountSnapshotsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CompetitionParticipantCountOutputType without action
+   */
+  export type CompetitionParticipantCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipantCountOutputType
+     */
+    select?: CompetitionParticipantCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CompetitionParticipantCountOutputType without action
+   */
+  export type CompetitionParticipantCountOutputTypeCountOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+  }
+
+  /**
+   * CompetitionParticipantCountOutputType without action
+   */
+  export type CompetitionParticipantCountOutputTypeCountSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettlementSnapshotWhereInput
+  }
+
+
+  /**
+   * Count Type TradingSessionCountOutputType
+   */
+
+  export type TradingSessionCountOutputType = {
+    orders: number
+    snapshots: number
+  }
+
+  export type TradingSessionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | TradingSessionCountOutputTypeCountOrdersArgs
+    snapshots?: boolean | TradingSessionCountOutputTypeCountSnapshotsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TradingSessionCountOutputType without action
+   */
+  export type TradingSessionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSessionCountOutputType
+     */
+    select?: TradingSessionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TradingSessionCountOutputType without action
+   */
+  export type TradingSessionCountOutputTypeCountOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+  }
+
+  /**
+   * TradingSessionCountOutputType without action
+   */
+  export type TradingSessionCountOutputTypeCountSnapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettlementSnapshotWhereInput
   }
 
 
@@ -2371,6 +2841,7 @@ export namespace Prisma {
     updatedAt?: boolean
     trades?: boolean | Agent$tradesArgs<ExtArgs>
     portfolios?: boolean | Agent$portfoliosArgs<ExtArgs>
+    participants?: boolean | Agent$participantsArgs<ExtArgs>
     orders?: boolean | Agent$ordersArgs<ExtArgs>
     logs?: boolean | Agent$logsArgs<ExtArgs>
     comments?: boolean | Agent$commentsArgs<ExtArgs>
@@ -2424,6 +2895,7 @@ export namespace Prisma {
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     trades?: boolean | Agent$tradesArgs<ExtArgs>
     portfolios?: boolean | Agent$portfoliosArgs<ExtArgs>
+    participants?: boolean | Agent$participantsArgs<ExtArgs>
     orders?: boolean | Agent$ordersArgs<ExtArgs>
     logs?: boolean | Agent$logsArgs<ExtArgs>
     comments?: boolean | Agent$commentsArgs<ExtArgs>
@@ -2438,6 +2910,7 @@ export namespace Prisma {
     objects: {
       trades: Prisma.$TradePayload<ExtArgs>[]
       portfolios: Prisma.$PortfolioPayload<ExtArgs>[]
+      participants: Prisma.$CompetitionParticipantPayload<ExtArgs>[]
       orders: Prisma.$OrderPayload<ExtArgs>[]
       logs: Prisma.$LogEntryPayload<ExtArgs>[]
       comments: Prisma.$CommentPayload<ExtArgs>[]
@@ -2851,6 +3324,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     trades<T extends Agent$tradesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$tradesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     portfolios<T extends Agent$portfoliosArgs<ExtArgs> = {}>(args?: Subset<T, Agent$portfoliosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    participants<T extends Agent$participantsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     orders<T extends Agent$ordersArgs<ExtArgs> = {}>(args?: Subset<T, Agent$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     logs<T extends Agent$logsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$logsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LogEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     comments<T extends Agent$commentsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3329,6 +3803,30 @@ export namespace Prisma {
   }
 
   /**
+   * Agent.participants
+   */
+  export type Agent$participantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    where?: CompetitionParticipantWhereInput
+    orderBy?: CompetitionParticipantOrderByWithRelationInput | CompetitionParticipantOrderByWithRelationInput[]
+    cursor?: CompetitionParticipantWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CompetitionParticipantScalarFieldEnum | CompetitionParticipantScalarFieldEnum[]
+  }
+
+  /**
    * Agent.orders
    */
   export type Agent$ordersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3457,10 +3955,18 @@ export namespace Prisma {
 
   export type CompetitionAvgAggregateOutputType = {
     initialCash: number | null
+    maxPositionPct: number | null
+    maxHoldingSymbols: number | null
+    commissionRate: number | null
+    slippageBps: number | null
   }
 
   export type CompetitionSumAggregateOutputType = {
     initialCash: number | null
+    maxPositionPct: number | null
+    maxHoldingSymbols: number | null
+    commissionRate: number | null
+    slippageBps: number | null
   }
 
   export type CompetitionMinAggregateOutputType = {
@@ -3473,6 +3979,18 @@ export namespace Prisma {
     initialCash: number | null
     market: string | null
     testMode: boolean | null
+    mode: string | null
+    entryRule: string | null
+    tradableSymbolsJson: string | null
+    maxPositionPct: number | null
+    maxHoldingSymbols: number | null
+    switchRequiresFlat: boolean | null
+    commissionRate: number | null
+    slippageBps: number | null
+    allowShort: boolean | null
+    scoreFormula: string | null
+    phase: string | null
+    tradingCalendar: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3487,6 +4005,18 @@ export namespace Prisma {
     initialCash: number | null
     market: string | null
     testMode: boolean | null
+    mode: string | null
+    entryRule: string | null
+    tradableSymbolsJson: string | null
+    maxPositionPct: number | null
+    maxHoldingSymbols: number | null
+    switchRequiresFlat: boolean | null
+    commissionRate: number | null
+    slippageBps: number | null
+    allowShort: boolean | null
+    scoreFormula: string | null
+    phase: string | null
+    tradingCalendar: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3501,6 +4031,18 @@ export namespace Prisma {
     initialCash: number
     market: number
     testMode: number
+    mode: number
+    entryRule: number
+    tradableSymbolsJson: number
+    maxPositionPct: number
+    maxHoldingSymbols: number
+    switchRequiresFlat: number
+    commissionRate: number
+    slippageBps: number
+    allowShort: number
+    scoreFormula: number
+    phase: number
+    tradingCalendar: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3509,10 +4051,18 @@ export namespace Prisma {
 
   export type CompetitionAvgAggregateInputType = {
     initialCash?: true
+    maxPositionPct?: true
+    maxHoldingSymbols?: true
+    commissionRate?: true
+    slippageBps?: true
   }
 
   export type CompetitionSumAggregateInputType = {
     initialCash?: true
+    maxPositionPct?: true
+    maxHoldingSymbols?: true
+    commissionRate?: true
+    slippageBps?: true
   }
 
   export type CompetitionMinAggregateInputType = {
@@ -3525,6 +4075,18 @@ export namespace Prisma {
     initialCash?: true
     market?: true
     testMode?: true
+    mode?: true
+    entryRule?: true
+    tradableSymbolsJson?: true
+    maxPositionPct?: true
+    maxHoldingSymbols?: true
+    switchRequiresFlat?: true
+    commissionRate?: true
+    slippageBps?: true
+    allowShort?: true
+    scoreFormula?: true
+    phase?: true
+    tradingCalendar?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3539,6 +4101,18 @@ export namespace Prisma {
     initialCash?: true
     market?: true
     testMode?: true
+    mode?: true
+    entryRule?: true
+    tradableSymbolsJson?: true
+    maxPositionPct?: true
+    maxHoldingSymbols?: true
+    switchRequiresFlat?: true
+    commissionRate?: true
+    slippageBps?: true
+    allowShort?: true
+    scoreFormula?: true
+    phase?: true
+    tradingCalendar?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3553,6 +4127,18 @@ export namespace Prisma {
     initialCash?: true
     market?: true
     testMode?: true
+    mode?: true
+    entryRule?: true
+    tradableSymbolsJson?: true
+    maxPositionPct?: true
+    maxHoldingSymbols?: true
+    switchRequiresFlat?: true
+    commissionRate?: true
+    slippageBps?: true
+    allowShort?: true
+    scoreFormula?: true
+    phase?: true
+    tradingCalendar?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3654,6 +4240,18 @@ export namespace Prisma {
     initialCash: number
     market: string
     testMode: boolean
+    mode: string
+    entryRule: string
+    tradableSymbolsJson: string | null
+    maxPositionPct: number
+    maxHoldingSymbols: number
+    switchRequiresFlat: boolean
+    commissionRate: number
+    slippageBps: number
+    allowShort: boolean
+    scoreFormula: string | null
+    phase: string
+    tradingCalendar: string | null
     createdAt: Date
     updatedAt: Date
     _count: CompetitionCountAggregateOutputType | null
@@ -3687,10 +4285,25 @@ export namespace Prisma {
     initialCash?: boolean
     market?: boolean
     testMode?: boolean
+    mode?: boolean
+    entryRule?: boolean
+    tradableSymbolsJson?: boolean
+    maxPositionPct?: boolean
+    maxHoldingSymbols?: boolean
+    switchRequiresFlat?: boolean
+    commissionRate?: boolean
+    slippageBps?: boolean
+    allowShort?: boolean
+    scoreFormula?: boolean
+    phase?: boolean
+    tradingCalendar?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    participants?: boolean | Competition$participantsArgs<ExtArgs>
     portfolios?: boolean | Competition$portfoliosArgs<ExtArgs>
     orders?: boolean | Competition$ordersArgs<ExtArgs>
+    tradingSessions?: boolean | Competition$tradingSessionsArgs<ExtArgs>
+    snapshots?: boolean | Competition$snapshotsArgs<ExtArgs>
     _count?: boolean | CompetitionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["competition"]>
 
@@ -3704,6 +4317,18 @@ export namespace Prisma {
     initialCash?: boolean
     market?: boolean
     testMode?: boolean
+    mode?: boolean
+    entryRule?: boolean
+    tradableSymbolsJson?: boolean
+    maxPositionPct?: boolean
+    maxHoldingSymbols?: boolean
+    switchRequiresFlat?: boolean
+    commissionRate?: boolean
+    slippageBps?: boolean
+    allowShort?: boolean
+    scoreFormula?: boolean
+    phase?: boolean
+    tradingCalendar?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["competition"]>
@@ -3718,6 +4343,18 @@ export namespace Prisma {
     initialCash?: boolean
     market?: boolean
     testMode?: boolean
+    mode?: boolean
+    entryRule?: boolean
+    tradableSymbolsJson?: boolean
+    maxPositionPct?: boolean
+    maxHoldingSymbols?: boolean
+    switchRequiresFlat?: boolean
+    commissionRate?: boolean
+    slippageBps?: boolean
+    allowShort?: boolean
+    scoreFormula?: boolean
+    phase?: boolean
+    tradingCalendar?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["competition"]>
@@ -3732,14 +4369,29 @@ export namespace Prisma {
     initialCash?: boolean
     market?: boolean
     testMode?: boolean
+    mode?: boolean
+    entryRule?: boolean
+    tradableSymbolsJson?: boolean
+    maxPositionPct?: boolean
+    maxHoldingSymbols?: boolean
+    switchRequiresFlat?: boolean
+    commissionRate?: boolean
+    slippageBps?: boolean
+    allowShort?: boolean
+    scoreFormula?: boolean
+    phase?: boolean
+    tradingCalendar?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CompetitionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "status" | "startAt" | "endAt" | "initialCash" | "market" | "testMode" | "createdAt" | "updatedAt", ExtArgs["result"]["competition"]>
+  export type CompetitionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "status" | "startAt" | "endAt" | "initialCash" | "market" | "testMode" | "mode" | "entryRule" | "tradableSymbolsJson" | "maxPositionPct" | "maxHoldingSymbols" | "switchRequiresFlat" | "commissionRate" | "slippageBps" | "allowShort" | "scoreFormula" | "phase" | "tradingCalendar" | "createdAt" | "updatedAt", ExtArgs["result"]["competition"]>
   export type CompetitionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    participants?: boolean | Competition$participantsArgs<ExtArgs>
     portfolios?: boolean | Competition$portfoliosArgs<ExtArgs>
     orders?: boolean | Competition$ordersArgs<ExtArgs>
+    tradingSessions?: boolean | Competition$tradingSessionsArgs<ExtArgs>
+    snapshots?: boolean | Competition$snapshotsArgs<ExtArgs>
     _count?: boolean | CompetitionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CompetitionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3748,8 +4400,11 @@ export namespace Prisma {
   export type $CompetitionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Competition"
     objects: {
+      participants: Prisma.$CompetitionParticipantPayload<ExtArgs>[]
       portfolios: Prisma.$PortfolioPayload<ExtArgs>[]
       orders: Prisma.$OrderPayload<ExtArgs>[]
+      tradingSessions: Prisma.$TradingSessionPayload<ExtArgs>[]
+      snapshots: Prisma.$SettlementSnapshotPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3761,6 +4416,18 @@ export namespace Prisma {
       initialCash: number
       market: string
       testMode: boolean
+      mode: string
+      entryRule: string
+      tradableSymbolsJson: string | null
+      maxPositionPct: number
+      maxHoldingSymbols: number
+      switchRequiresFlat: boolean
+      commissionRate: number
+      slippageBps: number
+      allowShort: boolean
+      scoreFormula: string | null
+      phase: string
+      tradingCalendar: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["competition"]>
@@ -4157,8 +4824,11 @@ export namespace Prisma {
    */
   export interface Prisma__CompetitionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    participants<T extends Competition$participantsArgs<ExtArgs> = {}>(args?: Subset<T, Competition$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     portfolios<T extends Competition$portfoliosArgs<ExtArgs> = {}>(args?: Subset<T, Competition$portfoliosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     orders<T extends Competition$ordersArgs<ExtArgs> = {}>(args?: Subset<T, Competition$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tradingSessions<T extends Competition$tradingSessionsArgs<ExtArgs> = {}>(args?: Subset<T, Competition$tradingSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    snapshots<T extends Competition$snapshotsArgs<ExtArgs> = {}>(args?: Subset<T, Competition$snapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4197,6 +4867,18 @@ export namespace Prisma {
     readonly initialCash: FieldRef<"Competition", 'Float'>
     readonly market: FieldRef<"Competition", 'String'>
     readonly testMode: FieldRef<"Competition", 'Boolean'>
+    readonly mode: FieldRef<"Competition", 'String'>
+    readonly entryRule: FieldRef<"Competition", 'String'>
+    readonly tradableSymbolsJson: FieldRef<"Competition", 'String'>
+    readonly maxPositionPct: FieldRef<"Competition", 'Float'>
+    readonly maxHoldingSymbols: FieldRef<"Competition", 'Int'>
+    readonly switchRequiresFlat: FieldRef<"Competition", 'Boolean'>
+    readonly commissionRate: FieldRef<"Competition", 'Float'>
+    readonly slippageBps: FieldRef<"Competition", 'Int'>
+    readonly allowShort: FieldRef<"Competition", 'Boolean'>
+    readonly scoreFormula: FieldRef<"Competition", 'String'>
+    readonly phase: FieldRef<"Competition", 'String'>
+    readonly tradingCalendar: FieldRef<"Competition", 'String'>
     readonly createdAt: FieldRef<"Competition", 'DateTime'>
     readonly updatedAt: FieldRef<"Competition", 'DateTime'>
   }
@@ -4585,6 +5267,30 @@ export namespace Prisma {
   }
 
   /**
+   * Competition.participants
+   */
+  export type Competition$participantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    where?: CompetitionParticipantWhereInput
+    orderBy?: CompetitionParticipantOrderByWithRelationInput | CompetitionParticipantOrderByWithRelationInput[]
+    cursor?: CompetitionParticipantWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CompetitionParticipantScalarFieldEnum | CompetitionParticipantScalarFieldEnum[]
+  }
+
+  /**
    * Competition.portfolios
    */
   export type Competition$portfoliosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4633,6 +5339,54 @@ export namespace Prisma {
   }
 
   /**
+   * Competition.tradingSessions
+   */
+  export type Competition$tradingSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    where?: TradingSessionWhereInput
+    orderBy?: TradingSessionOrderByWithRelationInput | TradingSessionOrderByWithRelationInput[]
+    cursor?: TradingSessionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TradingSessionScalarFieldEnum | TradingSessionScalarFieldEnum[]
+  }
+
+  /**
+   * Competition.snapshots
+   */
+  export type Competition$snapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    where?: SettlementSnapshotWhereInput
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    cursor?: SettlementSnapshotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
+  }
+
+  /**
    * Competition without action
    */
   export type CompetitionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4666,11 +5420,13 @@ export namespace Prisma {
   export type PortfolioAvgAggregateOutputType = {
     cash: number | null
     totalValue: number | null
+    holdingCount: number | null
   }
 
   export type PortfolioSumAggregateOutputType = {
     cash: number | null
     totalValue: number | null
+    holdingCount: number | null
   }
 
   export type PortfolioMinAggregateOutputType = {
@@ -4679,6 +5435,9 @@ export namespace Prisma {
     competitionId: string | null
     cash: number | null
     totalValue: number | null
+    holdingSymbol: string | null
+    holdingCount: number | null
+    switchRequiresFlat: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4689,6 +5448,9 @@ export namespace Prisma {
     competitionId: string | null
     cash: number | null
     totalValue: number | null
+    holdingSymbol: string | null
+    holdingCount: number | null
+    switchRequiresFlat: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4699,6 +5461,9 @@ export namespace Prisma {
     competitionId: number
     cash: number
     totalValue: number
+    holdingSymbol: number
+    holdingCount: number
+    switchRequiresFlat: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4708,11 +5473,13 @@ export namespace Prisma {
   export type PortfolioAvgAggregateInputType = {
     cash?: true
     totalValue?: true
+    holdingCount?: true
   }
 
   export type PortfolioSumAggregateInputType = {
     cash?: true
     totalValue?: true
+    holdingCount?: true
   }
 
   export type PortfolioMinAggregateInputType = {
@@ -4721,6 +5488,9 @@ export namespace Prisma {
     competitionId?: true
     cash?: true
     totalValue?: true
+    holdingSymbol?: true
+    holdingCount?: true
+    switchRequiresFlat?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4731,6 +5501,9 @@ export namespace Prisma {
     competitionId?: true
     cash?: true
     totalValue?: true
+    holdingSymbol?: true
+    holdingCount?: true
+    switchRequiresFlat?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4741,6 +5514,9 @@ export namespace Prisma {
     competitionId?: true
     cash?: true
     totalValue?: true
+    holdingSymbol?: true
+    holdingCount?: true
+    switchRequiresFlat?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4838,6 +5614,9 @@ export namespace Prisma {
     competitionId: string
     cash: number
     totalValue: number
+    holdingSymbol: string | null
+    holdingCount: number
+    switchRequiresFlat: boolean
     createdAt: Date
     updatedAt: Date
     _count: PortfolioCountAggregateOutputType | null
@@ -4867,13 +5646,18 @@ export namespace Prisma {
     competitionId?: boolean
     cash?: boolean
     totalValue?: boolean
+    holdingSymbol?: boolean
+    holdingCount?: boolean
+    switchRequiresFlat?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    participant?: boolean | Portfolio$participantArgs<ExtArgs>
     positions?: boolean | Portfolio$positionsArgs<ExtArgs>
     orders?: boolean | Portfolio$ordersArgs<ExtArgs>
     settlements?: boolean | Portfolio$settlementsArgs<ExtArgs>
+    snapshots?: boolean | Portfolio$snapshotsArgs<ExtArgs>
     _count?: boolean | PortfolioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["portfolio"]>
 
@@ -4883,6 +5667,9 @@ export namespace Prisma {
     competitionId?: boolean
     cash?: boolean
     totalValue?: boolean
+    holdingSymbol?: boolean
+    holdingCount?: boolean
+    switchRequiresFlat?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
@@ -4895,6 +5682,9 @@ export namespace Prisma {
     competitionId?: boolean
     cash?: boolean
     totalValue?: boolean
+    holdingSymbol?: boolean
+    holdingCount?: boolean
+    switchRequiresFlat?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
@@ -4907,17 +5697,22 @@ export namespace Prisma {
     competitionId?: boolean
     cash?: boolean
     totalValue?: boolean
+    holdingSymbol?: boolean
+    holdingCount?: boolean
+    switchRequiresFlat?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PortfolioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "competitionId" | "cash" | "totalValue" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
+  export type PortfolioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "competitionId" | "cash" | "totalValue" | "holdingSymbol" | "holdingCount" | "switchRequiresFlat" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
   export type PortfolioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    participant?: boolean | Portfolio$participantArgs<ExtArgs>
     positions?: boolean | Portfolio$positionsArgs<ExtArgs>
     orders?: boolean | Portfolio$ordersArgs<ExtArgs>
     settlements?: boolean | Portfolio$settlementsArgs<ExtArgs>
+    snapshots?: boolean | Portfolio$snapshotsArgs<ExtArgs>
     _count?: boolean | PortfolioCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PortfolioIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4934,9 +5729,11 @@ export namespace Prisma {
     objects: {
       agent: Prisma.$AgentPayload<ExtArgs>
       competition: Prisma.$CompetitionPayload<ExtArgs>
+      participant: Prisma.$CompetitionParticipantPayload<ExtArgs> | null
       positions: Prisma.$PositionPayload<ExtArgs>[]
       orders: Prisma.$OrderPayload<ExtArgs>[]
       settlements: Prisma.$DailySettlementPayload<ExtArgs>[]
+      snapshots: Prisma.$SettlementSnapshotPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4944,6 +5741,9 @@ export namespace Prisma {
       competitionId: string
       cash: number
       totalValue: number
+      holdingSymbol: string | null
+      holdingCount: number
+      switchRequiresFlat: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["portfolio"]>
@@ -5342,9 +6142,11 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     competition<T extends CompetitionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionDefaultArgs<ExtArgs>>): Prisma__CompetitionClient<$Result.GetResult<Prisma.$CompetitionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    participant<T extends Portfolio$participantArgs<ExtArgs> = {}>(args?: Subset<T, Portfolio$participantArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     positions<T extends Portfolio$positionsArgs<ExtArgs> = {}>(args?: Subset<T, Portfolio$positionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PositionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     orders<T extends Portfolio$ordersArgs<ExtArgs> = {}>(args?: Subset<T, Portfolio$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     settlements<T extends Portfolio$settlementsArgs<ExtArgs> = {}>(args?: Subset<T, Portfolio$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailySettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    snapshots<T extends Portfolio$snapshotsArgs<ExtArgs> = {}>(args?: Subset<T, Portfolio$snapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5379,6 +6181,9 @@ export namespace Prisma {
     readonly competitionId: FieldRef<"Portfolio", 'String'>
     readonly cash: FieldRef<"Portfolio", 'Float'>
     readonly totalValue: FieldRef<"Portfolio", 'Float'>
+    readonly holdingSymbol: FieldRef<"Portfolio", 'String'>
+    readonly holdingCount: FieldRef<"Portfolio", 'Int'>
+    readonly switchRequiresFlat: FieldRef<"Portfolio", 'Boolean'>
     readonly createdAt: FieldRef<"Portfolio", 'DateTime'>
     readonly updatedAt: FieldRef<"Portfolio", 'DateTime'>
   }
@@ -5775,6 +6580,25 @@ export namespace Prisma {
   }
 
   /**
+   * Portfolio.participant
+   */
+  export type Portfolio$participantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    where?: CompetitionParticipantWhereInput
+  }
+
+  /**
    * Portfolio.positions
    */
   export type Portfolio$positionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5844,6 +6668,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DailySettlementScalarFieldEnum | DailySettlementScalarFieldEnum[]
+  }
+
+  /**
+   * Portfolio.snapshots
+   */
+  export type Portfolio$snapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    where?: SettlementSnapshotWhereInput
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    cursor?: SettlementSnapshotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
   }
 
   /**
@@ -13967,11 +14815,16 @@ export namespace Prisma {
     agentId: string | null
     competitionId: string | null
     portfolioId: string | null
+    participantId: string | null
+    tradingSessionId: string | null
     symbol: string | null
     side: $Enums.TradeSide | null
     quantity: number | null
     note: string | null
     status: string | null
+    intent: $Enums.OrderIntent | null
+    riskCheckStatus: $Enums.RiskCheckStatus | null
+    riskRejectCode: string | null
     rejectReason: string | null
     submittedAt: Date | null
     matchedAt: Date | null
@@ -13982,11 +14835,16 @@ export namespace Prisma {
     agentId: string | null
     competitionId: string | null
     portfolioId: string | null
+    participantId: string | null
+    tradingSessionId: string | null
     symbol: string | null
     side: $Enums.TradeSide | null
     quantity: number | null
     note: string | null
     status: string | null
+    intent: $Enums.OrderIntent | null
+    riskCheckStatus: $Enums.RiskCheckStatus | null
+    riskRejectCode: string | null
     rejectReason: string | null
     submittedAt: Date | null
     matchedAt: Date | null
@@ -13997,11 +14855,16 @@ export namespace Prisma {
     agentId: number
     competitionId: number
     portfolioId: number
+    participantId: number
+    tradingSessionId: number
     symbol: number
     side: number
     quantity: number
     note: number
     status: number
+    intent: number
+    riskCheckStatus: number
+    riskRejectCode: number
     rejectReason: number
     submittedAt: number
     matchedAt: number
@@ -14022,11 +14885,16 @@ export namespace Prisma {
     agentId?: true
     competitionId?: true
     portfolioId?: true
+    participantId?: true
+    tradingSessionId?: true
     symbol?: true
     side?: true
     quantity?: true
     note?: true
     status?: true
+    intent?: true
+    riskCheckStatus?: true
+    riskRejectCode?: true
     rejectReason?: true
     submittedAt?: true
     matchedAt?: true
@@ -14037,11 +14905,16 @@ export namespace Prisma {
     agentId?: true
     competitionId?: true
     portfolioId?: true
+    participantId?: true
+    tradingSessionId?: true
     symbol?: true
     side?: true
     quantity?: true
     note?: true
     status?: true
+    intent?: true
+    riskCheckStatus?: true
+    riskRejectCode?: true
     rejectReason?: true
     submittedAt?: true
     matchedAt?: true
@@ -14052,11 +14925,16 @@ export namespace Prisma {
     agentId?: true
     competitionId?: true
     portfolioId?: true
+    participantId?: true
+    tradingSessionId?: true
     symbol?: true
     side?: true
     quantity?: true
     note?: true
     status?: true
+    intent?: true
+    riskCheckStatus?: true
+    riskRejectCode?: true
     rejectReason?: true
     submittedAt?: true
     matchedAt?: true
@@ -14154,11 +15032,16 @@ export namespace Prisma {
     agentId: string
     competitionId: string
     portfolioId: string
+    participantId: string | null
+    tradingSessionId: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note: string | null
     status: string
+    intent: $Enums.OrderIntent
+    riskCheckStatus: $Enums.RiskCheckStatus
+    riskRejectCode: string | null
     rejectReason: string | null
     submittedAt: Date
     matchedAt: Date | null
@@ -14188,17 +15071,24 @@ export namespace Prisma {
     agentId?: boolean
     competitionId?: boolean
     portfolioId?: boolean
+    participantId?: boolean
+    tradingSessionId?: boolean
     symbol?: boolean
     side?: boolean
     quantity?: boolean
     note?: boolean
     status?: boolean
+    intent?: boolean
+    riskCheckStatus?: boolean
+    riskRejectCode?: boolean
     rejectReason?: boolean
     submittedAt?: boolean
     matchedAt?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
     portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+    participant?: boolean | Order$participantArgs<ExtArgs>
+    tradingSession?: boolean | Order$tradingSessionArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
   export type OrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14206,17 +15096,24 @@ export namespace Prisma {
     agentId?: boolean
     competitionId?: boolean
     portfolioId?: boolean
+    participantId?: boolean
+    tradingSessionId?: boolean
     symbol?: boolean
     side?: boolean
     quantity?: boolean
     note?: boolean
     status?: boolean
+    intent?: boolean
+    riskCheckStatus?: boolean
+    riskRejectCode?: boolean
     rejectReason?: boolean
     submittedAt?: boolean
     matchedAt?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
     portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+    participant?: boolean | Order$participantArgs<ExtArgs>
+    tradingSession?: boolean | Order$tradingSessionArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
   export type OrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14224,17 +15121,24 @@ export namespace Prisma {
     agentId?: boolean
     competitionId?: boolean
     portfolioId?: boolean
+    participantId?: boolean
+    tradingSessionId?: boolean
     symbol?: boolean
     side?: boolean
     quantity?: boolean
     note?: boolean
     status?: boolean
+    intent?: boolean
+    riskCheckStatus?: boolean
+    riskRejectCode?: boolean
     rejectReason?: boolean
     submittedAt?: boolean
     matchedAt?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
     portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+    participant?: boolean | Order$participantArgs<ExtArgs>
+    tradingSession?: boolean | Order$tradingSessionArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
   export type OrderSelectScalar = {
@@ -14242,31 +15146,42 @@ export namespace Prisma {
     agentId?: boolean
     competitionId?: boolean
     portfolioId?: boolean
+    participantId?: boolean
+    tradingSessionId?: boolean
     symbol?: boolean
     side?: boolean
     quantity?: boolean
     note?: boolean
     status?: boolean
+    intent?: boolean
+    riskCheckStatus?: boolean
+    riskRejectCode?: boolean
     rejectReason?: boolean
     submittedAt?: boolean
     matchedAt?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "competitionId" | "portfolioId" | "symbol" | "side" | "quantity" | "note" | "status" | "rejectReason" | "submittedAt" | "matchedAt", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "competitionId" | "portfolioId" | "participantId" | "tradingSessionId" | "symbol" | "side" | "quantity" | "note" | "status" | "intent" | "riskCheckStatus" | "riskRejectCode" | "rejectReason" | "submittedAt" | "matchedAt", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
     portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+    participant?: boolean | Order$participantArgs<ExtArgs>
+    tradingSession?: boolean | Order$tradingSessionArgs<ExtArgs>
   }
   export type OrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
     portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+    participant?: boolean | Order$participantArgs<ExtArgs>
+    tradingSession?: boolean | Order$tradingSessionArgs<ExtArgs>
   }
   export type OrderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
     competition?: boolean | CompetitionDefaultArgs<ExtArgs>
     portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+    participant?: boolean | Order$participantArgs<ExtArgs>
+    tradingSession?: boolean | Order$tradingSessionArgs<ExtArgs>
   }
 
   export type $OrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14275,17 +15190,24 @@ export namespace Prisma {
       agent: Prisma.$AgentPayload<ExtArgs>
       competition: Prisma.$CompetitionPayload<ExtArgs>
       portfolio: Prisma.$PortfolioPayload<ExtArgs>
+      participant: Prisma.$CompetitionParticipantPayload<ExtArgs> | null
+      tradingSession: Prisma.$TradingSessionPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       agentId: string
       competitionId: string
       portfolioId: string
+      participantId: string | null
+      tradingSessionId: string | null
       symbol: string
       side: $Enums.TradeSide
       quantity: number
       note: string | null
       status: string
+      intent: $Enums.OrderIntent
+      riskCheckStatus: $Enums.RiskCheckStatus
+      riskRejectCode: string | null
       rejectReason: string | null
       submittedAt: Date
       matchedAt: Date | null
@@ -14686,6 +15608,8 @@ export namespace Prisma {
     agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     competition<T extends CompetitionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionDefaultArgs<ExtArgs>>): Prisma__CompetitionClient<$Result.GetResult<Prisma.$CompetitionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     portfolio<T extends PortfolioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PortfolioDefaultArgs<ExtArgs>>): Prisma__PortfolioClient<$Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    participant<T extends Order$participantArgs<ExtArgs> = {}>(args?: Subset<T, Order$participantArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    tradingSession<T extends Order$tradingSessionArgs<ExtArgs> = {}>(args?: Subset<T, Order$tradingSessionArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14719,11 +15643,16 @@ export namespace Prisma {
     readonly agentId: FieldRef<"Order", 'String'>
     readonly competitionId: FieldRef<"Order", 'String'>
     readonly portfolioId: FieldRef<"Order", 'String'>
+    readonly participantId: FieldRef<"Order", 'String'>
+    readonly tradingSessionId: FieldRef<"Order", 'String'>
     readonly symbol: FieldRef<"Order", 'String'>
     readonly side: FieldRef<"Order", 'TradeSide'>
     readonly quantity: FieldRef<"Order", 'Float'>
     readonly note: FieldRef<"Order", 'String'>
     readonly status: FieldRef<"Order", 'String'>
+    readonly intent: FieldRef<"Order", 'OrderIntent'>
+    readonly riskCheckStatus: FieldRef<"Order", 'RiskCheckStatus'>
+    readonly riskRejectCode: FieldRef<"Order", 'String'>
     readonly rejectReason: FieldRef<"Order", 'String'>
     readonly submittedAt: FieldRef<"Order", 'DateTime'>
     readonly matchedAt: FieldRef<"Order", 'DateTime'>
@@ -15118,6 +16047,44 @@ export namespace Prisma {
      * Limit how many Orders to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Order.participant
+   */
+  export type Order$participantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    where?: CompetitionParticipantWhereInput
+  }
+
+  /**
+   * Order.tradingSession
+   */
+  export type Order$tradingSessionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    where?: TradingSessionWhereInput
   }
 
   /**
@@ -16294,6 +17261,3856 @@ export namespace Prisma {
 
 
   /**
+   * Model CompetitionParticipant
+   */
+
+  export type AggregateCompetitionParticipant = {
+    _count: CompetitionParticipantCountAggregateOutputType | null
+    _min: CompetitionParticipantMinAggregateOutputType | null
+    _max: CompetitionParticipantMaxAggregateOutputType | null
+  }
+
+  export type CompetitionParticipantMinAggregateOutputType = {
+    id: string | null
+    competitionId: string | null
+    agentId: string | null
+    portfolioId: string | null
+    status: $Enums.ParticipantStatus | null
+    displayName: string | null
+    tagline: string | null
+    strategyTagsJson: string | null
+    riskLevel: string | null
+    webhookUrl: string | null
+    apiVersion: string | null
+    joinedAt: Date | null
+    approvedAt: Date | null
+    eliminatedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CompetitionParticipantMaxAggregateOutputType = {
+    id: string | null
+    competitionId: string | null
+    agentId: string | null
+    portfolioId: string | null
+    status: $Enums.ParticipantStatus | null
+    displayName: string | null
+    tagline: string | null
+    strategyTagsJson: string | null
+    riskLevel: string | null
+    webhookUrl: string | null
+    apiVersion: string | null
+    joinedAt: Date | null
+    approvedAt: Date | null
+    eliminatedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CompetitionParticipantCountAggregateOutputType = {
+    id: number
+    competitionId: number
+    agentId: number
+    portfolioId: number
+    status: number
+    displayName: number
+    tagline: number
+    strategyTagsJson: number
+    riskLevel: number
+    webhookUrl: number
+    apiVersion: number
+    joinedAt: number
+    approvedAt: number
+    eliminatedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CompetitionParticipantMinAggregateInputType = {
+    id?: true
+    competitionId?: true
+    agentId?: true
+    portfolioId?: true
+    status?: true
+    displayName?: true
+    tagline?: true
+    strategyTagsJson?: true
+    riskLevel?: true
+    webhookUrl?: true
+    apiVersion?: true
+    joinedAt?: true
+    approvedAt?: true
+    eliminatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CompetitionParticipantMaxAggregateInputType = {
+    id?: true
+    competitionId?: true
+    agentId?: true
+    portfolioId?: true
+    status?: true
+    displayName?: true
+    tagline?: true
+    strategyTagsJson?: true
+    riskLevel?: true
+    webhookUrl?: true
+    apiVersion?: true
+    joinedAt?: true
+    approvedAt?: true
+    eliminatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CompetitionParticipantCountAggregateInputType = {
+    id?: true
+    competitionId?: true
+    agentId?: true
+    portfolioId?: true
+    status?: true
+    displayName?: true
+    tagline?: true
+    strategyTagsJson?: true
+    riskLevel?: true
+    webhookUrl?: true
+    apiVersion?: true
+    joinedAt?: true
+    approvedAt?: true
+    eliminatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CompetitionParticipantAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CompetitionParticipant to aggregate.
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CompetitionParticipants to fetch.
+     */
+    orderBy?: CompetitionParticipantOrderByWithRelationInput | CompetitionParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CompetitionParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CompetitionParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CompetitionParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CompetitionParticipants
+    **/
+    _count?: true | CompetitionParticipantCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CompetitionParticipantMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CompetitionParticipantMaxAggregateInputType
+  }
+
+  export type GetCompetitionParticipantAggregateType<T extends CompetitionParticipantAggregateArgs> = {
+        [P in keyof T & keyof AggregateCompetitionParticipant]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCompetitionParticipant[P]>
+      : GetScalarType<T[P], AggregateCompetitionParticipant[P]>
+  }
+
+
+
+
+  export type CompetitionParticipantGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CompetitionParticipantWhereInput
+    orderBy?: CompetitionParticipantOrderByWithAggregationInput | CompetitionParticipantOrderByWithAggregationInput[]
+    by: CompetitionParticipantScalarFieldEnum[] | CompetitionParticipantScalarFieldEnum
+    having?: CompetitionParticipantScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CompetitionParticipantCountAggregateInputType | true
+    _min?: CompetitionParticipantMinAggregateInputType
+    _max?: CompetitionParticipantMaxAggregateInputType
+  }
+
+  export type CompetitionParticipantGroupByOutputType = {
+    id: string
+    competitionId: string
+    agentId: string
+    portfolioId: string | null
+    status: $Enums.ParticipantStatus
+    displayName: string | null
+    tagline: string | null
+    strategyTagsJson: string | null
+    riskLevel: string | null
+    webhookUrl: string | null
+    apiVersion: string | null
+    joinedAt: Date
+    approvedAt: Date | null
+    eliminatedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: CompetitionParticipantCountAggregateOutputType | null
+    _min: CompetitionParticipantMinAggregateOutputType | null
+    _max: CompetitionParticipantMaxAggregateOutputType | null
+  }
+
+  type GetCompetitionParticipantGroupByPayload<T extends CompetitionParticipantGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CompetitionParticipantGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CompetitionParticipantGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CompetitionParticipantGroupByOutputType[P]>
+            : GetScalarType<T[P], CompetitionParticipantGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CompetitionParticipantSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    agentId?: boolean
+    portfolioId?: boolean
+    status?: boolean
+    displayName?: boolean
+    tagline?: boolean
+    strategyTagsJson?: boolean
+    riskLevel?: boolean
+    webhookUrl?: boolean
+    apiVersion?: boolean
+    joinedAt?: boolean
+    approvedAt?: boolean
+    eliminatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    portfolio?: boolean | CompetitionParticipant$portfolioArgs<ExtArgs>
+    orders?: boolean | CompetitionParticipant$ordersArgs<ExtArgs>
+    snapshots?: boolean | CompetitionParticipant$snapshotsArgs<ExtArgs>
+    _count?: boolean | CompetitionParticipantCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["competitionParticipant"]>
+
+  export type CompetitionParticipantSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    agentId?: boolean
+    portfolioId?: boolean
+    status?: boolean
+    displayName?: boolean
+    tagline?: boolean
+    strategyTagsJson?: boolean
+    riskLevel?: boolean
+    webhookUrl?: boolean
+    apiVersion?: boolean
+    joinedAt?: boolean
+    approvedAt?: boolean
+    eliminatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    portfolio?: boolean | CompetitionParticipant$portfolioArgs<ExtArgs>
+  }, ExtArgs["result"]["competitionParticipant"]>
+
+  export type CompetitionParticipantSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    agentId?: boolean
+    portfolioId?: boolean
+    status?: boolean
+    displayName?: boolean
+    tagline?: boolean
+    strategyTagsJson?: boolean
+    riskLevel?: boolean
+    webhookUrl?: boolean
+    apiVersion?: boolean
+    joinedAt?: boolean
+    approvedAt?: boolean
+    eliminatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    portfolio?: boolean | CompetitionParticipant$portfolioArgs<ExtArgs>
+  }, ExtArgs["result"]["competitionParticipant"]>
+
+  export type CompetitionParticipantSelectScalar = {
+    id?: boolean
+    competitionId?: boolean
+    agentId?: boolean
+    portfolioId?: boolean
+    status?: boolean
+    displayName?: boolean
+    tagline?: boolean
+    strategyTagsJson?: boolean
+    riskLevel?: boolean
+    webhookUrl?: boolean
+    apiVersion?: boolean
+    joinedAt?: boolean
+    approvedAt?: boolean
+    eliminatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CompetitionParticipantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "competitionId" | "agentId" | "portfolioId" | "status" | "displayName" | "tagline" | "strategyTagsJson" | "riskLevel" | "webhookUrl" | "apiVersion" | "joinedAt" | "approvedAt" | "eliminatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["competitionParticipant"]>
+  export type CompetitionParticipantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    portfolio?: boolean | CompetitionParticipant$portfolioArgs<ExtArgs>
+    orders?: boolean | CompetitionParticipant$ordersArgs<ExtArgs>
+    snapshots?: boolean | CompetitionParticipant$snapshotsArgs<ExtArgs>
+    _count?: boolean | CompetitionParticipantCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type CompetitionParticipantIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    portfolio?: boolean | CompetitionParticipant$portfolioArgs<ExtArgs>
+  }
+  export type CompetitionParticipantIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    portfolio?: boolean | CompetitionParticipant$portfolioArgs<ExtArgs>
+  }
+
+  export type $CompetitionParticipantPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CompetitionParticipant"
+    objects: {
+      competition: Prisma.$CompetitionPayload<ExtArgs>
+      agent: Prisma.$AgentPayload<ExtArgs>
+      portfolio: Prisma.$PortfolioPayload<ExtArgs> | null
+      orders: Prisma.$OrderPayload<ExtArgs>[]
+      snapshots: Prisma.$SettlementSnapshotPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      competitionId: string
+      agentId: string
+      portfolioId: string | null
+      status: $Enums.ParticipantStatus
+      displayName: string | null
+      tagline: string | null
+      strategyTagsJson: string | null
+      riskLevel: string | null
+      webhookUrl: string | null
+      apiVersion: string | null
+      joinedAt: Date
+      approvedAt: Date | null
+      eliminatedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["competitionParticipant"]>
+    composites: {}
+  }
+
+  type CompetitionParticipantGetPayload<S extends boolean | null | undefined | CompetitionParticipantDefaultArgs> = $Result.GetResult<Prisma.$CompetitionParticipantPayload, S>
+
+  type CompetitionParticipantCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CompetitionParticipantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CompetitionParticipantCountAggregateInputType | true
+    }
+
+  export interface CompetitionParticipantDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CompetitionParticipant'], meta: { name: 'CompetitionParticipant' } }
+    /**
+     * Find zero or one CompetitionParticipant that matches the filter.
+     * @param {CompetitionParticipantFindUniqueArgs} args - Arguments to find a CompetitionParticipant
+     * @example
+     * // Get one CompetitionParticipant
+     * const competitionParticipant = await prisma.competitionParticipant.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CompetitionParticipantFindUniqueArgs>(args: SelectSubset<T, CompetitionParticipantFindUniqueArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CompetitionParticipant that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CompetitionParticipantFindUniqueOrThrowArgs} args - Arguments to find a CompetitionParticipant
+     * @example
+     * // Get one CompetitionParticipant
+     * const competitionParticipant = await prisma.competitionParticipant.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CompetitionParticipantFindUniqueOrThrowArgs>(args: SelectSubset<T, CompetitionParticipantFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CompetitionParticipant that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantFindFirstArgs} args - Arguments to find a CompetitionParticipant
+     * @example
+     * // Get one CompetitionParticipant
+     * const competitionParticipant = await prisma.competitionParticipant.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CompetitionParticipantFindFirstArgs>(args?: SelectSubset<T, CompetitionParticipantFindFirstArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CompetitionParticipant that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantFindFirstOrThrowArgs} args - Arguments to find a CompetitionParticipant
+     * @example
+     * // Get one CompetitionParticipant
+     * const competitionParticipant = await prisma.competitionParticipant.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CompetitionParticipantFindFirstOrThrowArgs>(args?: SelectSubset<T, CompetitionParticipantFindFirstOrThrowArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CompetitionParticipants that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CompetitionParticipants
+     * const competitionParticipants = await prisma.competitionParticipant.findMany()
+     * 
+     * // Get first 10 CompetitionParticipants
+     * const competitionParticipants = await prisma.competitionParticipant.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const competitionParticipantWithIdOnly = await prisma.competitionParticipant.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CompetitionParticipantFindManyArgs>(args?: SelectSubset<T, CompetitionParticipantFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CompetitionParticipant.
+     * @param {CompetitionParticipantCreateArgs} args - Arguments to create a CompetitionParticipant.
+     * @example
+     * // Create one CompetitionParticipant
+     * const CompetitionParticipant = await prisma.competitionParticipant.create({
+     *   data: {
+     *     // ... data to create a CompetitionParticipant
+     *   }
+     * })
+     * 
+     */
+    create<T extends CompetitionParticipantCreateArgs>(args: SelectSubset<T, CompetitionParticipantCreateArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CompetitionParticipants.
+     * @param {CompetitionParticipantCreateManyArgs} args - Arguments to create many CompetitionParticipants.
+     * @example
+     * // Create many CompetitionParticipants
+     * const competitionParticipant = await prisma.competitionParticipant.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CompetitionParticipantCreateManyArgs>(args?: SelectSubset<T, CompetitionParticipantCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CompetitionParticipants and returns the data saved in the database.
+     * @param {CompetitionParticipantCreateManyAndReturnArgs} args - Arguments to create many CompetitionParticipants.
+     * @example
+     * // Create many CompetitionParticipants
+     * const competitionParticipant = await prisma.competitionParticipant.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CompetitionParticipants and only return the `id`
+     * const competitionParticipantWithIdOnly = await prisma.competitionParticipant.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CompetitionParticipantCreateManyAndReturnArgs>(args?: SelectSubset<T, CompetitionParticipantCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CompetitionParticipant.
+     * @param {CompetitionParticipantDeleteArgs} args - Arguments to delete one CompetitionParticipant.
+     * @example
+     * // Delete one CompetitionParticipant
+     * const CompetitionParticipant = await prisma.competitionParticipant.delete({
+     *   where: {
+     *     // ... filter to delete one CompetitionParticipant
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CompetitionParticipantDeleteArgs>(args: SelectSubset<T, CompetitionParticipantDeleteArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CompetitionParticipant.
+     * @param {CompetitionParticipantUpdateArgs} args - Arguments to update one CompetitionParticipant.
+     * @example
+     * // Update one CompetitionParticipant
+     * const competitionParticipant = await prisma.competitionParticipant.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CompetitionParticipantUpdateArgs>(args: SelectSubset<T, CompetitionParticipantUpdateArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CompetitionParticipants.
+     * @param {CompetitionParticipantDeleteManyArgs} args - Arguments to filter CompetitionParticipants to delete.
+     * @example
+     * // Delete a few CompetitionParticipants
+     * const { count } = await prisma.competitionParticipant.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CompetitionParticipantDeleteManyArgs>(args?: SelectSubset<T, CompetitionParticipantDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CompetitionParticipants.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CompetitionParticipants
+     * const competitionParticipant = await prisma.competitionParticipant.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CompetitionParticipantUpdateManyArgs>(args: SelectSubset<T, CompetitionParticipantUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CompetitionParticipants and returns the data updated in the database.
+     * @param {CompetitionParticipantUpdateManyAndReturnArgs} args - Arguments to update many CompetitionParticipants.
+     * @example
+     * // Update many CompetitionParticipants
+     * const competitionParticipant = await prisma.competitionParticipant.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CompetitionParticipants and only return the `id`
+     * const competitionParticipantWithIdOnly = await prisma.competitionParticipant.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CompetitionParticipantUpdateManyAndReturnArgs>(args: SelectSubset<T, CompetitionParticipantUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CompetitionParticipant.
+     * @param {CompetitionParticipantUpsertArgs} args - Arguments to update or create a CompetitionParticipant.
+     * @example
+     * // Update or create a CompetitionParticipant
+     * const competitionParticipant = await prisma.competitionParticipant.upsert({
+     *   create: {
+     *     // ... data to create a CompetitionParticipant
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CompetitionParticipant we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CompetitionParticipantUpsertArgs>(args: SelectSubset<T, CompetitionParticipantUpsertArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CompetitionParticipants.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantCountArgs} args - Arguments to filter CompetitionParticipants to count.
+     * @example
+     * // Count the number of CompetitionParticipants
+     * const count = await prisma.competitionParticipant.count({
+     *   where: {
+     *     // ... the filter for the CompetitionParticipants we want to count
+     *   }
+     * })
+    **/
+    count<T extends CompetitionParticipantCountArgs>(
+      args?: Subset<T, CompetitionParticipantCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CompetitionParticipantCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CompetitionParticipant.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CompetitionParticipantAggregateArgs>(args: Subset<T, CompetitionParticipantAggregateArgs>): Prisma.PrismaPromise<GetCompetitionParticipantAggregateType<T>>
+
+    /**
+     * Group by CompetitionParticipant.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CompetitionParticipantGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CompetitionParticipantGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CompetitionParticipantGroupByArgs['orderBy'] }
+        : { orderBy?: CompetitionParticipantGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CompetitionParticipantGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCompetitionParticipantGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CompetitionParticipant model
+   */
+  readonly fields: CompetitionParticipantFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CompetitionParticipant.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CompetitionParticipantClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    competition<T extends CompetitionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionDefaultArgs<ExtArgs>>): Prisma__CompetitionClient<$Result.GetResult<Prisma.$CompetitionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    portfolio<T extends CompetitionParticipant$portfolioArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionParticipant$portfolioArgs<ExtArgs>>): Prisma__PortfolioClient<$Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    orders<T extends CompetitionParticipant$ordersArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionParticipant$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    snapshots<T extends CompetitionParticipant$snapshotsArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionParticipant$snapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CompetitionParticipant model
+   */
+  interface CompetitionParticipantFieldRefs {
+    readonly id: FieldRef<"CompetitionParticipant", 'String'>
+    readonly competitionId: FieldRef<"CompetitionParticipant", 'String'>
+    readonly agentId: FieldRef<"CompetitionParticipant", 'String'>
+    readonly portfolioId: FieldRef<"CompetitionParticipant", 'String'>
+    readonly status: FieldRef<"CompetitionParticipant", 'ParticipantStatus'>
+    readonly displayName: FieldRef<"CompetitionParticipant", 'String'>
+    readonly tagline: FieldRef<"CompetitionParticipant", 'String'>
+    readonly strategyTagsJson: FieldRef<"CompetitionParticipant", 'String'>
+    readonly riskLevel: FieldRef<"CompetitionParticipant", 'String'>
+    readonly webhookUrl: FieldRef<"CompetitionParticipant", 'String'>
+    readonly apiVersion: FieldRef<"CompetitionParticipant", 'String'>
+    readonly joinedAt: FieldRef<"CompetitionParticipant", 'DateTime'>
+    readonly approvedAt: FieldRef<"CompetitionParticipant", 'DateTime'>
+    readonly eliminatedAt: FieldRef<"CompetitionParticipant", 'DateTime'>
+    readonly createdAt: FieldRef<"CompetitionParticipant", 'DateTime'>
+    readonly updatedAt: FieldRef<"CompetitionParticipant", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CompetitionParticipant findUnique
+   */
+  export type CompetitionParticipantFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which CompetitionParticipant to fetch.
+     */
+    where: CompetitionParticipantWhereUniqueInput
+  }
+
+  /**
+   * CompetitionParticipant findUniqueOrThrow
+   */
+  export type CompetitionParticipantFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which CompetitionParticipant to fetch.
+     */
+    where: CompetitionParticipantWhereUniqueInput
+  }
+
+  /**
+   * CompetitionParticipant findFirst
+   */
+  export type CompetitionParticipantFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which CompetitionParticipant to fetch.
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CompetitionParticipants to fetch.
+     */
+    orderBy?: CompetitionParticipantOrderByWithRelationInput | CompetitionParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CompetitionParticipants.
+     */
+    cursor?: CompetitionParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CompetitionParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CompetitionParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CompetitionParticipants.
+     */
+    distinct?: CompetitionParticipantScalarFieldEnum | CompetitionParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * CompetitionParticipant findFirstOrThrow
+   */
+  export type CompetitionParticipantFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which CompetitionParticipant to fetch.
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CompetitionParticipants to fetch.
+     */
+    orderBy?: CompetitionParticipantOrderByWithRelationInput | CompetitionParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CompetitionParticipants.
+     */
+    cursor?: CompetitionParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CompetitionParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CompetitionParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CompetitionParticipants.
+     */
+    distinct?: CompetitionParticipantScalarFieldEnum | CompetitionParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * CompetitionParticipant findMany
+   */
+  export type CompetitionParticipantFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which CompetitionParticipants to fetch.
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CompetitionParticipants to fetch.
+     */
+    orderBy?: CompetitionParticipantOrderByWithRelationInput | CompetitionParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CompetitionParticipants.
+     */
+    cursor?: CompetitionParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CompetitionParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CompetitionParticipants.
+     */
+    skip?: number
+    distinct?: CompetitionParticipantScalarFieldEnum | CompetitionParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * CompetitionParticipant create
+   */
+  export type CompetitionParticipantCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CompetitionParticipant.
+     */
+    data: XOR<CompetitionParticipantCreateInput, CompetitionParticipantUncheckedCreateInput>
+  }
+
+  /**
+   * CompetitionParticipant createMany
+   */
+  export type CompetitionParticipantCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CompetitionParticipants.
+     */
+    data: CompetitionParticipantCreateManyInput | CompetitionParticipantCreateManyInput[]
+  }
+
+  /**
+   * CompetitionParticipant createManyAndReturn
+   */
+  export type CompetitionParticipantCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * The data used to create many CompetitionParticipants.
+     */
+    data: CompetitionParticipantCreateManyInput | CompetitionParticipantCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CompetitionParticipant update
+   */
+  export type CompetitionParticipantUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CompetitionParticipant.
+     */
+    data: XOR<CompetitionParticipantUpdateInput, CompetitionParticipantUncheckedUpdateInput>
+    /**
+     * Choose, which CompetitionParticipant to update.
+     */
+    where: CompetitionParticipantWhereUniqueInput
+  }
+
+  /**
+   * CompetitionParticipant updateMany
+   */
+  export type CompetitionParticipantUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CompetitionParticipants.
+     */
+    data: XOR<CompetitionParticipantUpdateManyMutationInput, CompetitionParticipantUncheckedUpdateManyInput>
+    /**
+     * Filter which CompetitionParticipants to update
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * Limit how many CompetitionParticipants to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CompetitionParticipant updateManyAndReturn
+   */
+  export type CompetitionParticipantUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * The data used to update CompetitionParticipants.
+     */
+    data: XOR<CompetitionParticipantUpdateManyMutationInput, CompetitionParticipantUncheckedUpdateManyInput>
+    /**
+     * Filter which CompetitionParticipants to update
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * Limit how many CompetitionParticipants to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CompetitionParticipant upsert
+   */
+  export type CompetitionParticipantUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CompetitionParticipant to update in case it exists.
+     */
+    where: CompetitionParticipantWhereUniqueInput
+    /**
+     * In case the CompetitionParticipant found by the `where` argument doesn't exist, create a new CompetitionParticipant with this data.
+     */
+    create: XOR<CompetitionParticipantCreateInput, CompetitionParticipantUncheckedCreateInput>
+    /**
+     * In case the CompetitionParticipant was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CompetitionParticipantUpdateInput, CompetitionParticipantUncheckedUpdateInput>
+  }
+
+  /**
+   * CompetitionParticipant delete
+   */
+  export type CompetitionParticipantDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    /**
+     * Filter which CompetitionParticipant to delete.
+     */
+    where: CompetitionParticipantWhereUniqueInput
+  }
+
+  /**
+   * CompetitionParticipant deleteMany
+   */
+  export type CompetitionParticipantDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CompetitionParticipants to delete
+     */
+    where?: CompetitionParticipantWhereInput
+    /**
+     * Limit how many CompetitionParticipants to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CompetitionParticipant.portfolio
+   */
+  export type CompetitionParticipant$portfolioArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Portfolio
+     */
+    select?: PortfolioSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Portfolio
+     */
+    omit?: PortfolioOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PortfolioInclude<ExtArgs> | null
+    where?: PortfolioWhereInput
+  }
+
+  /**
+   * CompetitionParticipant.orders
+   */
+  export type CompetitionParticipant$ordersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
+   * CompetitionParticipant.snapshots
+   */
+  export type CompetitionParticipant$snapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    where?: SettlementSnapshotWhereInput
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    cursor?: SettlementSnapshotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * CompetitionParticipant without action
+   */
+  export type CompetitionParticipantDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TradingSession
+   */
+
+  export type AggregateTradingSession = {
+    _count: TradingSessionCountAggregateOutputType | null
+    _min: TradingSessionMinAggregateOutputType | null
+    _max: TradingSessionMaxAggregateOutputType | null
+  }
+
+  export type TradingSessionMinAggregateOutputType = {
+    id: string | null
+    competitionId: string | null
+    tradingDate: string | null
+    sessionType: $Enums.TradingSessionType | null
+    status: $Enums.TradingSessionStatus | null
+    openAt: Date | null
+    closeAt: Date | null
+    marketSnapshotJson: string | null
+    leaderboardSnapshotJson: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TradingSessionMaxAggregateOutputType = {
+    id: string | null
+    competitionId: string | null
+    tradingDate: string | null
+    sessionType: $Enums.TradingSessionType | null
+    status: $Enums.TradingSessionStatus | null
+    openAt: Date | null
+    closeAt: Date | null
+    marketSnapshotJson: string | null
+    leaderboardSnapshotJson: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TradingSessionCountAggregateOutputType = {
+    id: number
+    competitionId: number
+    tradingDate: number
+    sessionType: number
+    status: number
+    openAt: number
+    closeAt: number
+    marketSnapshotJson: number
+    leaderboardSnapshotJson: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TradingSessionMinAggregateInputType = {
+    id?: true
+    competitionId?: true
+    tradingDate?: true
+    sessionType?: true
+    status?: true
+    openAt?: true
+    closeAt?: true
+    marketSnapshotJson?: true
+    leaderboardSnapshotJson?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TradingSessionMaxAggregateInputType = {
+    id?: true
+    competitionId?: true
+    tradingDate?: true
+    sessionType?: true
+    status?: true
+    openAt?: true
+    closeAt?: true
+    marketSnapshotJson?: true
+    leaderboardSnapshotJson?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TradingSessionCountAggregateInputType = {
+    id?: true
+    competitionId?: true
+    tradingDate?: true
+    sessionType?: true
+    status?: true
+    openAt?: true
+    closeAt?: true
+    marketSnapshotJson?: true
+    leaderboardSnapshotJson?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TradingSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TradingSession to aggregate.
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TradingSessions to fetch.
+     */
+    orderBy?: TradingSessionOrderByWithRelationInput | TradingSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TradingSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TradingSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TradingSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TradingSessions
+    **/
+    _count?: true | TradingSessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TradingSessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TradingSessionMaxAggregateInputType
+  }
+
+  export type GetTradingSessionAggregateType<T extends TradingSessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateTradingSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTradingSession[P]>
+      : GetScalarType<T[P], AggregateTradingSession[P]>
+  }
+
+
+
+
+  export type TradingSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TradingSessionWhereInput
+    orderBy?: TradingSessionOrderByWithAggregationInput | TradingSessionOrderByWithAggregationInput[]
+    by: TradingSessionScalarFieldEnum[] | TradingSessionScalarFieldEnum
+    having?: TradingSessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TradingSessionCountAggregateInputType | true
+    _min?: TradingSessionMinAggregateInputType
+    _max?: TradingSessionMaxAggregateInputType
+  }
+
+  export type TradingSessionGroupByOutputType = {
+    id: string
+    competitionId: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status: $Enums.TradingSessionStatus
+    openAt: Date
+    closeAt: Date
+    marketSnapshotJson: string | null
+    leaderboardSnapshotJson: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: TradingSessionCountAggregateOutputType | null
+    _min: TradingSessionMinAggregateOutputType | null
+    _max: TradingSessionMaxAggregateOutputType | null
+  }
+
+  type GetTradingSessionGroupByPayload<T extends TradingSessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TradingSessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TradingSessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TradingSessionGroupByOutputType[P]>
+            : GetScalarType<T[P], TradingSessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TradingSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    tradingDate?: boolean
+    sessionType?: boolean
+    status?: boolean
+    openAt?: boolean
+    closeAt?: boolean
+    marketSnapshotJson?: boolean
+    leaderboardSnapshotJson?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    orders?: boolean | TradingSession$ordersArgs<ExtArgs>
+    snapshots?: boolean | TradingSession$snapshotsArgs<ExtArgs>
+    _count?: boolean | TradingSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tradingSession"]>
+
+  export type TradingSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    tradingDate?: boolean
+    sessionType?: boolean
+    status?: boolean
+    openAt?: boolean
+    closeAt?: boolean
+    marketSnapshotJson?: boolean
+    leaderboardSnapshotJson?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tradingSession"]>
+
+  export type TradingSessionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    tradingDate?: boolean
+    sessionType?: boolean
+    status?: boolean
+    openAt?: boolean
+    closeAt?: boolean
+    marketSnapshotJson?: boolean
+    leaderboardSnapshotJson?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tradingSession"]>
+
+  export type TradingSessionSelectScalar = {
+    id?: boolean
+    competitionId?: boolean
+    tradingDate?: boolean
+    sessionType?: boolean
+    status?: boolean
+    openAt?: boolean
+    closeAt?: boolean
+    marketSnapshotJson?: boolean
+    leaderboardSnapshotJson?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TradingSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "competitionId" | "tradingDate" | "sessionType" | "status" | "openAt" | "closeAt" | "marketSnapshotJson" | "leaderboardSnapshotJson" | "createdAt" | "updatedAt", ExtArgs["result"]["tradingSession"]>
+  export type TradingSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    orders?: boolean | TradingSession$ordersArgs<ExtArgs>
+    snapshots?: boolean | TradingSession$snapshotsArgs<ExtArgs>
+    _count?: boolean | TradingSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type TradingSessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+  }
+  export type TradingSessionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+  }
+
+  export type $TradingSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TradingSession"
+    objects: {
+      competition: Prisma.$CompetitionPayload<ExtArgs>
+      orders: Prisma.$OrderPayload<ExtArgs>[]
+      snapshots: Prisma.$SettlementSnapshotPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      competitionId: string
+      tradingDate: string
+      sessionType: $Enums.TradingSessionType
+      status: $Enums.TradingSessionStatus
+      openAt: Date
+      closeAt: Date
+      marketSnapshotJson: string | null
+      leaderboardSnapshotJson: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["tradingSession"]>
+    composites: {}
+  }
+
+  type TradingSessionGetPayload<S extends boolean | null | undefined | TradingSessionDefaultArgs> = $Result.GetResult<Prisma.$TradingSessionPayload, S>
+
+  type TradingSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TradingSessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TradingSessionCountAggregateInputType | true
+    }
+
+  export interface TradingSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TradingSession'], meta: { name: 'TradingSession' } }
+    /**
+     * Find zero or one TradingSession that matches the filter.
+     * @param {TradingSessionFindUniqueArgs} args - Arguments to find a TradingSession
+     * @example
+     * // Get one TradingSession
+     * const tradingSession = await prisma.tradingSession.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TradingSessionFindUniqueArgs>(args: SelectSubset<T, TradingSessionFindUniqueArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TradingSession that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TradingSessionFindUniqueOrThrowArgs} args - Arguments to find a TradingSession
+     * @example
+     * // Get one TradingSession
+     * const tradingSession = await prisma.tradingSession.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TradingSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, TradingSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TradingSession that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionFindFirstArgs} args - Arguments to find a TradingSession
+     * @example
+     * // Get one TradingSession
+     * const tradingSession = await prisma.tradingSession.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TradingSessionFindFirstArgs>(args?: SelectSubset<T, TradingSessionFindFirstArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TradingSession that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionFindFirstOrThrowArgs} args - Arguments to find a TradingSession
+     * @example
+     * // Get one TradingSession
+     * const tradingSession = await prisma.tradingSession.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TradingSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, TradingSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TradingSessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TradingSessions
+     * const tradingSessions = await prisma.tradingSession.findMany()
+     * 
+     * // Get first 10 TradingSessions
+     * const tradingSessions = await prisma.tradingSession.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const tradingSessionWithIdOnly = await prisma.tradingSession.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TradingSessionFindManyArgs>(args?: SelectSubset<T, TradingSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TradingSession.
+     * @param {TradingSessionCreateArgs} args - Arguments to create a TradingSession.
+     * @example
+     * // Create one TradingSession
+     * const TradingSession = await prisma.tradingSession.create({
+     *   data: {
+     *     // ... data to create a TradingSession
+     *   }
+     * })
+     * 
+     */
+    create<T extends TradingSessionCreateArgs>(args: SelectSubset<T, TradingSessionCreateArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TradingSessions.
+     * @param {TradingSessionCreateManyArgs} args - Arguments to create many TradingSessions.
+     * @example
+     * // Create many TradingSessions
+     * const tradingSession = await prisma.tradingSession.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TradingSessionCreateManyArgs>(args?: SelectSubset<T, TradingSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TradingSessions and returns the data saved in the database.
+     * @param {TradingSessionCreateManyAndReturnArgs} args - Arguments to create many TradingSessions.
+     * @example
+     * // Create many TradingSessions
+     * const tradingSession = await prisma.tradingSession.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TradingSessions and only return the `id`
+     * const tradingSessionWithIdOnly = await prisma.tradingSession.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TradingSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, TradingSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TradingSession.
+     * @param {TradingSessionDeleteArgs} args - Arguments to delete one TradingSession.
+     * @example
+     * // Delete one TradingSession
+     * const TradingSession = await prisma.tradingSession.delete({
+     *   where: {
+     *     // ... filter to delete one TradingSession
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TradingSessionDeleteArgs>(args: SelectSubset<T, TradingSessionDeleteArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TradingSession.
+     * @param {TradingSessionUpdateArgs} args - Arguments to update one TradingSession.
+     * @example
+     * // Update one TradingSession
+     * const tradingSession = await prisma.tradingSession.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TradingSessionUpdateArgs>(args: SelectSubset<T, TradingSessionUpdateArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TradingSessions.
+     * @param {TradingSessionDeleteManyArgs} args - Arguments to filter TradingSessions to delete.
+     * @example
+     * // Delete a few TradingSessions
+     * const { count } = await prisma.tradingSession.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TradingSessionDeleteManyArgs>(args?: SelectSubset<T, TradingSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TradingSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TradingSessions
+     * const tradingSession = await prisma.tradingSession.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TradingSessionUpdateManyArgs>(args: SelectSubset<T, TradingSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TradingSessions and returns the data updated in the database.
+     * @param {TradingSessionUpdateManyAndReturnArgs} args - Arguments to update many TradingSessions.
+     * @example
+     * // Update many TradingSessions
+     * const tradingSession = await prisma.tradingSession.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TradingSessions and only return the `id`
+     * const tradingSessionWithIdOnly = await prisma.tradingSession.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TradingSessionUpdateManyAndReturnArgs>(args: SelectSubset<T, TradingSessionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TradingSession.
+     * @param {TradingSessionUpsertArgs} args - Arguments to update or create a TradingSession.
+     * @example
+     * // Update or create a TradingSession
+     * const tradingSession = await prisma.tradingSession.upsert({
+     *   create: {
+     *     // ... data to create a TradingSession
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TradingSession we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TradingSessionUpsertArgs>(args: SelectSubset<T, TradingSessionUpsertArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TradingSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionCountArgs} args - Arguments to filter TradingSessions to count.
+     * @example
+     * // Count the number of TradingSessions
+     * const count = await prisma.tradingSession.count({
+     *   where: {
+     *     // ... the filter for the TradingSessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends TradingSessionCountArgs>(
+      args?: Subset<T, TradingSessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TradingSessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TradingSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TradingSessionAggregateArgs>(args: Subset<T, TradingSessionAggregateArgs>): Prisma.PrismaPromise<GetTradingSessionAggregateType<T>>
+
+    /**
+     * Group by TradingSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TradingSessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TradingSessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TradingSessionGroupByArgs['orderBy'] }
+        : { orderBy?: TradingSessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TradingSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTradingSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TradingSession model
+   */
+  readonly fields: TradingSessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TradingSession.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TradingSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    competition<T extends CompetitionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionDefaultArgs<ExtArgs>>): Prisma__CompetitionClient<$Result.GetResult<Prisma.$CompetitionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    orders<T extends TradingSession$ordersArgs<ExtArgs> = {}>(args?: Subset<T, TradingSession$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    snapshots<T extends TradingSession$snapshotsArgs<ExtArgs> = {}>(args?: Subset<T, TradingSession$snapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TradingSession model
+   */
+  interface TradingSessionFieldRefs {
+    readonly id: FieldRef<"TradingSession", 'String'>
+    readonly competitionId: FieldRef<"TradingSession", 'String'>
+    readonly tradingDate: FieldRef<"TradingSession", 'String'>
+    readonly sessionType: FieldRef<"TradingSession", 'TradingSessionType'>
+    readonly status: FieldRef<"TradingSession", 'TradingSessionStatus'>
+    readonly openAt: FieldRef<"TradingSession", 'DateTime'>
+    readonly closeAt: FieldRef<"TradingSession", 'DateTime'>
+    readonly marketSnapshotJson: FieldRef<"TradingSession", 'String'>
+    readonly leaderboardSnapshotJson: FieldRef<"TradingSession", 'String'>
+    readonly createdAt: FieldRef<"TradingSession", 'DateTime'>
+    readonly updatedAt: FieldRef<"TradingSession", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TradingSession findUnique
+   */
+  export type TradingSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TradingSession to fetch.
+     */
+    where: TradingSessionWhereUniqueInput
+  }
+
+  /**
+   * TradingSession findUniqueOrThrow
+   */
+  export type TradingSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TradingSession to fetch.
+     */
+    where: TradingSessionWhereUniqueInput
+  }
+
+  /**
+   * TradingSession findFirst
+   */
+  export type TradingSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TradingSession to fetch.
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TradingSessions to fetch.
+     */
+    orderBy?: TradingSessionOrderByWithRelationInput | TradingSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TradingSessions.
+     */
+    cursor?: TradingSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TradingSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TradingSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TradingSessions.
+     */
+    distinct?: TradingSessionScalarFieldEnum | TradingSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TradingSession findFirstOrThrow
+   */
+  export type TradingSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TradingSession to fetch.
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TradingSessions to fetch.
+     */
+    orderBy?: TradingSessionOrderByWithRelationInput | TradingSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TradingSessions.
+     */
+    cursor?: TradingSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TradingSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TradingSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TradingSessions.
+     */
+    distinct?: TradingSessionScalarFieldEnum | TradingSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TradingSession findMany
+   */
+  export type TradingSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TradingSessions to fetch.
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TradingSessions to fetch.
+     */
+    orderBy?: TradingSessionOrderByWithRelationInput | TradingSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TradingSessions.
+     */
+    cursor?: TradingSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TradingSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TradingSessions.
+     */
+    skip?: number
+    distinct?: TradingSessionScalarFieldEnum | TradingSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TradingSession create
+   */
+  export type TradingSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TradingSession.
+     */
+    data: XOR<TradingSessionCreateInput, TradingSessionUncheckedCreateInput>
+  }
+
+  /**
+   * TradingSession createMany
+   */
+  export type TradingSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TradingSessions.
+     */
+    data: TradingSessionCreateManyInput | TradingSessionCreateManyInput[]
+  }
+
+  /**
+   * TradingSession createManyAndReturn
+   */
+  export type TradingSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * The data used to create many TradingSessions.
+     */
+    data: TradingSessionCreateManyInput | TradingSessionCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TradingSession update
+   */
+  export type TradingSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TradingSession.
+     */
+    data: XOR<TradingSessionUpdateInput, TradingSessionUncheckedUpdateInput>
+    /**
+     * Choose, which TradingSession to update.
+     */
+    where: TradingSessionWhereUniqueInput
+  }
+
+  /**
+   * TradingSession updateMany
+   */
+  export type TradingSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TradingSessions.
+     */
+    data: XOR<TradingSessionUpdateManyMutationInput, TradingSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which TradingSessions to update
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * Limit how many TradingSessions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TradingSession updateManyAndReturn
+   */
+  export type TradingSessionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * The data used to update TradingSessions.
+     */
+    data: XOR<TradingSessionUpdateManyMutationInput, TradingSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which TradingSessions to update
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * Limit how many TradingSessions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TradingSession upsert
+   */
+  export type TradingSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TradingSession to update in case it exists.
+     */
+    where: TradingSessionWhereUniqueInput
+    /**
+     * In case the TradingSession found by the `where` argument doesn't exist, create a new TradingSession with this data.
+     */
+    create: XOR<TradingSessionCreateInput, TradingSessionUncheckedCreateInput>
+    /**
+     * In case the TradingSession was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TradingSessionUpdateInput, TradingSessionUncheckedUpdateInput>
+  }
+
+  /**
+   * TradingSession delete
+   */
+  export type TradingSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    /**
+     * Filter which TradingSession to delete.
+     */
+    where: TradingSessionWhereUniqueInput
+  }
+
+  /**
+   * TradingSession deleteMany
+   */
+  export type TradingSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TradingSessions to delete
+     */
+    where?: TradingSessionWhereInput
+    /**
+     * Limit how many TradingSessions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TradingSession.orders
+   */
+  export type TradingSession$ordersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
+   * TradingSession.snapshots
+   */
+  export type TradingSession$snapshotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    where?: SettlementSnapshotWhereInput
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    cursor?: SettlementSnapshotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * TradingSession without action
+   */
+  export type TradingSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SettlementSnapshot
+   */
+
+  export type AggregateSettlementSnapshot = {
+    _count: SettlementSnapshotCountAggregateOutputType | null
+    _avg: SettlementSnapshotAvgAggregateOutputType | null
+    _sum: SettlementSnapshotSumAggregateOutputType | null
+    _min: SettlementSnapshotMinAggregateOutputType | null
+    _max: SettlementSnapshotMaxAggregateOutputType | null
+  }
+
+  export type SettlementSnapshotAvgAggregateOutputType = {
+    cash: number | null
+    marketValue: number | null
+    totalValue: number | null
+    realizedPnL: number | null
+    unrealizedPnL: number | null
+    returnPct: number | null
+    drawdownPct: number | null
+    turnoverPct: number | null
+    rank: number | null
+  }
+
+  export type SettlementSnapshotSumAggregateOutputType = {
+    cash: number | null
+    marketValue: number | null
+    totalValue: number | null
+    realizedPnL: number | null
+    unrealizedPnL: number | null
+    returnPct: number | null
+    drawdownPct: number | null
+    turnoverPct: number | null
+    rank: number | null
+  }
+
+  export type SettlementSnapshotMinAggregateOutputType = {
+    id: string | null
+    competitionId: string | null
+    tradingSessionId: string | null
+    participantId: string | null
+    portfolioId: string | null
+    snapshotAt: Date | null
+    cash: number | null
+    marketValue: number | null
+    totalValue: number | null
+    realizedPnL: number | null
+    unrealizedPnL: number | null
+    returnPct: number | null
+    drawdownPct: number | null
+    turnoverPct: number | null
+    rank: number | null
+    holdingSymbol: string | null
+    positionJson: string | null
+    metricsJson: string | null
+    createdAt: Date | null
+  }
+
+  export type SettlementSnapshotMaxAggregateOutputType = {
+    id: string | null
+    competitionId: string | null
+    tradingSessionId: string | null
+    participantId: string | null
+    portfolioId: string | null
+    snapshotAt: Date | null
+    cash: number | null
+    marketValue: number | null
+    totalValue: number | null
+    realizedPnL: number | null
+    unrealizedPnL: number | null
+    returnPct: number | null
+    drawdownPct: number | null
+    turnoverPct: number | null
+    rank: number | null
+    holdingSymbol: string | null
+    positionJson: string | null
+    metricsJson: string | null
+    createdAt: Date | null
+  }
+
+  export type SettlementSnapshotCountAggregateOutputType = {
+    id: number
+    competitionId: number
+    tradingSessionId: number
+    participantId: number
+    portfolioId: number
+    snapshotAt: number
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL: number
+    unrealizedPnL: number
+    returnPct: number
+    drawdownPct: number
+    turnoverPct: number
+    rank: number
+    holdingSymbol: number
+    positionJson: number
+    metricsJson: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SettlementSnapshotAvgAggregateInputType = {
+    cash?: true
+    marketValue?: true
+    totalValue?: true
+    realizedPnL?: true
+    unrealizedPnL?: true
+    returnPct?: true
+    drawdownPct?: true
+    turnoverPct?: true
+    rank?: true
+  }
+
+  export type SettlementSnapshotSumAggregateInputType = {
+    cash?: true
+    marketValue?: true
+    totalValue?: true
+    realizedPnL?: true
+    unrealizedPnL?: true
+    returnPct?: true
+    drawdownPct?: true
+    turnoverPct?: true
+    rank?: true
+  }
+
+  export type SettlementSnapshotMinAggregateInputType = {
+    id?: true
+    competitionId?: true
+    tradingSessionId?: true
+    participantId?: true
+    portfolioId?: true
+    snapshotAt?: true
+    cash?: true
+    marketValue?: true
+    totalValue?: true
+    realizedPnL?: true
+    unrealizedPnL?: true
+    returnPct?: true
+    drawdownPct?: true
+    turnoverPct?: true
+    rank?: true
+    holdingSymbol?: true
+    positionJson?: true
+    metricsJson?: true
+    createdAt?: true
+  }
+
+  export type SettlementSnapshotMaxAggregateInputType = {
+    id?: true
+    competitionId?: true
+    tradingSessionId?: true
+    participantId?: true
+    portfolioId?: true
+    snapshotAt?: true
+    cash?: true
+    marketValue?: true
+    totalValue?: true
+    realizedPnL?: true
+    unrealizedPnL?: true
+    returnPct?: true
+    drawdownPct?: true
+    turnoverPct?: true
+    rank?: true
+    holdingSymbol?: true
+    positionJson?: true
+    metricsJson?: true
+    createdAt?: true
+  }
+
+  export type SettlementSnapshotCountAggregateInputType = {
+    id?: true
+    competitionId?: true
+    tradingSessionId?: true
+    participantId?: true
+    portfolioId?: true
+    snapshotAt?: true
+    cash?: true
+    marketValue?: true
+    totalValue?: true
+    realizedPnL?: true
+    unrealizedPnL?: true
+    returnPct?: true
+    drawdownPct?: true
+    turnoverPct?: true
+    rank?: true
+    holdingSymbol?: true
+    positionJson?: true
+    metricsJson?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SettlementSnapshotAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SettlementSnapshot to aggregate.
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SettlementSnapshots to fetch.
+     */
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SettlementSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SettlementSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SettlementSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SettlementSnapshots
+    **/
+    _count?: true | SettlementSnapshotCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SettlementSnapshotAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SettlementSnapshotSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SettlementSnapshotMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SettlementSnapshotMaxAggregateInputType
+  }
+
+  export type GetSettlementSnapshotAggregateType<T extends SettlementSnapshotAggregateArgs> = {
+        [P in keyof T & keyof AggregateSettlementSnapshot]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSettlementSnapshot[P]>
+      : GetScalarType<T[P], AggregateSettlementSnapshot[P]>
+  }
+
+
+
+
+  export type SettlementSnapshotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettlementSnapshotWhereInput
+    orderBy?: SettlementSnapshotOrderByWithAggregationInput | SettlementSnapshotOrderByWithAggregationInput[]
+    by: SettlementSnapshotScalarFieldEnum[] | SettlementSnapshotScalarFieldEnum
+    having?: SettlementSnapshotScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SettlementSnapshotCountAggregateInputType | true
+    _avg?: SettlementSnapshotAvgAggregateInputType
+    _sum?: SettlementSnapshotSumAggregateInputType
+    _min?: SettlementSnapshotMinAggregateInputType
+    _max?: SettlementSnapshotMaxAggregateInputType
+  }
+
+  export type SettlementSnapshotGroupByOutputType = {
+    id: string
+    competitionId: string
+    tradingSessionId: string | null
+    participantId: string | null
+    portfolioId: string
+    snapshotAt: Date
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL: number
+    unrealizedPnL: number
+    returnPct: number
+    drawdownPct: number
+    turnoverPct: number
+    rank: number | null
+    holdingSymbol: string | null
+    positionJson: string | null
+    metricsJson: string | null
+    createdAt: Date
+    _count: SettlementSnapshotCountAggregateOutputType | null
+    _avg: SettlementSnapshotAvgAggregateOutputType | null
+    _sum: SettlementSnapshotSumAggregateOutputType | null
+    _min: SettlementSnapshotMinAggregateOutputType | null
+    _max: SettlementSnapshotMaxAggregateOutputType | null
+  }
+
+  type GetSettlementSnapshotGroupByPayload<T extends SettlementSnapshotGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SettlementSnapshotGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SettlementSnapshotGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SettlementSnapshotGroupByOutputType[P]>
+            : GetScalarType<T[P], SettlementSnapshotGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SettlementSnapshotSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    tradingSessionId?: boolean
+    participantId?: boolean
+    portfolioId?: boolean
+    snapshotAt?: boolean
+    cash?: boolean
+    marketValue?: boolean
+    totalValue?: boolean
+    realizedPnL?: boolean
+    unrealizedPnL?: boolean
+    returnPct?: boolean
+    drawdownPct?: boolean
+    turnoverPct?: boolean
+    rank?: boolean
+    holdingSymbol?: boolean
+    positionJson?: boolean
+    metricsJson?: boolean
+    createdAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    tradingSession?: boolean | SettlementSnapshot$tradingSessionArgs<ExtArgs>
+    participant?: boolean | SettlementSnapshot$participantArgs<ExtArgs>
+    portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["settlementSnapshot"]>
+
+  export type SettlementSnapshotSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    tradingSessionId?: boolean
+    participantId?: boolean
+    portfolioId?: boolean
+    snapshotAt?: boolean
+    cash?: boolean
+    marketValue?: boolean
+    totalValue?: boolean
+    realizedPnL?: boolean
+    unrealizedPnL?: boolean
+    returnPct?: boolean
+    drawdownPct?: boolean
+    turnoverPct?: boolean
+    rank?: boolean
+    holdingSymbol?: boolean
+    positionJson?: boolean
+    metricsJson?: boolean
+    createdAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    tradingSession?: boolean | SettlementSnapshot$tradingSessionArgs<ExtArgs>
+    participant?: boolean | SettlementSnapshot$participantArgs<ExtArgs>
+    portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["settlementSnapshot"]>
+
+  export type SettlementSnapshotSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    competitionId?: boolean
+    tradingSessionId?: boolean
+    participantId?: boolean
+    portfolioId?: boolean
+    snapshotAt?: boolean
+    cash?: boolean
+    marketValue?: boolean
+    totalValue?: boolean
+    realizedPnL?: boolean
+    unrealizedPnL?: boolean
+    returnPct?: boolean
+    drawdownPct?: boolean
+    turnoverPct?: boolean
+    rank?: boolean
+    holdingSymbol?: boolean
+    positionJson?: boolean
+    metricsJson?: boolean
+    createdAt?: boolean
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    tradingSession?: boolean | SettlementSnapshot$tradingSessionArgs<ExtArgs>
+    participant?: boolean | SettlementSnapshot$participantArgs<ExtArgs>
+    portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["settlementSnapshot"]>
+
+  export type SettlementSnapshotSelectScalar = {
+    id?: boolean
+    competitionId?: boolean
+    tradingSessionId?: boolean
+    participantId?: boolean
+    portfolioId?: boolean
+    snapshotAt?: boolean
+    cash?: boolean
+    marketValue?: boolean
+    totalValue?: boolean
+    realizedPnL?: boolean
+    unrealizedPnL?: boolean
+    returnPct?: boolean
+    drawdownPct?: boolean
+    turnoverPct?: boolean
+    rank?: boolean
+    holdingSymbol?: boolean
+    positionJson?: boolean
+    metricsJson?: boolean
+    createdAt?: boolean
+  }
+
+  export type SettlementSnapshotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "competitionId" | "tradingSessionId" | "participantId" | "portfolioId" | "snapshotAt" | "cash" | "marketValue" | "totalValue" | "realizedPnL" | "unrealizedPnL" | "returnPct" | "drawdownPct" | "turnoverPct" | "rank" | "holdingSymbol" | "positionJson" | "metricsJson" | "createdAt", ExtArgs["result"]["settlementSnapshot"]>
+  export type SettlementSnapshotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    tradingSession?: boolean | SettlementSnapshot$tradingSessionArgs<ExtArgs>
+    participant?: boolean | SettlementSnapshot$participantArgs<ExtArgs>
+    portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+  }
+  export type SettlementSnapshotIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    tradingSession?: boolean | SettlementSnapshot$tradingSessionArgs<ExtArgs>
+    participant?: boolean | SettlementSnapshot$participantArgs<ExtArgs>
+    portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+  }
+  export type SettlementSnapshotIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    competition?: boolean | CompetitionDefaultArgs<ExtArgs>
+    tradingSession?: boolean | SettlementSnapshot$tradingSessionArgs<ExtArgs>
+    participant?: boolean | SettlementSnapshot$participantArgs<ExtArgs>
+    portfolio?: boolean | PortfolioDefaultArgs<ExtArgs>
+  }
+
+  export type $SettlementSnapshotPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SettlementSnapshot"
+    objects: {
+      competition: Prisma.$CompetitionPayload<ExtArgs>
+      tradingSession: Prisma.$TradingSessionPayload<ExtArgs> | null
+      participant: Prisma.$CompetitionParticipantPayload<ExtArgs> | null
+      portfolio: Prisma.$PortfolioPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      competitionId: string
+      tradingSessionId: string | null
+      participantId: string | null
+      portfolioId: string
+      snapshotAt: Date
+      cash: number
+      marketValue: number
+      totalValue: number
+      realizedPnL: number
+      unrealizedPnL: number
+      returnPct: number
+      drawdownPct: number
+      turnoverPct: number
+      rank: number | null
+      holdingSymbol: string | null
+      positionJson: string | null
+      metricsJson: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["settlementSnapshot"]>
+    composites: {}
+  }
+
+  type SettlementSnapshotGetPayload<S extends boolean | null | undefined | SettlementSnapshotDefaultArgs> = $Result.GetResult<Prisma.$SettlementSnapshotPayload, S>
+
+  type SettlementSnapshotCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SettlementSnapshotFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SettlementSnapshotCountAggregateInputType | true
+    }
+
+  export interface SettlementSnapshotDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SettlementSnapshot'], meta: { name: 'SettlementSnapshot' } }
+    /**
+     * Find zero or one SettlementSnapshot that matches the filter.
+     * @param {SettlementSnapshotFindUniqueArgs} args - Arguments to find a SettlementSnapshot
+     * @example
+     * // Get one SettlementSnapshot
+     * const settlementSnapshot = await prisma.settlementSnapshot.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SettlementSnapshotFindUniqueArgs>(args: SelectSubset<T, SettlementSnapshotFindUniqueArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SettlementSnapshot that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SettlementSnapshotFindUniqueOrThrowArgs} args - Arguments to find a SettlementSnapshot
+     * @example
+     * // Get one SettlementSnapshot
+     * const settlementSnapshot = await prisma.settlementSnapshot.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SettlementSnapshotFindUniqueOrThrowArgs>(args: SelectSubset<T, SettlementSnapshotFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SettlementSnapshot that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotFindFirstArgs} args - Arguments to find a SettlementSnapshot
+     * @example
+     * // Get one SettlementSnapshot
+     * const settlementSnapshot = await prisma.settlementSnapshot.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SettlementSnapshotFindFirstArgs>(args?: SelectSubset<T, SettlementSnapshotFindFirstArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SettlementSnapshot that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotFindFirstOrThrowArgs} args - Arguments to find a SettlementSnapshot
+     * @example
+     * // Get one SettlementSnapshot
+     * const settlementSnapshot = await prisma.settlementSnapshot.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SettlementSnapshotFindFirstOrThrowArgs>(args?: SelectSubset<T, SettlementSnapshotFindFirstOrThrowArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SettlementSnapshots that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SettlementSnapshots
+     * const settlementSnapshots = await prisma.settlementSnapshot.findMany()
+     * 
+     * // Get first 10 SettlementSnapshots
+     * const settlementSnapshots = await prisma.settlementSnapshot.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const settlementSnapshotWithIdOnly = await prisma.settlementSnapshot.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SettlementSnapshotFindManyArgs>(args?: SelectSubset<T, SettlementSnapshotFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SettlementSnapshot.
+     * @param {SettlementSnapshotCreateArgs} args - Arguments to create a SettlementSnapshot.
+     * @example
+     * // Create one SettlementSnapshot
+     * const SettlementSnapshot = await prisma.settlementSnapshot.create({
+     *   data: {
+     *     // ... data to create a SettlementSnapshot
+     *   }
+     * })
+     * 
+     */
+    create<T extends SettlementSnapshotCreateArgs>(args: SelectSubset<T, SettlementSnapshotCreateArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SettlementSnapshots.
+     * @param {SettlementSnapshotCreateManyArgs} args - Arguments to create many SettlementSnapshots.
+     * @example
+     * // Create many SettlementSnapshots
+     * const settlementSnapshot = await prisma.settlementSnapshot.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SettlementSnapshotCreateManyArgs>(args?: SelectSubset<T, SettlementSnapshotCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SettlementSnapshots and returns the data saved in the database.
+     * @param {SettlementSnapshotCreateManyAndReturnArgs} args - Arguments to create many SettlementSnapshots.
+     * @example
+     * // Create many SettlementSnapshots
+     * const settlementSnapshot = await prisma.settlementSnapshot.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SettlementSnapshots and only return the `id`
+     * const settlementSnapshotWithIdOnly = await prisma.settlementSnapshot.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SettlementSnapshotCreateManyAndReturnArgs>(args?: SelectSubset<T, SettlementSnapshotCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SettlementSnapshot.
+     * @param {SettlementSnapshotDeleteArgs} args - Arguments to delete one SettlementSnapshot.
+     * @example
+     * // Delete one SettlementSnapshot
+     * const SettlementSnapshot = await prisma.settlementSnapshot.delete({
+     *   where: {
+     *     // ... filter to delete one SettlementSnapshot
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SettlementSnapshotDeleteArgs>(args: SelectSubset<T, SettlementSnapshotDeleteArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SettlementSnapshot.
+     * @param {SettlementSnapshotUpdateArgs} args - Arguments to update one SettlementSnapshot.
+     * @example
+     * // Update one SettlementSnapshot
+     * const settlementSnapshot = await prisma.settlementSnapshot.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SettlementSnapshotUpdateArgs>(args: SelectSubset<T, SettlementSnapshotUpdateArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SettlementSnapshots.
+     * @param {SettlementSnapshotDeleteManyArgs} args - Arguments to filter SettlementSnapshots to delete.
+     * @example
+     * // Delete a few SettlementSnapshots
+     * const { count } = await prisma.settlementSnapshot.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SettlementSnapshotDeleteManyArgs>(args?: SelectSubset<T, SettlementSnapshotDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SettlementSnapshots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SettlementSnapshots
+     * const settlementSnapshot = await prisma.settlementSnapshot.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SettlementSnapshotUpdateManyArgs>(args: SelectSubset<T, SettlementSnapshotUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SettlementSnapshots and returns the data updated in the database.
+     * @param {SettlementSnapshotUpdateManyAndReturnArgs} args - Arguments to update many SettlementSnapshots.
+     * @example
+     * // Update many SettlementSnapshots
+     * const settlementSnapshot = await prisma.settlementSnapshot.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SettlementSnapshots and only return the `id`
+     * const settlementSnapshotWithIdOnly = await prisma.settlementSnapshot.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SettlementSnapshotUpdateManyAndReturnArgs>(args: SelectSubset<T, SettlementSnapshotUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SettlementSnapshot.
+     * @param {SettlementSnapshotUpsertArgs} args - Arguments to update or create a SettlementSnapshot.
+     * @example
+     * // Update or create a SettlementSnapshot
+     * const settlementSnapshot = await prisma.settlementSnapshot.upsert({
+     *   create: {
+     *     // ... data to create a SettlementSnapshot
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SettlementSnapshot we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SettlementSnapshotUpsertArgs>(args: SelectSubset<T, SettlementSnapshotUpsertArgs<ExtArgs>>): Prisma__SettlementSnapshotClient<$Result.GetResult<Prisma.$SettlementSnapshotPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SettlementSnapshots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotCountArgs} args - Arguments to filter SettlementSnapshots to count.
+     * @example
+     * // Count the number of SettlementSnapshots
+     * const count = await prisma.settlementSnapshot.count({
+     *   where: {
+     *     // ... the filter for the SettlementSnapshots we want to count
+     *   }
+     * })
+    **/
+    count<T extends SettlementSnapshotCountArgs>(
+      args?: Subset<T, SettlementSnapshotCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SettlementSnapshotCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SettlementSnapshot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SettlementSnapshotAggregateArgs>(args: Subset<T, SettlementSnapshotAggregateArgs>): Prisma.PrismaPromise<GetSettlementSnapshotAggregateType<T>>
+
+    /**
+     * Group by SettlementSnapshot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettlementSnapshotGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SettlementSnapshotGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SettlementSnapshotGroupByArgs['orderBy'] }
+        : { orderBy?: SettlementSnapshotGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SettlementSnapshotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSettlementSnapshotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SettlementSnapshot model
+   */
+  readonly fields: SettlementSnapshotFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SettlementSnapshot.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SettlementSnapshotClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    competition<T extends CompetitionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompetitionDefaultArgs<ExtArgs>>): Prisma__CompetitionClient<$Result.GetResult<Prisma.$CompetitionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    tradingSession<T extends SettlementSnapshot$tradingSessionArgs<ExtArgs> = {}>(args?: Subset<T, SettlementSnapshot$tradingSessionArgs<ExtArgs>>): Prisma__TradingSessionClient<$Result.GetResult<Prisma.$TradingSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    participant<T extends SettlementSnapshot$participantArgs<ExtArgs> = {}>(args?: Subset<T, SettlementSnapshot$participantArgs<ExtArgs>>): Prisma__CompetitionParticipantClient<$Result.GetResult<Prisma.$CompetitionParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    portfolio<T extends PortfolioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PortfolioDefaultArgs<ExtArgs>>): Prisma__PortfolioClient<$Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SettlementSnapshot model
+   */
+  interface SettlementSnapshotFieldRefs {
+    readonly id: FieldRef<"SettlementSnapshot", 'String'>
+    readonly competitionId: FieldRef<"SettlementSnapshot", 'String'>
+    readonly tradingSessionId: FieldRef<"SettlementSnapshot", 'String'>
+    readonly participantId: FieldRef<"SettlementSnapshot", 'String'>
+    readonly portfolioId: FieldRef<"SettlementSnapshot", 'String'>
+    readonly snapshotAt: FieldRef<"SettlementSnapshot", 'DateTime'>
+    readonly cash: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly marketValue: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly totalValue: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly realizedPnL: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly unrealizedPnL: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly returnPct: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly drawdownPct: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly turnoverPct: FieldRef<"SettlementSnapshot", 'Float'>
+    readonly rank: FieldRef<"SettlementSnapshot", 'Int'>
+    readonly holdingSymbol: FieldRef<"SettlementSnapshot", 'String'>
+    readonly positionJson: FieldRef<"SettlementSnapshot", 'String'>
+    readonly metricsJson: FieldRef<"SettlementSnapshot", 'String'>
+    readonly createdAt: FieldRef<"SettlementSnapshot", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SettlementSnapshot findUnique
+   */
+  export type SettlementSnapshotFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SettlementSnapshot to fetch.
+     */
+    where: SettlementSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SettlementSnapshot findUniqueOrThrow
+   */
+  export type SettlementSnapshotFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SettlementSnapshot to fetch.
+     */
+    where: SettlementSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SettlementSnapshot findFirst
+   */
+  export type SettlementSnapshotFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SettlementSnapshot to fetch.
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SettlementSnapshots to fetch.
+     */
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SettlementSnapshots.
+     */
+    cursor?: SettlementSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SettlementSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SettlementSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SettlementSnapshots.
+     */
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * SettlementSnapshot findFirstOrThrow
+   */
+  export type SettlementSnapshotFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SettlementSnapshot to fetch.
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SettlementSnapshots to fetch.
+     */
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SettlementSnapshots.
+     */
+    cursor?: SettlementSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SettlementSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SettlementSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SettlementSnapshots.
+     */
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * SettlementSnapshot findMany
+   */
+  export type SettlementSnapshotFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SettlementSnapshots to fetch.
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SettlementSnapshots to fetch.
+     */
+    orderBy?: SettlementSnapshotOrderByWithRelationInput | SettlementSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SettlementSnapshots.
+     */
+    cursor?: SettlementSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SettlementSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SettlementSnapshots.
+     */
+    skip?: number
+    distinct?: SettlementSnapshotScalarFieldEnum | SettlementSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * SettlementSnapshot create
+   */
+  export type SettlementSnapshotCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SettlementSnapshot.
+     */
+    data: XOR<SettlementSnapshotCreateInput, SettlementSnapshotUncheckedCreateInput>
+  }
+
+  /**
+   * SettlementSnapshot createMany
+   */
+  export type SettlementSnapshotCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SettlementSnapshots.
+     */
+    data: SettlementSnapshotCreateManyInput | SettlementSnapshotCreateManyInput[]
+  }
+
+  /**
+   * SettlementSnapshot createManyAndReturn
+   */
+  export type SettlementSnapshotCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * The data used to create many SettlementSnapshots.
+     */
+    data: SettlementSnapshotCreateManyInput | SettlementSnapshotCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SettlementSnapshot update
+   */
+  export type SettlementSnapshotUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SettlementSnapshot.
+     */
+    data: XOR<SettlementSnapshotUpdateInput, SettlementSnapshotUncheckedUpdateInput>
+    /**
+     * Choose, which SettlementSnapshot to update.
+     */
+    where: SettlementSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SettlementSnapshot updateMany
+   */
+  export type SettlementSnapshotUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SettlementSnapshots.
+     */
+    data: XOR<SettlementSnapshotUpdateManyMutationInput, SettlementSnapshotUncheckedUpdateManyInput>
+    /**
+     * Filter which SettlementSnapshots to update
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * Limit how many SettlementSnapshots to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SettlementSnapshot updateManyAndReturn
+   */
+  export type SettlementSnapshotUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * The data used to update SettlementSnapshots.
+     */
+    data: XOR<SettlementSnapshotUpdateManyMutationInput, SettlementSnapshotUncheckedUpdateManyInput>
+    /**
+     * Filter which SettlementSnapshots to update
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * Limit how many SettlementSnapshots to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SettlementSnapshot upsert
+   */
+  export type SettlementSnapshotUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SettlementSnapshot to update in case it exists.
+     */
+    where: SettlementSnapshotWhereUniqueInput
+    /**
+     * In case the SettlementSnapshot found by the `where` argument doesn't exist, create a new SettlementSnapshot with this data.
+     */
+    create: XOR<SettlementSnapshotCreateInput, SettlementSnapshotUncheckedCreateInput>
+    /**
+     * In case the SettlementSnapshot was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SettlementSnapshotUpdateInput, SettlementSnapshotUncheckedUpdateInput>
+  }
+
+  /**
+   * SettlementSnapshot delete
+   */
+  export type SettlementSnapshotDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter which SettlementSnapshot to delete.
+     */
+    where: SettlementSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SettlementSnapshot deleteMany
+   */
+  export type SettlementSnapshotDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SettlementSnapshots to delete
+     */
+    where?: SettlementSnapshotWhereInput
+    /**
+     * Limit how many SettlementSnapshots to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SettlementSnapshot.tradingSession
+   */
+  export type SettlementSnapshot$tradingSessionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TradingSession
+     */
+    select?: TradingSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TradingSession
+     */
+    omit?: TradingSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TradingSessionInclude<ExtArgs> | null
+    where?: TradingSessionWhereInput
+  }
+
+  /**
+   * SettlementSnapshot.participant
+   */
+  export type SettlementSnapshot$participantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CompetitionParticipant
+     */
+    select?: CompetitionParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CompetitionParticipant
+     */
+    omit?: CompetitionParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompetitionParticipantInclude<ExtArgs> | null
+    where?: CompetitionParticipantWhereInput
+  }
+
+  /**
+   * SettlementSnapshot without action
+   */
+  export type SettlementSnapshotDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SettlementSnapshot
+     */
+    select?: SettlementSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SettlementSnapshot
+     */
+    omit?: SettlementSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettlementSnapshotInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -16331,6 +21148,18 @@ export namespace Prisma {
     initialCash: 'initialCash',
     market: 'market',
     testMode: 'testMode',
+    mode: 'mode',
+    entryRule: 'entryRule',
+    tradableSymbolsJson: 'tradableSymbolsJson',
+    maxPositionPct: 'maxPositionPct',
+    maxHoldingSymbols: 'maxHoldingSymbols',
+    switchRequiresFlat: 'switchRequiresFlat',
+    commissionRate: 'commissionRate',
+    slippageBps: 'slippageBps',
+    allowShort: 'allowShort',
+    scoreFormula: 'scoreFormula',
+    phase: 'phase',
+    tradingCalendar: 'tradingCalendar',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -16344,6 +21173,9 @@ export namespace Prisma {
     competitionId: 'competitionId',
     cash: 'cash',
     totalValue: 'totalValue',
+    holdingSymbol: 'holdingSymbol',
+    holdingCount: 'holdingCount',
+    switchRequiresFlat: 'switchRequiresFlat',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -16460,11 +21292,16 @@ export namespace Prisma {
     agentId: 'agentId',
     competitionId: 'competitionId',
     portfolioId: 'portfolioId',
+    participantId: 'participantId',
+    tradingSessionId: 'tradingSessionId',
     symbol: 'symbol',
     side: 'side',
     quantity: 'quantity',
     note: 'note',
     status: 'status',
+    intent: 'intent',
+    riskCheckStatus: 'riskCheckStatus',
+    riskRejectCode: 'riskRejectCode',
     rejectReason: 'rejectReason',
     submittedAt: 'submittedAt',
     matchedAt: 'matchedAt'
@@ -16486,6 +21323,70 @@ export namespace Prisma {
   };
 
   export type DailySettlementScalarFieldEnum = (typeof DailySettlementScalarFieldEnum)[keyof typeof DailySettlementScalarFieldEnum]
+
+
+  export const CompetitionParticipantScalarFieldEnum: {
+    id: 'id',
+    competitionId: 'competitionId',
+    agentId: 'agentId',
+    portfolioId: 'portfolioId',
+    status: 'status',
+    displayName: 'displayName',
+    tagline: 'tagline',
+    strategyTagsJson: 'strategyTagsJson',
+    riskLevel: 'riskLevel',
+    webhookUrl: 'webhookUrl',
+    apiVersion: 'apiVersion',
+    joinedAt: 'joinedAt',
+    approvedAt: 'approvedAt',
+    eliminatedAt: 'eliminatedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CompetitionParticipantScalarFieldEnum = (typeof CompetitionParticipantScalarFieldEnum)[keyof typeof CompetitionParticipantScalarFieldEnum]
+
+
+  export const TradingSessionScalarFieldEnum: {
+    id: 'id',
+    competitionId: 'competitionId',
+    tradingDate: 'tradingDate',
+    sessionType: 'sessionType',
+    status: 'status',
+    openAt: 'openAt',
+    closeAt: 'closeAt',
+    marketSnapshotJson: 'marketSnapshotJson',
+    leaderboardSnapshotJson: 'leaderboardSnapshotJson',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TradingSessionScalarFieldEnum = (typeof TradingSessionScalarFieldEnum)[keyof typeof TradingSessionScalarFieldEnum]
+
+
+  export const SettlementSnapshotScalarFieldEnum: {
+    id: 'id',
+    competitionId: 'competitionId',
+    tradingSessionId: 'tradingSessionId',
+    participantId: 'participantId',
+    portfolioId: 'portfolioId',
+    snapshotAt: 'snapshotAt',
+    cash: 'cash',
+    marketValue: 'marketValue',
+    totalValue: 'totalValue',
+    realizedPnL: 'realizedPnL',
+    unrealizedPnL: 'unrealizedPnL',
+    returnPct: 'returnPct',
+    drawdownPct: 'drawdownPct',
+    turnoverPct: 'turnoverPct',
+    rank: 'rank',
+    holdingSymbol: 'holdingSymbol',
+    positionJson: 'positionJson',
+    metricsJson: 'metricsJson',
+    createdAt: 'createdAt'
+  };
+
+  export type SettlementSnapshotScalarFieldEnum = (typeof SettlementSnapshotScalarFieldEnum)[keyof typeof SettlementSnapshotScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -16552,6 +21453,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
    * Reference to a field of type 'TradeSide'
    */
   export type EnumTradeSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TradeSide'>
@@ -16580,9 +21488,37 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'OrderIntent'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type EnumOrderIntentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderIntent'>
+    
+
+
+  /**
+   * Reference to a field of type 'RiskCheckStatus'
+   */
+  export type EnumRiskCheckStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RiskCheckStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ParticipantStatus'
+   */
+  export type EnumParticipantStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ParticipantStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'TradingSessionType'
+   */
+  export type EnumTradingSessionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TradingSessionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'TradingSessionStatus'
+   */
+  export type EnumTradingSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TradingSessionStatus'>
     
   /**
    * Deep Input Types
@@ -16606,6 +21542,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Agent"> | Date | string
     trades?: TradeListRelationFilter
     portfolios?: PortfolioListRelationFilter
+    participants?: CompetitionParticipantListRelationFilter
     orders?: OrderListRelationFilter
     logs?: LogEntryListRelationFilter
     comments?: CommentListRelationFilter
@@ -16626,6 +21563,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     trades?: TradeOrderByRelationAggregateInput
     portfolios?: PortfolioOrderByRelationAggregateInput
+    participants?: CompetitionParticipantOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
     logs?: LogEntryOrderByRelationAggregateInput
     comments?: CommentOrderByRelationAggregateInput
@@ -16649,6 +21587,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Agent"> | Date | string
     trades?: TradeListRelationFilter
     portfolios?: PortfolioListRelationFilter
+    participants?: CompetitionParticipantListRelationFilter
     orders?: OrderListRelationFilter
     logs?: LogEntryListRelationFilter
     comments?: CommentListRelationFilter
@@ -16702,10 +21641,25 @@ export namespace Prisma {
     initialCash?: FloatFilter<"Competition"> | number
     market?: StringFilter<"Competition"> | string
     testMode?: BoolFilter<"Competition"> | boolean
+    mode?: StringFilter<"Competition"> | string
+    entryRule?: StringFilter<"Competition"> | string
+    tradableSymbolsJson?: StringNullableFilter<"Competition"> | string | null
+    maxPositionPct?: FloatFilter<"Competition"> | number
+    maxHoldingSymbols?: IntFilter<"Competition"> | number
+    switchRequiresFlat?: BoolFilter<"Competition"> | boolean
+    commissionRate?: FloatFilter<"Competition"> | number
+    slippageBps?: IntFilter<"Competition"> | number
+    allowShort?: BoolFilter<"Competition"> | boolean
+    scoreFormula?: StringNullableFilter<"Competition"> | string | null
+    phase?: StringFilter<"Competition"> | string
+    tradingCalendar?: StringNullableFilter<"Competition"> | string | null
     createdAt?: DateTimeFilter<"Competition"> | Date | string
     updatedAt?: DateTimeFilter<"Competition"> | Date | string
+    participants?: CompetitionParticipantListRelationFilter
     portfolios?: PortfolioListRelationFilter
     orders?: OrderListRelationFilter
+    tradingSessions?: TradingSessionListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
   }
 
   export type CompetitionOrderByWithRelationInput = {
@@ -16718,10 +21672,25 @@ export namespace Prisma {
     initialCash?: SortOrder
     market?: SortOrder
     testMode?: SortOrder
+    mode?: SortOrder
+    entryRule?: SortOrder
+    tradableSymbolsJson?: SortOrderInput | SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    switchRequiresFlat?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
+    allowShort?: SortOrder
+    scoreFormula?: SortOrderInput | SortOrder
+    phase?: SortOrder
+    tradingCalendar?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    participants?: CompetitionParticipantOrderByRelationAggregateInput
     portfolios?: PortfolioOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
+    tradingSessions?: TradingSessionOrderByRelationAggregateInput
+    snapshots?: SettlementSnapshotOrderByRelationAggregateInput
   }
 
   export type CompetitionWhereUniqueInput = Prisma.AtLeast<{
@@ -16737,10 +21706,25 @@ export namespace Prisma {
     initialCash?: FloatFilter<"Competition"> | number
     market?: StringFilter<"Competition"> | string
     testMode?: BoolFilter<"Competition"> | boolean
+    mode?: StringFilter<"Competition"> | string
+    entryRule?: StringFilter<"Competition"> | string
+    tradableSymbolsJson?: StringNullableFilter<"Competition"> | string | null
+    maxPositionPct?: FloatFilter<"Competition"> | number
+    maxHoldingSymbols?: IntFilter<"Competition"> | number
+    switchRequiresFlat?: BoolFilter<"Competition"> | boolean
+    commissionRate?: FloatFilter<"Competition"> | number
+    slippageBps?: IntFilter<"Competition"> | number
+    allowShort?: BoolFilter<"Competition"> | boolean
+    scoreFormula?: StringNullableFilter<"Competition"> | string | null
+    phase?: StringFilter<"Competition"> | string
+    tradingCalendar?: StringNullableFilter<"Competition"> | string | null
     createdAt?: DateTimeFilter<"Competition"> | Date | string
     updatedAt?: DateTimeFilter<"Competition"> | Date | string
+    participants?: CompetitionParticipantListRelationFilter
     portfolios?: PortfolioListRelationFilter
     orders?: OrderListRelationFilter
+    tradingSessions?: TradingSessionListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
   }, "id">
 
   export type CompetitionOrderByWithAggregationInput = {
@@ -16753,6 +21737,18 @@ export namespace Prisma {
     initialCash?: SortOrder
     market?: SortOrder
     testMode?: SortOrder
+    mode?: SortOrder
+    entryRule?: SortOrder
+    tradableSymbolsJson?: SortOrderInput | SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    switchRequiresFlat?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
+    allowShort?: SortOrder
+    scoreFormula?: SortOrderInput | SortOrder
+    phase?: SortOrder
+    tradingCalendar?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CompetitionCountOrderByAggregateInput
@@ -16775,6 +21771,18 @@ export namespace Prisma {
     initialCash?: FloatWithAggregatesFilter<"Competition"> | number
     market?: StringWithAggregatesFilter<"Competition"> | string
     testMode?: BoolWithAggregatesFilter<"Competition"> | boolean
+    mode?: StringWithAggregatesFilter<"Competition"> | string
+    entryRule?: StringWithAggregatesFilter<"Competition"> | string
+    tradableSymbolsJson?: StringNullableWithAggregatesFilter<"Competition"> | string | null
+    maxPositionPct?: FloatWithAggregatesFilter<"Competition"> | number
+    maxHoldingSymbols?: IntWithAggregatesFilter<"Competition"> | number
+    switchRequiresFlat?: BoolWithAggregatesFilter<"Competition"> | boolean
+    commissionRate?: FloatWithAggregatesFilter<"Competition"> | number
+    slippageBps?: IntWithAggregatesFilter<"Competition"> | number
+    allowShort?: BoolWithAggregatesFilter<"Competition"> | boolean
+    scoreFormula?: StringNullableWithAggregatesFilter<"Competition"> | string | null
+    phase?: StringWithAggregatesFilter<"Competition"> | string
+    tradingCalendar?: StringNullableWithAggregatesFilter<"Competition"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Competition"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Competition"> | Date | string
   }
@@ -16788,13 +21796,18 @@ export namespace Prisma {
     competitionId?: StringFilter<"Portfolio"> | string
     cash?: FloatFilter<"Portfolio"> | number
     totalValue?: FloatFilter<"Portfolio"> | number
+    holdingSymbol?: StringNullableFilter<"Portfolio"> | string | null
+    holdingCount?: IntFilter<"Portfolio"> | number
+    switchRequiresFlat?: BoolFilter<"Portfolio"> | boolean
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
     agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    participant?: XOR<CompetitionParticipantNullableScalarRelationFilter, CompetitionParticipantWhereInput> | null
     positions?: PositionListRelationFilter
     orders?: OrderListRelationFilter
     settlements?: DailySettlementListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
   }
 
   export type PortfolioOrderByWithRelationInput = {
@@ -16803,13 +21816,18 @@ export namespace Prisma {
     competitionId?: SortOrder
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingSymbol?: SortOrderInput | SortOrder
+    holdingCount?: SortOrder
+    switchRequiresFlat?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     agent?: AgentOrderByWithRelationInput
     competition?: CompetitionOrderByWithRelationInput
+    participant?: CompetitionParticipantOrderByWithRelationInput
     positions?: PositionOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
     settlements?: DailySettlementOrderByRelationAggregateInput
+    snapshots?: SettlementSnapshotOrderByRelationAggregateInput
   }
 
   export type PortfolioWhereUniqueInput = Prisma.AtLeast<{
@@ -16822,13 +21840,18 @@ export namespace Prisma {
     competitionId?: StringFilter<"Portfolio"> | string
     cash?: FloatFilter<"Portfolio"> | number
     totalValue?: FloatFilter<"Portfolio"> | number
+    holdingSymbol?: StringNullableFilter<"Portfolio"> | string | null
+    holdingCount?: IntFilter<"Portfolio"> | number
+    switchRequiresFlat?: BoolFilter<"Portfolio"> | boolean
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
     agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    participant?: XOR<CompetitionParticipantNullableScalarRelationFilter, CompetitionParticipantWhereInput> | null
     positions?: PositionListRelationFilter
     orders?: OrderListRelationFilter
     settlements?: DailySettlementListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
   }, "id" | "agentId_competitionId">
 
   export type PortfolioOrderByWithAggregationInput = {
@@ -16837,6 +21860,9 @@ export namespace Prisma {
     competitionId?: SortOrder
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingSymbol?: SortOrderInput | SortOrder
+    holdingCount?: SortOrder
+    switchRequiresFlat?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PortfolioCountOrderByAggregateInput
@@ -16855,6 +21881,9 @@ export namespace Prisma {
     competitionId?: StringWithAggregatesFilter<"Portfolio"> | string
     cash?: FloatWithAggregatesFilter<"Portfolio"> | number
     totalValue?: FloatWithAggregatesFilter<"Portfolio"> | number
+    holdingSymbol?: StringNullableWithAggregatesFilter<"Portfolio"> | string | null
+    holdingCount?: IntWithAggregatesFilter<"Portfolio"> | number
+    switchRequiresFlat?: BoolWithAggregatesFilter<"Portfolio"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Portfolio"> | Date | string
   }
@@ -17410,17 +22439,24 @@ export namespace Prisma {
     agentId?: StringFilter<"Order"> | string
     competitionId?: StringFilter<"Order"> | string
     portfolioId?: StringFilter<"Order"> | string
+    participantId?: StringNullableFilter<"Order"> | string | null
+    tradingSessionId?: StringNullableFilter<"Order"> | string | null
     symbol?: StringFilter<"Order"> | string
     side?: EnumTradeSideFilter<"Order"> | $Enums.TradeSide
     quantity?: FloatFilter<"Order"> | number
     note?: StringNullableFilter<"Order"> | string | null
     status?: StringFilter<"Order"> | string
+    intent?: EnumOrderIntentFilter<"Order"> | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFilter<"Order"> | $Enums.RiskCheckStatus
+    riskRejectCode?: StringNullableFilter<"Order"> | string | null
     rejectReason?: StringNullableFilter<"Order"> | string | null
     submittedAt?: DateTimeFilter<"Order"> | Date | string
     matchedAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
     portfolio?: XOR<PortfolioScalarRelationFilter, PortfolioWhereInput>
+    participant?: XOR<CompetitionParticipantNullableScalarRelationFilter, CompetitionParticipantWhereInput> | null
+    tradingSession?: XOR<TradingSessionNullableScalarRelationFilter, TradingSessionWhereInput> | null
   }
 
   export type OrderOrderByWithRelationInput = {
@@ -17428,17 +22464,24 @@ export namespace Prisma {
     agentId?: SortOrder
     competitionId?: SortOrder
     portfolioId?: SortOrder
+    participantId?: SortOrderInput | SortOrder
+    tradingSessionId?: SortOrderInput | SortOrder
     symbol?: SortOrder
     side?: SortOrder
     quantity?: SortOrder
     note?: SortOrderInput | SortOrder
     status?: SortOrder
+    intent?: SortOrder
+    riskCheckStatus?: SortOrder
+    riskRejectCode?: SortOrderInput | SortOrder
     rejectReason?: SortOrderInput | SortOrder
     submittedAt?: SortOrder
     matchedAt?: SortOrderInput | SortOrder
     agent?: AgentOrderByWithRelationInput
     competition?: CompetitionOrderByWithRelationInput
     portfolio?: PortfolioOrderByWithRelationInput
+    participant?: CompetitionParticipantOrderByWithRelationInput
+    tradingSession?: TradingSessionOrderByWithRelationInput
   }
 
   export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -17449,17 +22492,24 @@ export namespace Prisma {
     agentId?: StringFilter<"Order"> | string
     competitionId?: StringFilter<"Order"> | string
     portfolioId?: StringFilter<"Order"> | string
+    participantId?: StringNullableFilter<"Order"> | string | null
+    tradingSessionId?: StringNullableFilter<"Order"> | string | null
     symbol?: StringFilter<"Order"> | string
     side?: EnumTradeSideFilter<"Order"> | $Enums.TradeSide
     quantity?: FloatFilter<"Order"> | number
     note?: StringNullableFilter<"Order"> | string | null
     status?: StringFilter<"Order"> | string
+    intent?: EnumOrderIntentFilter<"Order"> | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFilter<"Order"> | $Enums.RiskCheckStatus
+    riskRejectCode?: StringNullableFilter<"Order"> | string | null
     rejectReason?: StringNullableFilter<"Order"> | string | null
     submittedAt?: DateTimeFilter<"Order"> | Date | string
     matchedAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
     portfolio?: XOR<PortfolioScalarRelationFilter, PortfolioWhereInput>
+    participant?: XOR<CompetitionParticipantNullableScalarRelationFilter, CompetitionParticipantWhereInput> | null
+    tradingSession?: XOR<TradingSessionNullableScalarRelationFilter, TradingSessionWhereInput> | null
   }, "id">
 
   export type OrderOrderByWithAggregationInput = {
@@ -17467,11 +22517,16 @@ export namespace Prisma {
     agentId?: SortOrder
     competitionId?: SortOrder
     portfolioId?: SortOrder
+    participantId?: SortOrderInput | SortOrder
+    tradingSessionId?: SortOrderInput | SortOrder
     symbol?: SortOrder
     side?: SortOrder
     quantity?: SortOrder
     note?: SortOrderInput | SortOrder
     status?: SortOrder
+    intent?: SortOrder
+    riskCheckStatus?: SortOrder
+    riskRejectCode?: SortOrderInput | SortOrder
     rejectReason?: SortOrderInput | SortOrder
     submittedAt?: SortOrder
     matchedAt?: SortOrderInput | SortOrder
@@ -17490,11 +22545,16 @@ export namespace Prisma {
     agentId?: StringWithAggregatesFilter<"Order"> | string
     competitionId?: StringWithAggregatesFilter<"Order"> | string
     portfolioId?: StringWithAggregatesFilter<"Order"> | string
+    participantId?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    tradingSessionId?: StringNullableWithAggregatesFilter<"Order"> | string | null
     symbol?: StringWithAggregatesFilter<"Order"> | string
     side?: EnumTradeSideWithAggregatesFilter<"Order"> | $Enums.TradeSide
     quantity?: FloatWithAggregatesFilter<"Order"> | number
     note?: StringNullableWithAggregatesFilter<"Order"> | string | null
     status?: StringWithAggregatesFilter<"Order"> | string
+    intent?: EnumOrderIntentWithAggregatesFilter<"Order"> | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusWithAggregatesFilter<"Order"> | $Enums.RiskCheckStatus
+    riskRejectCode?: StringNullableWithAggregatesFilter<"Order"> | string | null
     rejectReason?: StringNullableWithAggregatesFilter<"Order"> | string | null
     submittedAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     matchedAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
@@ -17578,6 +22638,357 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"DailySettlement"> | Date | string
   }
 
+  export type CompetitionParticipantWhereInput = {
+    AND?: CompetitionParticipantWhereInput | CompetitionParticipantWhereInput[]
+    OR?: CompetitionParticipantWhereInput[]
+    NOT?: CompetitionParticipantWhereInput | CompetitionParticipantWhereInput[]
+    id?: StringFilter<"CompetitionParticipant"> | string
+    competitionId?: StringFilter<"CompetitionParticipant"> | string
+    agentId?: StringFilter<"CompetitionParticipant"> | string
+    portfolioId?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    status?: EnumParticipantStatusFilter<"CompetitionParticipant"> | $Enums.ParticipantStatus
+    displayName?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    tagline?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    strategyTagsJson?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    riskLevel?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    webhookUrl?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    apiVersion?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    joinedAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    approvedAt?: DateTimeNullableFilter<"CompetitionParticipant"> | Date | string | null
+    eliminatedAt?: DateTimeNullableFilter<"CompetitionParticipant"> | Date | string | null
+    createdAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    updatedAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    portfolio?: XOR<PortfolioNullableScalarRelationFilter, PortfolioWhereInput> | null
+    orders?: OrderListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
+  }
+
+  export type CompetitionParticipantOrderByWithRelationInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    agentId?: SortOrder
+    portfolioId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    displayName?: SortOrderInput | SortOrder
+    tagline?: SortOrderInput | SortOrder
+    strategyTagsJson?: SortOrderInput | SortOrder
+    riskLevel?: SortOrderInput | SortOrder
+    webhookUrl?: SortOrderInput | SortOrder
+    apiVersion?: SortOrderInput | SortOrder
+    joinedAt?: SortOrder
+    approvedAt?: SortOrderInput | SortOrder
+    eliminatedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    competition?: CompetitionOrderByWithRelationInput
+    agent?: AgentOrderByWithRelationInput
+    portfolio?: PortfolioOrderByWithRelationInput
+    orders?: OrderOrderByRelationAggregateInput
+    snapshots?: SettlementSnapshotOrderByRelationAggregateInput
+  }
+
+  export type CompetitionParticipantWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    portfolioId?: string
+    competitionId_agentId?: CompetitionParticipantCompetitionIdAgentIdCompoundUniqueInput
+    AND?: CompetitionParticipantWhereInput | CompetitionParticipantWhereInput[]
+    OR?: CompetitionParticipantWhereInput[]
+    NOT?: CompetitionParticipantWhereInput | CompetitionParticipantWhereInput[]
+    competitionId?: StringFilter<"CompetitionParticipant"> | string
+    agentId?: StringFilter<"CompetitionParticipant"> | string
+    status?: EnumParticipantStatusFilter<"CompetitionParticipant"> | $Enums.ParticipantStatus
+    displayName?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    tagline?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    strategyTagsJson?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    riskLevel?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    webhookUrl?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    apiVersion?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    joinedAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    approvedAt?: DateTimeNullableFilter<"CompetitionParticipant"> | Date | string | null
+    eliminatedAt?: DateTimeNullableFilter<"CompetitionParticipant"> | Date | string | null
+    createdAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    updatedAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    portfolio?: XOR<PortfolioNullableScalarRelationFilter, PortfolioWhereInput> | null
+    orders?: OrderListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
+  }, "id" | "portfolioId" | "competitionId_agentId">
+
+  export type CompetitionParticipantOrderByWithAggregationInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    agentId?: SortOrder
+    portfolioId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    displayName?: SortOrderInput | SortOrder
+    tagline?: SortOrderInput | SortOrder
+    strategyTagsJson?: SortOrderInput | SortOrder
+    riskLevel?: SortOrderInput | SortOrder
+    webhookUrl?: SortOrderInput | SortOrder
+    apiVersion?: SortOrderInput | SortOrder
+    joinedAt?: SortOrder
+    approvedAt?: SortOrderInput | SortOrder
+    eliminatedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CompetitionParticipantCountOrderByAggregateInput
+    _max?: CompetitionParticipantMaxOrderByAggregateInput
+    _min?: CompetitionParticipantMinOrderByAggregateInput
+  }
+
+  export type CompetitionParticipantScalarWhereWithAggregatesInput = {
+    AND?: CompetitionParticipantScalarWhereWithAggregatesInput | CompetitionParticipantScalarWhereWithAggregatesInput[]
+    OR?: CompetitionParticipantScalarWhereWithAggregatesInput[]
+    NOT?: CompetitionParticipantScalarWhereWithAggregatesInput | CompetitionParticipantScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CompetitionParticipant"> | string
+    competitionId?: StringWithAggregatesFilter<"CompetitionParticipant"> | string
+    agentId?: StringWithAggregatesFilter<"CompetitionParticipant"> | string
+    portfolioId?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    status?: EnumParticipantStatusWithAggregatesFilter<"CompetitionParticipant"> | $Enums.ParticipantStatus
+    displayName?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    tagline?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    strategyTagsJson?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    riskLevel?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    webhookUrl?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    apiVersion?: StringNullableWithAggregatesFilter<"CompetitionParticipant"> | string | null
+    joinedAt?: DateTimeWithAggregatesFilter<"CompetitionParticipant"> | Date | string
+    approvedAt?: DateTimeNullableWithAggregatesFilter<"CompetitionParticipant"> | Date | string | null
+    eliminatedAt?: DateTimeNullableWithAggregatesFilter<"CompetitionParticipant"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CompetitionParticipant"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CompetitionParticipant"> | Date | string
+  }
+
+  export type TradingSessionWhereInput = {
+    AND?: TradingSessionWhereInput | TradingSessionWhereInput[]
+    OR?: TradingSessionWhereInput[]
+    NOT?: TradingSessionWhereInput | TradingSessionWhereInput[]
+    id?: StringFilter<"TradingSession"> | string
+    competitionId?: StringFilter<"TradingSession"> | string
+    tradingDate?: StringFilter<"TradingSession"> | string
+    sessionType?: EnumTradingSessionTypeFilter<"TradingSession"> | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFilter<"TradingSession"> | $Enums.TradingSessionStatus
+    openAt?: DateTimeFilter<"TradingSession"> | Date | string
+    closeAt?: DateTimeFilter<"TradingSession"> | Date | string
+    marketSnapshotJson?: StringNullableFilter<"TradingSession"> | string | null
+    leaderboardSnapshotJson?: StringNullableFilter<"TradingSession"> | string | null
+    createdAt?: DateTimeFilter<"TradingSession"> | Date | string
+    updatedAt?: DateTimeFilter<"TradingSession"> | Date | string
+    competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    orders?: OrderListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
+  }
+
+  export type TradingSessionOrderByWithRelationInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingDate?: SortOrder
+    sessionType?: SortOrder
+    status?: SortOrder
+    openAt?: SortOrder
+    closeAt?: SortOrder
+    marketSnapshotJson?: SortOrderInput | SortOrder
+    leaderboardSnapshotJson?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    competition?: CompetitionOrderByWithRelationInput
+    orders?: OrderOrderByRelationAggregateInput
+    snapshots?: SettlementSnapshotOrderByRelationAggregateInput
+  }
+
+  export type TradingSessionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    competitionId_tradingDate_sessionType?: TradingSessionCompetitionIdTradingDateSessionTypeCompoundUniqueInput
+    AND?: TradingSessionWhereInput | TradingSessionWhereInput[]
+    OR?: TradingSessionWhereInput[]
+    NOT?: TradingSessionWhereInput | TradingSessionWhereInput[]
+    competitionId?: StringFilter<"TradingSession"> | string
+    tradingDate?: StringFilter<"TradingSession"> | string
+    sessionType?: EnumTradingSessionTypeFilter<"TradingSession"> | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFilter<"TradingSession"> | $Enums.TradingSessionStatus
+    openAt?: DateTimeFilter<"TradingSession"> | Date | string
+    closeAt?: DateTimeFilter<"TradingSession"> | Date | string
+    marketSnapshotJson?: StringNullableFilter<"TradingSession"> | string | null
+    leaderboardSnapshotJson?: StringNullableFilter<"TradingSession"> | string | null
+    createdAt?: DateTimeFilter<"TradingSession"> | Date | string
+    updatedAt?: DateTimeFilter<"TradingSession"> | Date | string
+    competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    orders?: OrderListRelationFilter
+    snapshots?: SettlementSnapshotListRelationFilter
+  }, "id" | "competitionId_tradingDate_sessionType">
+
+  export type TradingSessionOrderByWithAggregationInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingDate?: SortOrder
+    sessionType?: SortOrder
+    status?: SortOrder
+    openAt?: SortOrder
+    closeAt?: SortOrder
+    marketSnapshotJson?: SortOrderInput | SortOrder
+    leaderboardSnapshotJson?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TradingSessionCountOrderByAggregateInput
+    _max?: TradingSessionMaxOrderByAggregateInput
+    _min?: TradingSessionMinOrderByAggregateInput
+  }
+
+  export type TradingSessionScalarWhereWithAggregatesInput = {
+    AND?: TradingSessionScalarWhereWithAggregatesInput | TradingSessionScalarWhereWithAggregatesInput[]
+    OR?: TradingSessionScalarWhereWithAggregatesInput[]
+    NOT?: TradingSessionScalarWhereWithAggregatesInput | TradingSessionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TradingSession"> | string
+    competitionId?: StringWithAggregatesFilter<"TradingSession"> | string
+    tradingDate?: StringWithAggregatesFilter<"TradingSession"> | string
+    sessionType?: EnumTradingSessionTypeWithAggregatesFilter<"TradingSession"> | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusWithAggregatesFilter<"TradingSession"> | $Enums.TradingSessionStatus
+    openAt?: DateTimeWithAggregatesFilter<"TradingSession"> | Date | string
+    closeAt?: DateTimeWithAggregatesFilter<"TradingSession"> | Date | string
+    marketSnapshotJson?: StringNullableWithAggregatesFilter<"TradingSession"> | string | null
+    leaderboardSnapshotJson?: StringNullableWithAggregatesFilter<"TradingSession"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"TradingSession"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TradingSession"> | Date | string
+  }
+
+  export type SettlementSnapshotWhereInput = {
+    AND?: SettlementSnapshotWhereInput | SettlementSnapshotWhereInput[]
+    OR?: SettlementSnapshotWhereInput[]
+    NOT?: SettlementSnapshotWhereInput | SettlementSnapshotWhereInput[]
+    id?: StringFilter<"SettlementSnapshot"> | string
+    competitionId?: StringFilter<"SettlementSnapshot"> | string
+    tradingSessionId?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    participantId?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    portfolioId?: StringFilter<"SettlementSnapshot"> | string
+    snapshotAt?: DateTimeFilter<"SettlementSnapshot"> | Date | string
+    cash?: FloatFilter<"SettlementSnapshot"> | number
+    marketValue?: FloatFilter<"SettlementSnapshot"> | number
+    totalValue?: FloatFilter<"SettlementSnapshot"> | number
+    realizedPnL?: FloatFilter<"SettlementSnapshot"> | number
+    unrealizedPnL?: FloatFilter<"SettlementSnapshot"> | number
+    returnPct?: FloatFilter<"SettlementSnapshot"> | number
+    drawdownPct?: FloatFilter<"SettlementSnapshot"> | number
+    turnoverPct?: FloatFilter<"SettlementSnapshot"> | number
+    rank?: IntNullableFilter<"SettlementSnapshot"> | number | null
+    holdingSymbol?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    positionJson?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    metricsJson?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    createdAt?: DateTimeFilter<"SettlementSnapshot"> | Date | string
+    competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    tradingSession?: XOR<TradingSessionNullableScalarRelationFilter, TradingSessionWhereInput> | null
+    participant?: XOR<CompetitionParticipantNullableScalarRelationFilter, CompetitionParticipantWhereInput> | null
+    portfolio?: XOR<PortfolioScalarRelationFilter, PortfolioWhereInput>
+  }
+
+  export type SettlementSnapshotOrderByWithRelationInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingSessionId?: SortOrderInput | SortOrder
+    participantId?: SortOrderInput | SortOrder
+    portfolioId?: SortOrder
+    snapshotAt?: SortOrder
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrderInput | SortOrder
+    holdingSymbol?: SortOrderInput | SortOrder
+    positionJson?: SortOrderInput | SortOrder
+    metricsJson?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    competition?: CompetitionOrderByWithRelationInput
+    tradingSession?: TradingSessionOrderByWithRelationInput
+    participant?: CompetitionParticipantOrderByWithRelationInput
+    portfolio?: PortfolioOrderByWithRelationInput
+  }
+
+  export type SettlementSnapshotWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SettlementSnapshotWhereInput | SettlementSnapshotWhereInput[]
+    OR?: SettlementSnapshotWhereInput[]
+    NOT?: SettlementSnapshotWhereInput | SettlementSnapshotWhereInput[]
+    competitionId?: StringFilter<"SettlementSnapshot"> | string
+    tradingSessionId?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    participantId?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    portfolioId?: StringFilter<"SettlementSnapshot"> | string
+    snapshotAt?: DateTimeFilter<"SettlementSnapshot"> | Date | string
+    cash?: FloatFilter<"SettlementSnapshot"> | number
+    marketValue?: FloatFilter<"SettlementSnapshot"> | number
+    totalValue?: FloatFilter<"SettlementSnapshot"> | number
+    realizedPnL?: FloatFilter<"SettlementSnapshot"> | number
+    unrealizedPnL?: FloatFilter<"SettlementSnapshot"> | number
+    returnPct?: FloatFilter<"SettlementSnapshot"> | number
+    drawdownPct?: FloatFilter<"SettlementSnapshot"> | number
+    turnoverPct?: FloatFilter<"SettlementSnapshot"> | number
+    rank?: IntNullableFilter<"SettlementSnapshot"> | number | null
+    holdingSymbol?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    positionJson?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    metricsJson?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    createdAt?: DateTimeFilter<"SettlementSnapshot"> | Date | string
+    competition?: XOR<CompetitionScalarRelationFilter, CompetitionWhereInput>
+    tradingSession?: XOR<TradingSessionNullableScalarRelationFilter, TradingSessionWhereInput> | null
+    participant?: XOR<CompetitionParticipantNullableScalarRelationFilter, CompetitionParticipantWhereInput> | null
+    portfolio?: XOR<PortfolioScalarRelationFilter, PortfolioWhereInput>
+  }, "id">
+
+  export type SettlementSnapshotOrderByWithAggregationInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingSessionId?: SortOrderInput | SortOrder
+    participantId?: SortOrderInput | SortOrder
+    portfolioId?: SortOrder
+    snapshotAt?: SortOrder
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrderInput | SortOrder
+    holdingSymbol?: SortOrderInput | SortOrder
+    positionJson?: SortOrderInput | SortOrder
+    metricsJson?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: SettlementSnapshotCountOrderByAggregateInput
+    _avg?: SettlementSnapshotAvgOrderByAggregateInput
+    _max?: SettlementSnapshotMaxOrderByAggregateInput
+    _min?: SettlementSnapshotMinOrderByAggregateInput
+    _sum?: SettlementSnapshotSumOrderByAggregateInput
+  }
+
+  export type SettlementSnapshotScalarWhereWithAggregatesInput = {
+    AND?: SettlementSnapshotScalarWhereWithAggregatesInput | SettlementSnapshotScalarWhereWithAggregatesInput[]
+    OR?: SettlementSnapshotScalarWhereWithAggregatesInput[]
+    NOT?: SettlementSnapshotScalarWhereWithAggregatesInput | SettlementSnapshotScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SettlementSnapshot"> | string
+    competitionId?: StringWithAggregatesFilter<"SettlementSnapshot"> | string
+    tradingSessionId?: StringNullableWithAggregatesFilter<"SettlementSnapshot"> | string | null
+    participantId?: StringNullableWithAggregatesFilter<"SettlementSnapshot"> | string | null
+    portfolioId?: StringWithAggregatesFilter<"SettlementSnapshot"> | string
+    snapshotAt?: DateTimeWithAggregatesFilter<"SettlementSnapshot"> | Date | string
+    cash?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    marketValue?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    totalValue?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    realizedPnL?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    unrealizedPnL?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    returnPct?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    drawdownPct?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    turnoverPct?: FloatWithAggregatesFilter<"SettlementSnapshot"> | number
+    rank?: IntNullableWithAggregatesFilter<"SettlementSnapshot"> | number | null
+    holdingSymbol?: StringNullableWithAggregatesFilter<"SettlementSnapshot"> | string | null
+    positionJson?: StringNullableWithAggregatesFilter<"SettlementSnapshot"> | string | null
+    metricsJson?: StringNullableWithAggregatesFilter<"SettlementSnapshot"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SettlementSnapshot"> | Date | string
+  }
+
   export type AgentCreateInput = {
     id?: string
     name: string
@@ -17592,6 +23003,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     orders?: OrderCreateNestedManyWithoutAgentInput
     logs?: LogEntryCreateNestedManyWithoutAgentInput
     comments?: CommentCreateNestedManyWithoutAgentInput
@@ -17612,6 +23024,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
     logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
     comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
@@ -17632,6 +23045,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     orders?: OrderUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUpdateManyWithoutAgentNestedInput
     comments?: CommentUpdateManyWithoutAgentNestedInput
@@ -17652,6 +23066,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
     comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
@@ -17710,10 +23125,25 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    participants?: CompetitionParticipantCreateNestedManyWithoutCompetitionInput
     portfolios?: PortfolioCreateNestedManyWithoutCompetitionInput
     orders?: OrderCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutCompetitionInput
   }
 
   export type CompetitionUncheckedCreateInput = {
@@ -17726,10 +23156,25 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutCompetitionInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutCompetitionInput
     orders?: OrderUncheckedCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionUncheckedCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutCompetitionInput
   }
 
   export type CompetitionUpdateInput = {
@@ -17742,10 +23187,25 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUpdateManyWithoutCompetitionNestedInput
     portfolios?: PortfolioUpdateManyWithoutCompetitionNestedInput
     orders?: OrderUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutCompetitionNestedInput
   }
 
   export type CompetitionUncheckedUpdateInput = {
@@ -17758,10 +23218,25 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutCompetitionNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutCompetitionNestedInput
     orders?: OrderUncheckedUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUncheckedUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutCompetitionNestedInput
   }
 
   export type CompetitionCreateManyInput = {
@@ -17774,6 +23249,18 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17788,6 +23275,18 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17802,6 +23301,18 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17810,13 +23321,18 @@ export namespace Prisma {
     id?: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     agent: AgentCreateNestedOneWithoutPortfoliosInput
     competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
     positions?: PositionCreateNestedManyWithoutPortfolioInput
     orders?: OrderCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUncheckedCreateInput = {
@@ -17825,24 +23341,34 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
     positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
     orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
     competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateInput = {
@@ -17851,11 +23377,16 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioCreateManyInput = {
@@ -17864,6 +23395,9 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17872,6 +23406,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17882,6 +23419,9 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18478,12 +24018,17 @@ export namespace Prisma {
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
     agent: AgentCreateNestedOneWithoutOrdersInput
     competition: CompetitionCreateNestedOneWithoutOrdersInput
     portfolio: PortfolioCreateNestedOneWithoutOrdersInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutOrdersInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutOrdersInput
   }
 
   export type OrderUncheckedCreateInput = {
@@ -18491,11 +24036,16 @@ export namespace Prisma {
     agentId: string
     competitionId: string
     portfolioId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -18508,12 +24058,17 @@ export namespace Prisma {
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     agent?: AgentUpdateOneRequiredWithoutOrdersNestedInput
     competition?: CompetitionUpdateOneRequiredWithoutOrdersNestedInput
     portfolio?: PortfolioUpdateOneRequiredWithoutOrdersNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutOrdersNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutOrdersNestedInput
   }
 
   export type OrderUncheckedUpdateInput = {
@@ -18521,11 +24076,16 @@ export namespace Prisma {
     agentId?: StringFieldUpdateOperationsInput | string
     competitionId?: StringFieldUpdateOperationsInput | string
     portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -18536,11 +24096,16 @@ export namespace Prisma {
     agentId: string
     competitionId: string
     portfolioId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -18553,6 +24118,9 @@ export namespace Prisma {
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -18563,11 +24131,16 @@ export namespace Prisma {
     agentId?: StringFieldUpdateOperationsInput | string
     competitionId?: StringFieldUpdateOperationsInput | string
     portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -18656,6 +24229,399 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CompetitionParticipantCreateInput = {
+    id?: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutParticipantsInput
+    agent: AgentCreateNestedOneWithoutParticipantsInput
+    portfolio?: PortfolioCreateNestedOneWithoutParticipantInput
+    orders?: OrderCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUncheckedCreateInput = {
+    id?: string
+    competitionId: string
+    agentId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutParticipantsNestedInput
+    agent?: AgentUpdateOneRequiredWithoutParticipantsNestedInput
+    portfolio?: PortfolioUpdateOneWithoutParticipantNestedInput
+    orders?: OrderUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantCreateManyInput = {
+    id?: string
+    competitionId: string
+    agentId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CompetitionParticipantUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CompetitionParticipantUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TradingSessionCreateInput = {
+    id?: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutTradingSessionsInput
+    orders?: OrderCreateNestedManyWithoutTradingSessionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionUncheckedCreateInput = {
+    id?: string
+    competitionId: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutTradingSessionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutTradingSessionsNestedInput
+    orders?: OrderUpdateManyWithoutTradingSessionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type TradingSessionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutTradingSessionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type TradingSessionCreateManyInput = {
+    id?: string
+    competitionId: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TradingSessionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TradingSessionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotCreateInput = {
+    id?: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutSnapshotsInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutSnapshotsInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutSnapshotsInput
+    portfolio: PortfolioCreateNestedOneWithoutSnapshotsInput
+  }
+
+  export type SettlementSnapshotUncheckedCreateInput = {
+    id?: string
+    competitionId: string
+    tradingSessionId?: string | null
+    participantId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutSnapshotsNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutSnapshotsNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutSnapshotsNestedInput
+    portfolio?: PortfolioUpdateOneRequiredWithoutSnapshotsNestedInput
+  }
+
+  export type SettlementSnapshotUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotCreateManyInput = {
+    id?: string
+    competitionId: string
+    tradingSessionId?: string | null
+    participantId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -18714,6 +24680,12 @@ export namespace Prisma {
     none?: PortfolioWhereInput
   }
 
+  export type CompetitionParticipantListRelationFilter = {
+    every?: CompetitionParticipantWhereInput
+    some?: CompetitionParticipantWhereInput
+    none?: CompetitionParticipantWhereInput
+  }
+
   export type OrderListRelationFilter = {
     every?: OrderWhereInput
     some?: OrderWhereInput
@@ -18748,6 +24720,10 @@ export namespace Prisma {
   }
 
   export type PortfolioOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CompetitionParticipantOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -18901,6 +24877,37 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type TradingSessionListRelationFilter = {
+    every?: TradingSessionWhereInput
+    some?: TradingSessionWhereInput
+    none?: TradingSessionWhereInput
+  }
+
+  export type SettlementSnapshotListRelationFilter = {
+    every?: SettlementSnapshotWhereInput
+    some?: SettlementSnapshotWhereInput
+    none?: SettlementSnapshotWhereInput
+  }
+
+  export type TradingSessionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SettlementSnapshotOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type CompetitionCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -18911,12 +24918,28 @@ export namespace Prisma {
     initialCash?: SortOrder
     market?: SortOrder
     testMode?: SortOrder
+    mode?: SortOrder
+    entryRule?: SortOrder
+    tradableSymbolsJson?: SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    switchRequiresFlat?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
+    allowShort?: SortOrder
+    scoreFormula?: SortOrder
+    phase?: SortOrder
+    tradingCalendar?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type CompetitionAvgOrderByAggregateInput = {
     initialCash?: SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
   }
 
   export type CompetitionMaxOrderByAggregateInput = {
@@ -18929,6 +24952,18 @@ export namespace Prisma {
     initialCash?: SortOrder
     market?: SortOrder
     testMode?: SortOrder
+    mode?: SortOrder
+    entryRule?: SortOrder
+    tradableSymbolsJson?: SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    switchRequiresFlat?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
+    allowShort?: SortOrder
+    scoreFormula?: SortOrder
+    phase?: SortOrder
+    tradingCalendar?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18943,12 +24978,28 @@ export namespace Prisma {
     initialCash?: SortOrder
     market?: SortOrder
     testMode?: SortOrder
+    mode?: SortOrder
+    entryRule?: SortOrder
+    tradableSymbolsJson?: SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    switchRequiresFlat?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
+    allowShort?: SortOrder
+    scoreFormula?: SortOrder
+    phase?: SortOrder
+    tradingCalendar?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type CompetitionSumOrderByAggregateInput = {
     initialCash?: SortOrder
+    maxPositionPct?: SortOrder
+    maxHoldingSymbols?: SortOrder
+    commissionRate?: SortOrder
+    slippageBps?: SortOrder
   }
 
   export type EnumCompetitionStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -18999,6 +25050,22 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type AgentScalarRelationFilter = {
     is?: AgentWhereInput
     isNot?: AgentWhereInput
@@ -19007,6 +25074,11 @@ export namespace Prisma {
   export type CompetitionScalarRelationFilter = {
     is?: CompetitionWhereInput
     isNot?: CompetitionWhereInput
+  }
+
+  export type CompetitionParticipantNullableScalarRelationFilter = {
+    is?: CompetitionParticipantWhereInput | null
+    isNot?: CompetitionParticipantWhereInput | null
   }
 
   export type PositionListRelationFilter = {
@@ -19040,6 +25112,9 @@ export namespace Prisma {
     competitionId?: SortOrder
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingSymbol?: SortOrder
+    holdingCount?: SortOrder
+    switchRequiresFlat?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19047,6 +25122,7 @@ export namespace Prisma {
   export type PortfolioAvgOrderByAggregateInput = {
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingCount?: SortOrder
   }
 
   export type PortfolioMaxOrderByAggregateInput = {
@@ -19055,6 +25131,9 @@ export namespace Prisma {
     competitionId?: SortOrder
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingSymbol?: SortOrder
+    holdingCount?: SortOrder
+    switchRequiresFlat?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19065,6 +25144,9 @@ export namespace Prisma {
     competitionId?: SortOrder
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingSymbol?: SortOrder
+    holdingCount?: SortOrder
+    switchRequiresFlat?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19072,6 +25154,7 @@ export namespace Prisma {
   export type PortfolioSumOrderByAggregateInput = {
     cash?: SortOrder
     totalValue?: SortOrder
+    holdingCount?: SortOrder
   }
 
   export type FloatNullableFilter<$PrismaModel = never> = {
@@ -19525,16 +25608,40 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type EnumOrderIntentFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderIntent | EnumOrderIntentFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderIntent[]
+    notIn?: $Enums.OrderIntent[]
+    not?: NestedEnumOrderIntentFilter<$PrismaModel> | $Enums.OrderIntent
+  }
+
+  export type EnumRiskCheckStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskCheckStatus | EnumRiskCheckStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskCheckStatus[]
+    notIn?: $Enums.RiskCheckStatus[]
+    not?: NestedEnumRiskCheckStatusFilter<$PrismaModel> | $Enums.RiskCheckStatus
+  }
+
+  export type TradingSessionNullableScalarRelationFilter = {
+    is?: TradingSessionWhereInput | null
+    isNot?: TradingSessionWhereInput | null
+  }
+
   export type OrderCountOrderByAggregateInput = {
     id?: SortOrder
     agentId?: SortOrder
     competitionId?: SortOrder
     portfolioId?: SortOrder
+    participantId?: SortOrder
+    tradingSessionId?: SortOrder
     symbol?: SortOrder
     side?: SortOrder
     quantity?: SortOrder
     note?: SortOrder
     status?: SortOrder
+    intent?: SortOrder
+    riskCheckStatus?: SortOrder
+    riskRejectCode?: SortOrder
     rejectReason?: SortOrder
     submittedAt?: SortOrder
     matchedAt?: SortOrder
@@ -19549,11 +25656,16 @@ export namespace Prisma {
     agentId?: SortOrder
     competitionId?: SortOrder
     portfolioId?: SortOrder
+    participantId?: SortOrder
+    tradingSessionId?: SortOrder
     symbol?: SortOrder
     side?: SortOrder
     quantity?: SortOrder
     note?: SortOrder
     status?: SortOrder
+    intent?: SortOrder
+    riskCheckStatus?: SortOrder
+    riskRejectCode?: SortOrder
     rejectReason?: SortOrder
     submittedAt?: SortOrder
     matchedAt?: SortOrder
@@ -19564,11 +25676,16 @@ export namespace Prisma {
     agentId?: SortOrder
     competitionId?: SortOrder
     portfolioId?: SortOrder
+    participantId?: SortOrder
+    tradingSessionId?: SortOrder
     symbol?: SortOrder
     side?: SortOrder
     quantity?: SortOrder
     note?: SortOrder
     status?: SortOrder
+    intent?: SortOrder
+    riskCheckStatus?: SortOrder
+    riskRejectCode?: SortOrder
     rejectReason?: SortOrder
     submittedAt?: SortOrder
     matchedAt?: SortOrder
@@ -19578,15 +25695,24 @@ export namespace Prisma {
     quantity?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+  export type EnumOrderIntentWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderIntent | EnumOrderIntentFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderIntent[]
+    notIn?: $Enums.OrderIntent[]
+    not?: NestedEnumOrderIntentWithAggregatesFilter<$PrismaModel> | $Enums.OrderIntent
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOrderIntentFilter<$PrismaModel>
+    _max?: NestedEnumOrderIntentFilter<$PrismaModel>
+  }
+
+  export type EnumRiskCheckStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskCheckStatus | EnumRiskCheckStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskCheckStatus[]
+    notIn?: $Enums.RiskCheckStatus[]
+    not?: NestedEnumRiskCheckStatusWithAggregatesFilter<$PrismaModel> | $Enums.RiskCheckStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRiskCheckStatusFilter<$PrismaModel>
+    _max?: NestedEnumRiskCheckStatusFilter<$PrismaModel>
   }
 
   export type DailySettlementPortfolioIdDateCompoundUniqueInput = {
@@ -19644,20 +25770,260 @@ export namespace Prisma {
     returnPct?: SortOrder
   }
 
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+  export type EnumParticipantStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipantStatus | EnumParticipantStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipantStatus[]
+    notIn?: $Enums.ParticipantStatus[]
+    not?: NestedEnumParticipantStatusFilter<$PrismaModel> | $Enums.ParticipantStatus
+  }
+
+  export type PortfolioNullableScalarRelationFilter = {
+    is?: PortfolioWhereInput | null
+    isNot?: PortfolioWhereInput | null
+  }
+
+  export type CompetitionParticipantCompetitionIdAgentIdCompoundUniqueInput = {
+    competitionId: string
+    agentId: string
+  }
+
+  export type CompetitionParticipantCountOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    agentId?: SortOrder
+    portfolioId?: SortOrder
+    status?: SortOrder
+    displayName?: SortOrder
+    tagline?: SortOrder
+    strategyTagsJson?: SortOrder
+    riskLevel?: SortOrder
+    webhookUrl?: SortOrder
+    apiVersion?: SortOrder
+    joinedAt?: SortOrder
+    approvedAt?: SortOrder
+    eliminatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CompetitionParticipantMaxOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    agentId?: SortOrder
+    portfolioId?: SortOrder
+    status?: SortOrder
+    displayName?: SortOrder
+    tagline?: SortOrder
+    strategyTagsJson?: SortOrder
+    riskLevel?: SortOrder
+    webhookUrl?: SortOrder
+    apiVersion?: SortOrder
+    joinedAt?: SortOrder
+    approvedAt?: SortOrder
+    eliminatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CompetitionParticipantMinOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    agentId?: SortOrder
+    portfolioId?: SortOrder
+    status?: SortOrder
+    displayName?: SortOrder
+    tagline?: SortOrder
+    strategyTagsJson?: SortOrder
+    riskLevel?: SortOrder
+    webhookUrl?: SortOrder
+    apiVersion?: SortOrder
+    joinedAt?: SortOrder
+    approvedAt?: SortOrder
+    eliminatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumParticipantStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipantStatus | EnumParticipantStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipantStatus[]
+    notIn?: $Enums.ParticipantStatus[]
+    not?: NestedEnumParticipantStatusWithAggregatesFilter<$PrismaModel> | $Enums.ParticipantStatus
     _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumParticipantStatusFilter<$PrismaModel>
+    _max?: NestedEnumParticipantStatusFilter<$PrismaModel>
+  }
+
+  export type EnumTradingSessionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionType | EnumTradingSessionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionType[]
+    notIn?: $Enums.TradingSessionType[]
+    not?: NestedEnumTradingSessionTypeFilter<$PrismaModel> | $Enums.TradingSessionType
+  }
+
+  export type EnumTradingSessionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionStatus | EnumTradingSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionStatus[]
+    notIn?: $Enums.TradingSessionStatus[]
+    not?: NestedEnumTradingSessionStatusFilter<$PrismaModel> | $Enums.TradingSessionStatus
+  }
+
+  export type TradingSessionCompetitionIdTradingDateSessionTypeCompoundUniqueInput = {
+    competitionId: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+  }
+
+  export type TradingSessionCountOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingDate?: SortOrder
+    sessionType?: SortOrder
+    status?: SortOrder
+    openAt?: SortOrder
+    closeAt?: SortOrder
+    marketSnapshotJson?: SortOrder
+    leaderboardSnapshotJson?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TradingSessionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingDate?: SortOrder
+    sessionType?: SortOrder
+    status?: SortOrder
+    openAt?: SortOrder
+    closeAt?: SortOrder
+    marketSnapshotJson?: SortOrder
+    leaderboardSnapshotJson?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TradingSessionMinOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingDate?: SortOrder
+    sessionType?: SortOrder
+    status?: SortOrder
+    openAt?: SortOrder
+    closeAt?: SortOrder
+    marketSnapshotJson?: SortOrder
+    leaderboardSnapshotJson?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumTradingSessionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionType | EnumTradingSessionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionType[]
+    notIn?: $Enums.TradingSessionType[]
+    not?: NestedEnumTradingSessionTypeWithAggregatesFilter<$PrismaModel> | $Enums.TradingSessionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTradingSessionTypeFilter<$PrismaModel>
+    _max?: NestedEnumTradingSessionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumTradingSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionStatus | EnumTradingSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionStatus[]
+    notIn?: $Enums.TradingSessionStatus[]
+    not?: NestedEnumTradingSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.TradingSessionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTradingSessionStatusFilter<$PrismaModel>
+    _max?: NestedEnumTradingSessionStatusFilter<$PrismaModel>
+  }
+
+  export type SettlementSnapshotCountOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingSessionId?: SortOrder
+    participantId?: SortOrder
+    portfolioId?: SortOrder
+    snapshotAt?: SortOrder
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrder
+    holdingSymbol?: SortOrder
+    positionJson?: SortOrder
+    metricsJson?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SettlementSnapshotAvgOrderByAggregateInput = {
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrder
+  }
+
+  export type SettlementSnapshotMaxOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingSessionId?: SortOrder
+    participantId?: SortOrder
+    portfolioId?: SortOrder
+    snapshotAt?: SortOrder
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrder
+    holdingSymbol?: SortOrder
+    positionJson?: SortOrder
+    metricsJson?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SettlementSnapshotMinOrderByAggregateInput = {
+    id?: SortOrder
+    competitionId?: SortOrder
+    tradingSessionId?: SortOrder
+    participantId?: SortOrder
+    portfolioId?: SortOrder
+    snapshotAt?: SortOrder
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrder
+    holdingSymbol?: SortOrder
+    positionJson?: SortOrder
+    metricsJson?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SettlementSnapshotSumOrderByAggregateInput = {
+    cash?: SortOrder
+    marketValue?: SortOrder
+    totalValue?: SortOrder
+    realizedPnL?: SortOrder
+    unrealizedPnL?: SortOrder
+    returnPct?: SortOrder
+    drawdownPct?: SortOrder
+    turnoverPct?: SortOrder
+    rank?: SortOrder
   }
 
   export type TradeCreateNestedManyWithoutAgentInput = {
@@ -19672,6 +26038,13 @@ export namespace Prisma {
     connectOrCreate?: PortfolioCreateOrConnectWithoutAgentInput | PortfolioCreateOrConnectWithoutAgentInput[]
     createMany?: PortfolioCreateManyAgentInputEnvelope
     connect?: PortfolioWhereUniqueInput | PortfolioWhereUniqueInput[]
+  }
+
+  export type CompetitionParticipantCreateNestedManyWithoutAgentInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutAgentInput, CompetitionParticipantUncheckedCreateWithoutAgentInput> | CompetitionParticipantCreateWithoutAgentInput[] | CompetitionParticipantUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutAgentInput | CompetitionParticipantCreateOrConnectWithoutAgentInput[]
+    createMany?: CompetitionParticipantCreateManyAgentInputEnvelope
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
   }
 
   export type OrderCreateNestedManyWithoutAgentInput = {
@@ -19714,6 +26087,13 @@ export namespace Prisma {
     connectOrCreate?: PortfolioCreateOrConnectWithoutAgentInput | PortfolioCreateOrConnectWithoutAgentInput[]
     createMany?: PortfolioCreateManyAgentInputEnvelope
     connect?: PortfolioWhereUniqueInput | PortfolioWhereUniqueInput[]
+  }
+
+  export type CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutAgentInput, CompetitionParticipantUncheckedCreateWithoutAgentInput> | CompetitionParticipantCreateWithoutAgentInput[] | CompetitionParticipantUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutAgentInput | CompetitionParticipantCreateOrConnectWithoutAgentInput[]
+    createMany?: CompetitionParticipantCreateManyAgentInputEnvelope
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
   }
 
   export type OrderUncheckedCreateNestedManyWithoutAgentInput = {
@@ -19786,6 +26166,20 @@ export namespace Prisma {
     update?: PortfolioUpdateWithWhereUniqueWithoutAgentInput | PortfolioUpdateWithWhereUniqueWithoutAgentInput[]
     updateMany?: PortfolioUpdateManyWithWhereWithoutAgentInput | PortfolioUpdateManyWithWhereWithoutAgentInput[]
     deleteMany?: PortfolioScalarWhereInput | PortfolioScalarWhereInput[]
+  }
+
+  export type CompetitionParticipantUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutAgentInput, CompetitionParticipantUncheckedCreateWithoutAgentInput> | CompetitionParticipantCreateWithoutAgentInput[] | CompetitionParticipantUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutAgentInput | CompetitionParticipantCreateOrConnectWithoutAgentInput[]
+    upsert?: CompetitionParticipantUpsertWithWhereUniqueWithoutAgentInput | CompetitionParticipantUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: CompetitionParticipantCreateManyAgentInputEnvelope
+    set?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    disconnect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    delete?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    update?: CompetitionParticipantUpdateWithWhereUniqueWithoutAgentInput | CompetitionParticipantUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: CompetitionParticipantUpdateManyWithWhereWithoutAgentInput | CompetitionParticipantUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: CompetitionParticipantScalarWhereInput | CompetitionParticipantScalarWhereInput[]
   }
 
   export type OrderUpdateManyWithoutAgentNestedInput = {
@@ -19872,6 +26266,20 @@ export namespace Prisma {
     deleteMany?: PortfolioScalarWhereInput | PortfolioScalarWhereInput[]
   }
 
+  export type CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutAgentInput, CompetitionParticipantUncheckedCreateWithoutAgentInput> | CompetitionParticipantCreateWithoutAgentInput[] | CompetitionParticipantUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutAgentInput | CompetitionParticipantCreateOrConnectWithoutAgentInput[]
+    upsert?: CompetitionParticipantUpsertWithWhereUniqueWithoutAgentInput | CompetitionParticipantUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: CompetitionParticipantCreateManyAgentInputEnvelope
+    set?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    disconnect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    delete?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    update?: CompetitionParticipantUpdateWithWhereUniqueWithoutAgentInput | CompetitionParticipantUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: CompetitionParticipantUpdateManyWithWhereWithoutAgentInput | CompetitionParticipantUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: CompetitionParticipantScalarWhereInput | CompetitionParticipantScalarWhereInput[]
+  }
+
   export type OrderUncheckedUpdateManyWithoutAgentNestedInput = {
     create?: XOR<OrderCreateWithoutAgentInput, OrderUncheckedCreateWithoutAgentInput> | OrderCreateWithoutAgentInput[] | OrderUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: OrderCreateOrConnectWithoutAgentInput | OrderCreateOrConnectWithoutAgentInput[]
@@ -19928,6 +26336,13 @@ export namespace Prisma {
     deleteMany?: DeliveryScalarWhereInput | DeliveryScalarWhereInput[]
   }
 
+  export type CompetitionParticipantCreateNestedManyWithoutCompetitionInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutCompetitionInput, CompetitionParticipantUncheckedCreateWithoutCompetitionInput> | CompetitionParticipantCreateWithoutCompetitionInput[] | CompetitionParticipantUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutCompetitionInput | CompetitionParticipantCreateOrConnectWithoutCompetitionInput[]
+    createMany?: CompetitionParticipantCreateManyCompetitionInputEnvelope
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+  }
+
   export type PortfolioCreateNestedManyWithoutCompetitionInput = {
     create?: XOR<PortfolioCreateWithoutCompetitionInput, PortfolioUncheckedCreateWithoutCompetitionInput> | PortfolioCreateWithoutCompetitionInput[] | PortfolioUncheckedCreateWithoutCompetitionInput[]
     connectOrCreate?: PortfolioCreateOrConnectWithoutCompetitionInput | PortfolioCreateOrConnectWithoutCompetitionInput[]
@@ -19942,6 +26357,27 @@ export namespace Prisma {
     connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
   }
 
+  export type TradingSessionCreateNestedManyWithoutCompetitionInput = {
+    create?: XOR<TradingSessionCreateWithoutCompetitionInput, TradingSessionUncheckedCreateWithoutCompetitionInput> | TradingSessionCreateWithoutCompetitionInput[] | TradingSessionUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutCompetitionInput | TradingSessionCreateOrConnectWithoutCompetitionInput[]
+    createMany?: TradingSessionCreateManyCompetitionInputEnvelope
+    connect?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+  }
+
+  export type SettlementSnapshotCreateNestedManyWithoutCompetitionInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutCompetitionInput, SettlementSnapshotUncheckedCreateWithoutCompetitionInput> | SettlementSnapshotCreateWithoutCompetitionInput[] | SettlementSnapshotUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutCompetitionInput | SettlementSnapshotCreateOrConnectWithoutCompetitionInput[]
+    createMany?: SettlementSnapshotCreateManyCompetitionInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
+  export type CompetitionParticipantUncheckedCreateNestedManyWithoutCompetitionInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutCompetitionInput, CompetitionParticipantUncheckedCreateWithoutCompetitionInput> | CompetitionParticipantCreateWithoutCompetitionInput[] | CompetitionParticipantUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutCompetitionInput | CompetitionParticipantCreateOrConnectWithoutCompetitionInput[]
+    createMany?: CompetitionParticipantCreateManyCompetitionInputEnvelope
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+  }
+
   export type PortfolioUncheckedCreateNestedManyWithoutCompetitionInput = {
     create?: XOR<PortfolioCreateWithoutCompetitionInput, PortfolioUncheckedCreateWithoutCompetitionInput> | PortfolioCreateWithoutCompetitionInput[] | PortfolioUncheckedCreateWithoutCompetitionInput[]
     connectOrCreate?: PortfolioCreateOrConnectWithoutCompetitionInput | PortfolioCreateOrConnectWithoutCompetitionInput[]
@@ -19954,6 +26390,20 @@ export namespace Prisma {
     connectOrCreate?: OrderCreateOrConnectWithoutCompetitionInput | OrderCreateOrConnectWithoutCompetitionInput[]
     createMany?: OrderCreateManyCompetitionInputEnvelope
     connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type TradingSessionUncheckedCreateNestedManyWithoutCompetitionInput = {
+    create?: XOR<TradingSessionCreateWithoutCompetitionInput, TradingSessionUncheckedCreateWithoutCompetitionInput> | TradingSessionCreateWithoutCompetitionInput[] | TradingSessionUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutCompetitionInput | TradingSessionCreateOrConnectWithoutCompetitionInput[]
+    createMany?: TradingSessionCreateManyCompetitionInputEnvelope
+    connect?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+  }
+
+  export type SettlementSnapshotUncheckedCreateNestedManyWithoutCompetitionInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutCompetitionInput, SettlementSnapshotUncheckedCreateWithoutCompetitionInput> | SettlementSnapshotCreateWithoutCompetitionInput[] | SettlementSnapshotUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutCompetitionInput | SettlementSnapshotCreateOrConnectWithoutCompetitionInput[]
+    createMany?: SettlementSnapshotCreateManyCompetitionInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
   }
 
   export type EnumCompetitionStatusFieldUpdateOperationsInput = {
@@ -19974,6 +26424,28 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type CompetitionParticipantUpdateManyWithoutCompetitionNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutCompetitionInput, CompetitionParticipantUncheckedCreateWithoutCompetitionInput> | CompetitionParticipantCreateWithoutCompetitionInput[] | CompetitionParticipantUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutCompetitionInput | CompetitionParticipantCreateOrConnectWithoutCompetitionInput[]
+    upsert?: CompetitionParticipantUpsertWithWhereUniqueWithoutCompetitionInput | CompetitionParticipantUpsertWithWhereUniqueWithoutCompetitionInput[]
+    createMany?: CompetitionParticipantCreateManyCompetitionInputEnvelope
+    set?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    disconnect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    delete?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    update?: CompetitionParticipantUpdateWithWhereUniqueWithoutCompetitionInput | CompetitionParticipantUpdateWithWhereUniqueWithoutCompetitionInput[]
+    updateMany?: CompetitionParticipantUpdateManyWithWhereWithoutCompetitionInput | CompetitionParticipantUpdateManyWithWhereWithoutCompetitionInput[]
+    deleteMany?: CompetitionParticipantScalarWhereInput | CompetitionParticipantScalarWhereInput[]
   }
 
   export type PortfolioUpdateManyWithoutCompetitionNestedInput = {
@@ -20004,6 +26476,48 @@ export namespace Prisma {
     deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
   }
 
+  export type TradingSessionUpdateManyWithoutCompetitionNestedInput = {
+    create?: XOR<TradingSessionCreateWithoutCompetitionInput, TradingSessionUncheckedCreateWithoutCompetitionInput> | TradingSessionCreateWithoutCompetitionInput[] | TradingSessionUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutCompetitionInput | TradingSessionCreateOrConnectWithoutCompetitionInput[]
+    upsert?: TradingSessionUpsertWithWhereUniqueWithoutCompetitionInput | TradingSessionUpsertWithWhereUniqueWithoutCompetitionInput[]
+    createMany?: TradingSessionCreateManyCompetitionInputEnvelope
+    set?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    disconnect?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    delete?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    connect?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    update?: TradingSessionUpdateWithWhereUniqueWithoutCompetitionInput | TradingSessionUpdateWithWhereUniqueWithoutCompetitionInput[]
+    updateMany?: TradingSessionUpdateManyWithWhereWithoutCompetitionInput | TradingSessionUpdateManyWithWhereWithoutCompetitionInput[]
+    deleteMany?: TradingSessionScalarWhereInput | TradingSessionScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUpdateManyWithoutCompetitionNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutCompetitionInput, SettlementSnapshotUncheckedCreateWithoutCompetitionInput> | SettlementSnapshotCreateWithoutCompetitionInput[] | SettlementSnapshotUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutCompetitionInput | SettlementSnapshotCreateOrConnectWithoutCompetitionInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutCompetitionInput | SettlementSnapshotUpsertWithWhereUniqueWithoutCompetitionInput[]
+    createMany?: SettlementSnapshotCreateManyCompetitionInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutCompetitionInput | SettlementSnapshotUpdateWithWhereUniqueWithoutCompetitionInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutCompetitionInput | SettlementSnapshotUpdateManyWithWhereWithoutCompetitionInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
+  export type CompetitionParticipantUncheckedUpdateManyWithoutCompetitionNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutCompetitionInput, CompetitionParticipantUncheckedCreateWithoutCompetitionInput> | CompetitionParticipantCreateWithoutCompetitionInput[] | CompetitionParticipantUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutCompetitionInput | CompetitionParticipantCreateOrConnectWithoutCompetitionInput[]
+    upsert?: CompetitionParticipantUpsertWithWhereUniqueWithoutCompetitionInput | CompetitionParticipantUpsertWithWhereUniqueWithoutCompetitionInput[]
+    createMany?: CompetitionParticipantCreateManyCompetitionInputEnvelope
+    set?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    disconnect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    delete?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    connect?: CompetitionParticipantWhereUniqueInput | CompetitionParticipantWhereUniqueInput[]
+    update?: CompetitionParticipantUpdateWithWhereUniqueWithoutCompetitionInput | CompetitionParticipantUpdateWithWhereUniqueWithoutCompetitionInput[]
+    updateMany?: CompetitionParticipantUpdateManyWithWhereWithoutCompetitionInput | CompetitionParticipantUpdateManyWithWhereWithoutCompetitionInput[]
+    deleteMany?: CompetitionParticipantScalarWhereInput | CompetitionParticipantScalarWhereInput[]
+  }
+
   export type PortfolioUncheckedUpdateManyWithoutCompetitionNestedInput = {
     create?: XOR<PortfolioCreateWithoutCompetitionInput, PortfolioUncheckedCreateWithoutCompetitionInput> | PortfolioCreateWithoutCompetitionInput[] | PortfolioUncheckedCreateWithoutCompetitionInput[]
     connectOrCreate?: PortfolioCreateOrConnectWithoutCompetitionInput | PortfolioCreateOrConnectWithoutCompetitionInput[]
@@ -20032,6 +26546,34 @@ export namespace Prisma {
     deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
   }
 
+  export type TradingSessionUncheckedUpdateManyWithoutCompetitionNestedInput = {
+    create?: XOR<TradingSessionCreateWithoutCompetitionInput, TradingSessionUncheckedCreateWithoutCompetitionInput> | TradingSessionCreateWithoutCompetitionInput[] | TradingSessionUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutCompetitionInput | TradingSessionCreateOrConnectWithoutCompetitionInput[]
+    upsert?: TradingSessionUpsertWithWhereUniqueWithoutCompetitionInput | TradingSessionUpsertWithWhereUniqueWithoutCompetitionInput[]
+    createMany?: TradingSessionCreateManyCompetitionInputEnvelope
+    set?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    disconnect?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    delete?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    connect?: TradingSessionWhereUniqueInput | TradingSessionWhereUniqueInput[]
+    update?: TradingSessionUpdateWithWhereUniqueWithoutCompetitionInput | TradingSessionUpdateWithWhereUniqueWithoutCompetitionInput[]
+    updateMany?: TradingSessionUpdateManyWithWhereWithoutCompetitionInput | TradingSessionUpdateManyWithWhereWithoutCompetitionInput[]
+    deleteMany?: TradingSessionScalarWhereInput | TradingSessionScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutCompetitionNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutCompetitionInput, SettlementSnapshotUncheckedCreateWithoutCompetitionInput> | SettlementSnapshotCreateWithoutCompetitionInput[] | SettlementSnapshotUncheckedCreateWithoutCompetitionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutCompetitionInput | SettlementSnapshotCreateOrConnectWithoutCompetitionInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutCompetitionInput | SettlementSnapshotUpsertWithWhereUniqueWithoutCompetitionInput[]
+    createMany?: SettlementSnapshotCreateManyCompetitionInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutCompetitionInput | SettlementSnapshotUpdateWithWhereUniqueWithoutCompetitionInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutCompetitionInput | SettlementSnapshotUpdateManyWithWhereWithoutCompetitionInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
   export type AgentCreateNestedOneWithoutPortfoliosInput = {
     create?: XOR<AgentCreateWithoutPortfoliosInput, AgentUncheckedCreateWithoutPortfoliosInput>
     connectOrCreate?: AgentCreateOrConnectWithoutPortfoliosInput
@@ -20042,6 +26584,12 @@ export namespace Prisma {
     create?: XOR<CompetitionCreateWithoutPortfoliosInput, CompetitionUncheckedCreateWithoutPortfoliosInput>
     connectOrCreate?: CompetitionCreateOrConnectWithoutPortfoliosInput
     connect?: CompetitionWhereUniqueInput
+  }
+
+  export type CompetitionParticipantCreateNestedOneWithoutPortfolioInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutPortfolioInput, CompetitionParticipantUncheckedCreateWithoutPortfolioInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutPortfolioInput
+    connect?: CompetitionParticipantWhereUniqueInput
   }
 
   export type PositionCreateNestedManyWithoutPortfolioInput = {
@@ -20065,6 +26613,19 @@ export namespace Prisma {
     connect?: DailySettlementWhereUniqueInput | DailySettlementWhereUniqueInput[]
   }
 
+  export type SettlementSnapshotCreateNestedManyWithoutPortfolioInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutPortfolioInput, SettlementSnapshotUncheckedCreateWithoutPortfolioInput> | SettlementSnapshotCreateWithoutPortfolioInput[] | SettlementSnapshotUncheckedCreateWithoutPortfolioInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutPortfolioInput | SettlementSnapshotCreateOrConnectWithoutPortfolioInput[]
+    createMany?: SettlementSnapshotCreateManyPortfolioInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
+  export type CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutPortfolioInput, CompetitionParticipantUncheckedCreateWithoutPortfolioInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutPortfolioInput
+    connect?: CompetitionParticipantWhereUniqueInput
+  }
+
   export type PositionUncheckedCreateNestedManyWithoutPortfolioInput = {
     create?: XOR<PositionCreateWithoutPortfolioInput, PositionUncheckedCreateWithoutPortfolioInput> | PositionCreateWithoutPortfolioInput[] | PositionUncheckedCreateWithoutPortfolioInput[]
     connectOrCreate?: PositionCreateOrConnectWithoutPortfolioInput | PositionCreateOrConnectWithoutPortfolioInput[]
@@ -20086,6 +26647,13 @@ export namespace Prisma {
     connect?: DailySettlementWhereUniqueInput | DailySettlementWhereUniqueInput[]
   }
 
+  export type SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutPortfolioInput, SettlementSnapshotUncheckedCreateWithoutPortfolioInput> | SettlementSnapshotCreateWithoutPortfolioInput[] | SettlementSnapshotUncheckedCreateWithoutPortfolioInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutPortfolioInput | SettlementSnapshotCreateOrConnectWithoutPortfolioInput[]
+    createMany?: SettlementSnapshotCreateManyPortfolioInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
   export type AgentUpdateOneRequiredWithoutPortfoliosNestedInput = {
     create?: XOR<AgentCreateWithoutPortfoliosInput, AgentUncheckedCreateWithoutPortfoliosInput>
     connectOrCreate?: AgentCreateOrConnectWithoutPortfoliosInput
@@ -20100,6 +26668,16 @@ export namespace Prisma {
     upsert?: CompetitionUpsertWithoutPortfoliosInput
     connect?: CompetitionWhereUniqueInput
     update?: XOR<XOR<CompetitionUpdateToOneWithWhereWithoutPortfoliosInput, CompetitionUpdateWithoutPortfoliosInput>, CompetitionUncheckedUpdateWithoutPortfoliosInput>
+  }
+
+  export type CompetitionParticipantUpdateOneWithoutPortfolioNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutPortfolioInput, CompetitionParticipantUncheckedCreateWithoutPortfolioInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutPortfolioInput
+    upsert?: CompetitionParticipantUpsertWithoutPortfolioInput
+    disconnect?: CompetitionParticipantWhereInput | boolean
+    delete?: CompetitionParticipantWhereInput | boolean
+    connect?: CompetitionParticipantWhereUniqueInput
+    update?: XOR<XOR<CompetitionParticipantUpdateToOneWithWhereWithoutPortfolioInput, CompetitionParticipantUpdateWithoutPortfolioInput>, CompetitionParticipantUncheckedUpdateWithoutPortfolioInput>
   }
 
   export type PositionUpdateManyWithoutPortfolioNestedInput = {
@@ -20144,6 +26722,30 @@ export namespace Prisma {
     deleteMany?: DailySettlementScalarWhereInput | DailySettlementScalarWhereInput[]
   }
 
+  export type SettlementSnapshotUpdateManyWithoutPortfolioNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutPortfolioInput, SettlementSnapshotUncheckedCreateWithoutPortfolioInput> | SettlementSnapshotCreateWithoutPortfolioInput[] | SettlementSnapshotUncheckedCreateWithoutPortfolioInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutPortfolioInput | SettlementSnapshotCreateOrConnectWithoutPortfolioInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutPortfolioInput | SettlementSnapshotUpsertWithWhereUniqueWithoutPortfolioInput[]
+    createMany?: SettlementSnapshotCreateManyPortfolioInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutPortfolioInput | SettlementSnapshotUpdateWithWhereUniqueWithoutPortfolioInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutPortfolioInput | SettlementSnapshotUpdateManyWithWhereWithoutPortfolioInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
+  export type CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutPortfolioInput, CompetitionParticipantUncheckedCreateWithoutPortfolioInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutPortfolioInput
+    upsert?: CompetitionParticipantUpsertWithoutPortfolioInput
+    disconnect?: CompetitionParticipantWhereInput | boolean
+    delete?: CompetitionParticipantWhereInput | boolean
+    connect?: CompetitionParticipantWhereUniqueInput
+    update?: XOR<XOR<CompetitionParticipantUpdateToOneWithWhereWithoutPortfolioInput, CompetitionParticipantUpdateWithoutPortfolioInput>, CompetitionParticipantUncheckedUpdateWithoutPortfolioInput>
+  }
+
   export type PositionUncheckedUpdateManyWithoutPortfolioNestedInput = {
     create?: XOR<PositionCreateWithoutPortfolioInput, PositionUncheckedCreateWithoutPortfolioInput> | PositionCreateWithoutPortfolioInput[] | PositionUncheckedCreateWithoutPortfolioInput[]
     connectOrCreate?: PositionCreateOrConnectWithoutPortfolioInput | PositionCreateOrConnectWithoutPortfolioInput[]
@@ -20184,6 +26786,20 @@ export namespace Prisma {
     update?: DailySettlementUpdateWithWhereUniqueWithoutPortfolioInput | DailySettlementUpdateWithWhereUniqueWithoutPortfolioInput[]
     updateMany?: DailySettlementUpdateManyWithWhereWithoutPortfolioInput | DailySettlementUpdateManyWithWhereWithoutPortfolioInput[]
     deleteMany?: DailySettlementScalarWhereInput | DailySettlementScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutPortfolioInput, SettlementSnapshotUncheckedCreateWithoutPortfolioInput> | SettlementSnapshotCreateWithoutPortfolioInput[] | SettlementSnapshotUncheckedCreateWithoutPortfolioInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutPortfolioInput | SettlementSnapshotCreateOrConnectWithoutPortfolioInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutPortfolioInput | SettlementSnapshotUpsertWithWhereUniqueWithoutPortfolioInput[]
+    createMany?: SettlementSnapshotCreateManyPortfolioInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutPortfolioInput | SettlementSnapshotUpdateWithWhereUniqueWithoutPortfolioInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutPortfolioInput | SettlementSnapshotUpdateManyWithWhereWithoutPortfolioInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
   }
 
   export type PortfolioCreateNestedOneWithoutPositionsInput = {
@@ -20484,6 +27100,26 @@ export namespace Prisma {
     connect?: PortfolioWhereUniqueInput
   }
 
+  export type CompetitionParticipantCreateNestedOneWithoutOrdersInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutOrdersInput, CompetitionParticipantUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutOrdersInput
+    connect?: CompetitionParticipantWhereUniqueInput
+  }
+
+  export type TradingSessionCreateNestedOneWithoutOrdersInput = {
+    create?: XOR<TradingSessionCreateWithoutOrdersInput, TradingSessionUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutOrdersInput
+    connect?: TradingSessionWhereUniqueInput
+  }
+
+  export type EnumOrderIntentFieldUpdateOperationsInput = {
+    set?: $Enums.OrderIntent
+  }
+
+  export type EnumRiskCheckStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RiskCheckStatus
+  }
+
   export type AgentUpdateOneRequiredWithoutOrdersNestedInput = {
     create?: XOR<AgentCreateWithoutOrdersInput, AgentUncheckedCreateWithoutOrdersInput>
     connectOrCreate?: AgentCreateOrConnectWithoutOrdersInput
@@ -20508,18 +27144,30 @@ export namespace Prisma {
     update?: XOR<XOR<PortfolioUpdateToOneWithWhereWithoutOrdersInput, PortfolioUpdateWithoutOrdersInput>, PortfolioUncheckedUpdateWithoutOrdersInput>
   }
 
+  export type CompetitionParticipantUpdateOneWithoutOrdersNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutOrdersInput, CompetitionParticipantUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutOrdersInput
+    upsert?: CompetitionParticipantUpsertWithoutOrdersInput
+    disconnect?: CompetitionParticipantWhereInput | boolean
+    delete?: CompetitionParticipantWhereInput | boolean
+    connect?: CompetitionParticipantWhereUniqueInput
+    update?: XOR<XOR<CompetitionParticipantUpdateToOneWithWhereWithoutOrdersInput, CompetitionParticipantUpdateWithoutOrdersInput>, CompetitionParticipantUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type TradingSessionUpdateOneWithoutOrdersNestedInput = {
+    create?: XOR<TradingSessionCreateWithoutOrdersInput, TradingSessionUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutOrdersInput
+    upsert?: TradingSessionUpsertWithoutOrdersInput
+    disconnect?: TradingSessionWhereInput | boolean
+    delete?: TradingSessionWhereInput | boolean
+    connect?: TradingSessionWhereUniqueInput
+    update?: XOR<XOR<TradingSessionUpdateToOneWithWhereWithoutOrdersInput, TradingSessionUpdateWithoutOrdersInput>, TradingSessionUncheckedUpdateWithoutOrdersInput>
+  }
+
   export type PortfolioCreateNestedOneWithoutSettlementsInput = {
     create?: XOR<PortfolioCreateWithoutSettlementsInput, PortfolioUncheckedCreateWithoutSettlementsInput>
     connectOrCreate?: PortfolioCreateOrConnectWithoutSettlementsInput
     connect?: PortfolioWhereUniqueInput
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type PortfolioUpdateOneRequiredWithoutSettlementsNestedInput = {
@@ -20528,6 +27176,304 @@ export namespace Prisma {
     upsert?: PortfolioUpsertWithoutSettlementsInput
     connect?: PortfolioWhereUniqueInput
     update?: XOR<XOR<PortfolioUpdateToOneWithWhereWithoutSettlementsInput, PortfolioUpdateWithoutSettlementsInput>, PortfolioUncheckedUpdateWithoutSettlementsInput>
+  }
+
+  export type CompetitionCreateNestedOneWithoutParticipantsInput = {
+    create?: XOR<CompetitionCreateWithoutParticipantsInput, CompetitionUncheckedCreateWithoutParticipantsInput>
+    connectOrCreate?: CompetitionCreateOrConnectWithoutParticipantsInput
+    connect?: CompetitionWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutParticipantsInput = {
+    create?: XOR<AgentCreateWithoutParticipantsInput, AgentUncheckedCreateWithoutParticipantsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutParticipantsInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type PortfolioCreateNestedOneWithoutParticipantInput = {
+    create?: XOR<PortfolioCreateWithoutParticipantInput, PortfolioUncheckedCreateWithoutParticipantInput>
+    connectOrCreate?: PortfolioCreateOrConnectWithoutParticipantInput
+    connect?: PortfolioWhereUniqueInput
+  }
+
+  export type OrderCreateNestedManyWithoutParticipantInput = {
+    create?: XOR<OrderCreateWithoutParticipantInput, OrderUncheckedCreateWithoutParticipantInput> | OrderCreateWithoutParticipantInput[] | OrderUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutParticipantInput | OrderCreateOrConnectWithoutParticipantInput[]
+    createMany?: OrderCreateManyParticipantInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type SettlementSnapshotCreateNestedManyWithoutParticipantInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutParticipantInput, SettlementSnapshotUncheckedCreateWithoutParticipantInput> | SettlementSnapshotCreateWithoutParticipantInput[] | SettlementSnapshotUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutParticipantInput | SettlementSnapshotCreateOrConnectWithoutParticipantInput[]
+    createMany?: SettlementSnapshotCreateManyParticipantInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutParticipantInput = {
+    create?: XOR<OrderCreateWithoutParticipantInput, OrderUncheckedCreateWithoutParticipantInput> | OrderCreateWithoutParticipantInput[] | OrderUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutParticipantInput | OrderCreateOrConnectWithoutParticipantInput[]
+    createMany?: OrderCreateManyParticipantInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type SettlementSnapshotUncheckedCreateNestedManyWithoutParticipantInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutParticipantInput, SettlementSnapshotUncheckedCreateWithoutParticipantInput> | SettlementSnapshotCreateWithoutParticipantInput[] | SettlementSnapshotUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutParticipantInput | SettlementSnapshotCreateOrConnectWithoutParticipantInput[]
+    createMany?: SettlementSnapshotCreateManyParticipantInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
+  export type EnumParticipantStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ParticipantStatus
+  }
+
+  export type CompetitionUpdateOneRequiredWithoutParticipantsNestedInput = {
+    create?: XOR<CompetitionCreateWithoutParticipantsInput, CompetitionUncheckedCreateWithoutParticipantsInput>
+    connectOrCreate?: CompetitionCreateOrConnectWithoutParticipantsInput
+    upsert?: CompetitionUpsertWithoutParticipantsInput
+    connect?: CompetitionWhereUniqueInput
+    update?: XOR<XOR<CompetitionUpdateToOneWithWhereWithoutParticipantsInput, CompetitionUpdateWithoutParticipantsInput>, CompetitionUncheckedUpdateWithoutParticipantsInput>
+  }
+
+  export type AgentUpdateOneRequiredWithoutParticipantsNestedInput = {
+    create?: XOR<AgentCreateWithoutParticipantsInput, AgentUncheckedCreateWithoutParticipantsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutParticipantsInput
+    upsert?: AgentUpsertWithoutParticipantsInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutParticipantsInput, AgentUpdateWithoutParticipantsInput>, AgentUncheckedUpdateWithoutParticipantsInput>
+  }
+
+  export type PortfolioUpdateOneWithoutParticipantNestedInput = {
+    create?: XOR<PortfolioCreateWithoutParticipantInput, PortfolioUncheckedCreateWithoutParticipantInput>
+    connectOrCreate?: PortfolioCreateOrConnectWithoutParticipantInput
+    upsert?: PortfolioUpsertWithoutParticipantInput
+    disconnect?: PortfolioWhereInput | boolean
+    delete?: PortfolioWhereInput | boolean
+    connect?: PortfolioWhereUniqueInput
+    update?: XOR<XOR<PortfolioUpdateToOneWithWhereWithoutParticipantInput, PortfolioUpdateWithoutParticipantInput>, PortfolioUncheckedUpdateWithoutParticipantInput>
+  }
+
+  export type OrderUpdateManyWithoutParticipantNestedInput = {
+    create?: XOR<OrderCreateWithoutParticipantInput, OrderUncheckedCreateWithoutParticipantInput> | OrderCreateWithoutParticipantInput[] | OrderUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutParticipantInput | OrderCreateOrConnectWithoutParticipantInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutParticipantInput | OrderUpsertWithWhereUniqueWithoutParticipantInput[]
+    createMany?: OrderCreateManyParticipantInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutParticipantInput | OrderUpdateWithWhereUniqueWithoutParticipantInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutParticipantInput | OrderUpdateManyWithWhereWithoutParticipantInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUpdateManyWithoutParticipantNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutParticipantInput, SettlementSnapshotUncheckedCreateWithoutParticipantInput> | SettlementSnapshotCreateWithoutParticipantInput[] | SettlementSnapshotUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutParticipantInput | SettlementSnapshotCreateOrConnectWithoutParticipantInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutParticipantInput | SettlementSnapshotUpsertWithWhereUniqueWithoutParticipantInput[]
+    createMany?: SettlementSnapshotCreateManyParticipantInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutParticipantInput | SettlementSnapshotUpdateWithWhereUniqueWithoutParticipantInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutParticipantInput | SettlementSnapshotUpdateManyWithWhereWithoutParticipantInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
+  export type OrderUncheckedUpdateManyWithoutParticipantNestedInput = {
+    create?: XOR<OrderCreateWithoutParticipantInput, OrderUncheckedCreateWithoutParticipantInput> | OrderCreateWithoutParticipantInput[] | OrderUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutParticipantInput | OrderCreateOrConnectWithoutParticipantInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutParticipantInput | OrderUpsertWithWhereUniqueWithoutParticipantInput[]
+    createMany?: OrderCreateManyParticipantInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutParticipantInput | OrderUpdateWithWhereUniqueWithoutParticipantInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutParticipantInput | OrderUpdateManyWithWhereWithoutParticipantInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutParticipantNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutParticipantInput, SettlementSnapshotUncheckedCreateWithoutParticipantInput> | SettlementSnapshotCreateWithoutParticipantInput[] | SettlementSnapshotUncheckedCreateWithoutParticipantInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutParticipantInput | SettlementSnapshotCreateOrConnectWithoutParticipantInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutParticipantInput | SettlementSnapshotUpsertWithWhereUniqueWithoutParticipantInput[]
+    createMany?: SettlementSnapshotCreateManyParticipantInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutParticipantInput | SettlementSnapshotUpdateWithWhereUniqueWithoutParticipantInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutParticipantInput | SettlementSnapshotUpdateManyWithWhereWithoutParticipantInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
+  export type CompetitionCreateNestedOneWithoutTradingSessionsInput = {
+    create?: XOR<CompetitionCreateWithoutTradingSessionsInput, CompetitionUncheckedCreateWithoutTradingSessionsInput>
+    connectOrCreate?: CompetitionCreateOrConnectWithoutTradingSessionsInput
+    connect?: CompetitionWhereUniqueInput
+  }
+
+  export type OrderCreateNestedManyWithoutTradingSessionInput = {
+    create?: XOR<OrderCreateWithoutTradingSessionInput, OrderUncheckedCreateWithoutTradingSessionInput> | OrderCreateWithoutTradingSessionInput[] | OrderUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutTradingSessionInput | OrderCreateOrConnectWithoutTradingSessionInput[]
+    createMany?: OrderCreateManyTradingSessionInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type SettlementSnapshotCreateNestedManyWithoutTradingSessionInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutTradingSessionInput, SettlementSnapshotUncheckedCreateWithoutTradingSessionInput> | SettlementSnapshotCreateWithoutTradingSessionInput[] | SettlementSnapshotUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutTradingSessionInput | SettlementSnapshotCreateOrConnectWithoutTradingSessionInput[]
+    createMany?: SettlementSnapshotCreateManyTradingSessionInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutTradingSessionInput = {
+    create?: XOR<OrderCreateWithoutTradingSessionInput, OrderUncheckedCreateWithoutTradingSessionInput> | OrderCreateWithoutTradingSessionInput[] | OrderUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutTradingSessionInput | OrderCreateOrConnectWithoutTradingSessionInput[]
+    createMany?: OrderCreateManyTradingSessionInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type SettlementSnapshotUncheckedCreateNestedManyWithoutTradingSessionInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutTradingSessionInput, SettlementSnapshotUncheckedCreateWithoutTradingSessionInput> | SettlementSnapshotCreateWithoutTradingSessionInput[] | SettlementSnapshotUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutTradingSessionInput | SettlementSnapshotCreateOrConnectWithoutTradingSessionInput[]
+    createMany?: SettlementSnapshotCreateManyTradingSessionInputEnvelope
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+  }
+
+  export type EnumTradingSessionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.TradingSessionType
+  }
+
+  export type EnumTradingSessionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.TradingSessionStatus
+  }
+
+  export type CompetitionUpdateOneRequiredWithoutTradingSessionsNestedInput = {
+    create?: XOR<CompetitionCreateWithoutTradingSessionsInput, CompetitionUncheckedCreateWithoutTradingSessionsInput>
+    connectOrCreate?: CompetitionCreateOrConnectWithoutTradingSessionsInput
+    upsert?: CompetitionUpsertWithoutTradingSessionsInput
+    connect?: CompetitionWhereUniqueInput
+    update?: XOR<XOR<CompetitionUpdateToOneWithWhereWithoutTradingSessionsInput, CompetitionUpdateWithoutTradingSessionsInput>, CompetitionUncheckedUpdateWithoutTradingSessionsInput>
+  }
+
+  export type OrderUpdateManyWithoutTradingSessionNestedInput = {
+    create?: XOR<OrderCreateWithoutTradingSessionInput, OrderUncheckedCreateWithoutTradingSessionInput> | OrderCreateWithoutTradingSessionInput[] | OrderUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutTradingSessionInput | OrderCreateOrConnectWithoutTradingSessionInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutTradingSessionInput | OrderUpsertWithWhereUniqueWithoutTradingSessionInput[]
+    createMany?: OrderCreateManyTradingSessionInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutTradingSessionInput | OrderUpdateWithWhereUniqueWithoutTradingSessionInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutTradingSessionInput | OrderUpdateManyWithWhereWithoutTradingSessionInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUpdateManyWithoutTradingSessionNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutTradingSessionInput, SettlementSnapshotUncheckedCreateWithoutTradingSessionInput> | SettlementSnapshotCreateWithoutTradingSessionInput[] | SettlementSnapshotUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutTradingSessionInput | SettlementSnapshotCreateOrConnectWithoutTradingSessionInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutTradingSessionInput | SettlementSnapshotUpsertWithWhereUniqueWithoutTradingSessionInput[]
+    createMany?: SettlementSnapshotCreateManyTradingSessionInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutTradingSessionInput | SettlementSnapshotUpdateWithWhereUniqueWithoutTradingSessionInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutTradingSessionInput | SettlementSnapshotUpdateManyWithWhereWithoutTradingSessionInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
+  export type OrderUncheckedUpdateManyWithoutTradingSessionNestedInput = {
+    create?: XOR<OrderCreateWithoutTradingSessionInput, OrderUncheckedCreateWithoutTradingSessionInput> | OrderCreateWithoutTradingSessionInput[] | OrderUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutTradingSessionInput | OrderCreateOrConnectWithoutTradingSessionInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutTradingSessionInput | OrderUpsertWithWhereUniqueWithoutTradingSessionInput[]
+    createMany?: OrderCreateManyTradingSessionInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutTradingSessionInput | OrderUpdateWithWhereUniqueWithoutTradingSessionInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutTradingSessionInput | OrderUpdateManyWithWhereWithoutTradingSessionInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutTradingSessionNestedInput = {
+    create?: XOR<SettlementSnapshotCreateWithoutTradingSessionInput, SettlementSnapshotUncheckedCreateWithoutTradingSessionInput> | SettlementSnapshotCreateWithoutTradingSessionInput[] | SettlementSnapshotUncheckedCreateWithoutTradingSessionInput[]
+    connectOrCreate?: SettlementSnapshotCreateOrConnectWithoutTradingSessionInput | SettlementSnapshotCreateOrConnectWithoutTradingSessionInput[]
+    upsert?: SettlementSnapshotUpsertWithWhereUniqueWithoutTradingSessionInput | SettlementSnapshotUpsertWithWhereUniqueWithoutTradingSessionInput[]
+    createMany?: SettlementSnapshotCreateManyTradingSessionInputEnvelope
+    set?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    disconnect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    delete?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    connect?: SettlementSnapshotWhereUniqueInput | SettlementSnapshotWhereUniqueInput[]
+    update?: SettlementSnapshotUpdateWithWhereUniqueWithoutTradingSessionInput | SettlementSnapshotUpdateWithWhereUniqueWithoutTradingSessionInput[]
+    updateMany?: SettlementSnapshotUpdateManyWithWhereWithoutTradingSessionInput | SettlementSnapshotUpdateManyWithWhereWithoutTradingSessionInput[]
+    deleteMany?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+  }
+
+  export type CompetitionCreateNestedOneWithoutSnapshotsInput = {
+    create?: XOR<CompetitionCreateWithoutSnapshotsInput, CompetitionUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: CompetitionCreateOrConnectWithoutSnapshotsInput
+    connect?: CompetitionWhereUniqueInput
+  }
+
+  export type TradingSessionCreateNestedOneWithoutSnapshotsInput = {
+    create?: XOR<TradingSessionCreateWithoutSnapshotsInput, TradingSessionUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutSnapshotsInput
+    connect?: TradingSessionWhereUniqueInput
+  }
+
+  export type CompetitionParticipantCreateNestedOneWithoutSnapshotsInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutSnapshotsInput, CompetitionParticipantUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutSnapshotsInput
+    connect?: CompetitionParticipantWhereUniqueInput
+  }
+
+  export type PortfolioCreateNestedOneWithoutSnapshotsInput = {
+    create?: XOR<PortfolioCreateWithoutSnapshotsInput, PortfolioUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: PortfolioCreateOrConnectWithoutSnapshotsInput
+    connect?: PortfolioWhereUniqueInput
+  }
+
+  export type CompetitionUpdateOneRequiredWithoutSnapshotsNestedInput = {
+    create?: XOR<CompetitionCreateWithoutSnapshotsInput, CompetitionUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: CompetitionCreateOrConnectWithoutSnapshotsInput
+    upsert?: CompetitionUpsertWithoutSnapshotsInput
+    connect?: CompetitionWhereUniqueInput
+    update?: XOR<XOR<CompetitionUpdateToOneWithWhereWithoutSnapshotsInput, CompetitionUpdateWithoutSnapshotsInput>, CompetitionUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type TradingSessionUpdateOneWithoutSnapshotsNestedInput = {
+    create?: XOR<TradingSessionCreateWithoutSnapshotsInput, TradingSessionUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: TradingSessionCreateOrConnectWithoutSnapshotsInput
+    upsert?: TradingSessionUpsertWithoutSnapshotsInput
+    disconnect?: TradingSessionWhereInput | boolean
+    delete?: TradingSessionWhereInput | boolean
+    connect?: TradingSessionWhereUniqueInput
+    update?: XOR<XOR<TradingSessionUpdateToOneWithWhereWithoutSnapshotsInput, TradingSessionUpdateWithoutSnapshotsInput>, TradingSessionUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type CompetitionParticipantUpdateOneWithoutSnapshotsNestedInput = {
+    create?: XOR<CompetitionParticipantCreateWithoutSnapshotsInput, CompetitionParticipantUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: CompetitionParticipantCreateOrConnectWithoutSnapshotsInput
+    upsert?: CompetitionParticipantUpsertWithoutSnapshotsInput
+    disconnect?: CompetitionParticipantWhereInput | boolean
+    delete?: CompetitionParticipantWhereInput | boolean
+    connect?: CompetitionParticipantWhereUniqueInput
+    update?: XOR<XOR<CompetitionParticipantUpdateToOneWithWhereWithoutSnapshotsInput, CompetitionParticipantUpdateWithoutSnapshotsInput>, CompetitionParticipantUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type PortfolioUpdateOneRequiredWithoutSnapshotsNestedInput = {
+    create?: XOR<PortfolioCreateWithoutSnapshotsInput, PortfolioUncheckedCreateWithoutSnapshotsInput>
+    connectOrCreate?: PortfolioCreateOrConnectWithoutSnapshotsInput
+    upsert?: PortfolioUpsertWithoutSnapshotsInput
+    connect?: PortfolioWhereUniqueInput
+    update?: XOR<XOR<PortfolioUpdateToOneWithWhereWithoutSnapshotsInput, PortfolioUpdateWithoutSnapshotsInput>, PortfolioUncheckedUpdateWithoutSnapshotsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -20738,6 +27684,22 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -20849,20 +27811,89 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+  export type NestedEnumOrderIntentFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderIntent | EnumOrderIntentFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderIntent[]
+    notIn?: $Enums.OrderIntent[]
+    not?: NestedEnumOrderIntentFilter<$PrismaModel> | $Enums.OrderIntent
+  }
+
+  export type NestedEnumRiskCheckStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskCheckStatus | EnumRiskCheckStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskCheckStatus[]
+    notIn?: $Enums.RiskCheckStatus[]
+    not?: NestedEnumRiskCheckStatusFilter<$PrismaModel> | $Enums.RiskCheckStatus
+  }
+
+  export type NestedEnumOrderIntentWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderIntent | EnumOrderIntentFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderIntent[]
+    notIn?: $Enums.OrderIntent[]
+    not?: NestedEnumOrderIntentWithAggregatesFilter<$PrismaModel> | $Enums.OrderIntent
     _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOrderIntentFilter<$PrismaModel>
+    _max?: NestedEnumOrderIntentFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRiskCheckStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskCheckStatus | EnumRiskCheckStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskCheckStatus[]
+    notIn?: $Enums.RiskCheckStatus[]
+    not?: NestedEnumRiskCheckStatusWithAggregatesFilter<$PrismaModel> | $Enums.RiskCheckStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRiskCheckStatusFilter<$PrismaModel>
+    _max?: NestedEnumRiskCheckStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumParticipantStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipantStatus | EnumParticipantStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipantStatus[]
+    notIn?: $Enums.ParticipantStatus[]
+    not?: NestedEnumParticipantStatusFilter<$PrismaModel> | $Enums.ParticipantStatus
+  }
+
+  export type NestedEnumParticipantStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipantStatus | EnumParticipantStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipantStatus[]
+    notIn?: $Enums.ParticipantStatus[]
+    not?: NestedEnumParticipantStatusWithAggregatesFilter<$PrismaModel> | $Enums.ParticipantStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumParticipantStatusFilter<$PrismaModel>
+    _max?: NestedEnumParticipantStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTradingSessionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionType | EnumTradingSessionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionType[]
+    notIn?: $Enums.TradingSessionType[]
+    not?: NestedEnumTradingSessionTypeFilter<$PrismaModel> | $Enums.TradingSessionType
+  }
+
+  export type NestedEnumTradingSessionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionStatus | EnumTradingSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionStatus[]
+    notIn?: $Enums.TradingSessionStatus[]
+    not?: NestedEnumTradingSessionStatusFilter<$PrismaModel> | $Enums.TradingSessionStatus
+  }
+
+  export type NestedEnumTradingSessionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionType | EnumTradingSessionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionType[]
+    notIn?: $Enums.TradingSessionType[]
+    not?: NestedEnumTradingSessionTypeWithAggregatesFilter<$PrismaModel> | $Enums.TradingSessionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTradingSessionTypeFilter<$PrismaModel>
+    _max?: NestedEnumTradingSessionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTradingSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TradingSessionStatus | EnumTradingSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TradingSessionStatus[]
+    notIn?: $Enums.TradingSessionStatus[]
+    not?: NestedEnumTradingSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.TradingSessionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTradingSessionStatusFilter<$PrismaModel>
+    _max?: NestedEnumTradingSessionStatusFilter<$PrismaModel>
   }
 
   export type TradeCreateWithoutAgentInput = {
@@ -20912,12 +27943,17 @@ export namespace Prisma {
     id?: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
     positions?: PositionCreateNestedManyWithoutPortfolioInput
     orders?: OrderCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUncheckedCreateWithoutAgentInput = {
@@ -20925,11 +27961,16 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
     positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
     orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioCreateOrConnectWithoutAgentInput = {
@@ -20941,6 +27982,55 @@ export namespace Prisma {
     data: PortfolioCreateManyAgentInput | PortfolioCreateManyAgentInput[]
   }
 
+  export type CompetitionParticipantCreateWithoutAgentInput = {
+    id?: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutParticipantsInput
+    portfolio?: PortfolioCreateNestedOneWithoutParticipantInput
+    orders?: OrderCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUncheckedCreateWithoutAgentInput = {
+    id?: string
+    competitionId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantCreateOrConnectWithoutAgentInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    create: XOR<CompetitionParticipantCreateWithoutAgentInput, CompetitionParticipantUncheckedCreateWithoutAgentInput>
+  }
+
+  export type CompetitionParticipantCreateManyAgentInputEnvelope = {
+    data: CompetitionParticipantCreateManyAgentInput | CompetitionParticipantCreateManyAgentInput[]
+  }
+
   export type OrderCreateWithoutAgentInput = {
     id?: string
     symbol: string
@@ -20948,22 +28038,32 @@ export namespace Prisma {
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
     competition: CompetitionCreateNestedOneWithoutOrdersInput
     portfolio: PortfolioCreateNestedOneWithoutOrdersInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutOrdersInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutOrdersInput
   }
 
   export type OrderUncheckedCreateWithoutAgentInput = {
     id?: string
     competitionId: string
     portfolioId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -21127,8 +28227,49 @@ export namespace Prisma {
     competitionId?: StringFilter<"Portfolio"> | string
     cash?: FloatFilter<"Portfolio"> | number
     totalValue?: FloatFilter<"Portfolio"> | number
+    holdingSymbol?: StringNullableFilter<"Portfolio"> | string | null
+    holdingCount?: IntFilter<"Portfolio"> | number
+    switchRequiresFlat?: BoolFilter<"Portfolio"> | boolean
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
+  }
+
+  export type CompetitionParticipantUpsertWithWhereUniqueWithoutAgentInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    update: XOR<CompetitionParticipantUpdateWithoutAgentInput, CompetitionParticipantUncheckedUpdateWithoutAgentInput>
+    create: XOR<CompetitionParticipantCreateWithoutAgentInput, CompetitionParticipantUncheckedCreateWithoutAgentInput>
+  }
+
+  export type CompetitionParticipantUpdateWithWhereUniqueWithoutAgentInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    data: XOR<CompetitionParticipantUpdateWithoutAgentInput, CompetitionParticipantUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type CompetitionParticipantUpdateManyWithWhereWithoutAgentInput = {
+    where: CompetitionParticipantScalarWhereInput
+    data: XOR<CompetitionParticipantUpdateManyMutationInput, CompetitionParticipantUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type CompetitionParticipantScalarWhereInput = {
+    AND?: CompetitionParticipantScalarWhereInput | CompetitionParticipantScalarWhereInput[]
+    OR?: CompetitionParticipantScalarWhereInput[]
+    NOT?: CompetitionParticipantScalarWhereInput | CompetitionParticipantScalarWhereInput[]
+    id?: StringFilter<"CompetitionParticipant"> | string
+    competitionId?: StringFilter<"CompetitionParticipant"> | string
+    agentId?: StringFilter<"CompetitionParticipant"> | string
+    portfolioId?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    status?: EnumParticipantStatusFilter<"CompetitionParticipant"> | $Enums.ParticipantStatus
+    displayName?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    tagline?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    strategyTagsJson?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    riskLevel?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    webhookUrl?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    apiVersion?: StringNullableFilter<"CompetitionParticipant"> | string | null
+    joinedAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    approvedAt?: DateTimeNullableFilter<"CompetitionParticipant"> | Date | string | null
+    eliminatedAt?: DateTimeNullableFilter<"CompetitionParticipant"> | Date | string | null
+    createdAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
+    updatedAt?: DateTimeFilter<"CompetitionParticipant"> | Date | string
   }
 
   export type OrderUpsertWithWhereUniqueWithoutAgentInput = {
@@ -21155,11 +28296,16 @@ export namespace Prisma {
     agentId?: StringFilter<"Order"> | string
     competitionId?: StringFilter<"Order"> | string
     portfolioId?: StringFilter<"Order"> | string
+    participantId?: StringNullableFilter<"Order"> | string | null
+    tradingSessionId?: StringNullableFilter<"Order"> | string | null
     symbol?: StringFilter<"Order"> | string
     side?: EnumTradeSideFilter<"Order"> | $Enums.TradeSide
     quantity?: FloatFilter<"Order"> | number
     note?: StringNullableFilter<"Order"> | string | null
     status?: StringFilter<"Order"> | string
+    intent?: EnumOrderIntentFilter<"Order"> | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFilter<"Order"> | $Enums.RiskCheckStatus
+    riskRejectCode?: StringNullableFilter<"Order"> | string | null
     rejectReason?: StringNullableFilter<"Order"> | string | null
     submittedAt?: DateTimeFilter<"Order"> | Date | string
     matchedAt?: DateTimeNullableFilter<"Order"> | Date | string | null
@@ -21255,16 +28401,70 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Delivery"> | Date | string
   }
 
+  export type CompetitionParticipantCreateWithoutCompetitionInput = {
+    id?: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agent: AgentCreateNestedOneWithoutParticipantsInput
+    portfolio?: PortfolioCreateNestedOneWithoutParticipantInput
+    orders?: OrderCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUncheckedCreateWithoutCompetitionInput = {
+    id?: string
+    agentId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantCreateOrConnectWithoutCompetitionInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    create: XOR<CompetitionParticipantCreateWithoutCompetitionInput, CompetitionParticipantUncheckedCreateWithoutCompetitionInput>
+  }
+
+  export type CompetitionParticipantCreateManyCompetitionInputEnvelope = {
+    data: CompetitionParticipantCreateManyCompetitionInput | CompetitionParticipantCreateManyCompetitionInput[]
+  }
+
   export type PortfolioCreateWithoutCompetitionInput = {
     id?: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     agent: AgentCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
     positions?: PositionCreateNestedManyWithoutPortfolioInput
     orders?: OrderCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUncheckedCreateWithoutCompetitionInput = {
@@ -21272,11 +28472,16 @@ export namespace Prisma {
     agentId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
     positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
     orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioCreateOrConnectWithoutCompetitionInput = {
@@ -21295,22 +28500,32 @@ export namespace Prisma {
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
     agent: AgentCreateNestedOneWithoutOrdersInput
     portfolio: PortfolioCreateNestedOneWithoutOrdersInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutOrdersInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutOrdersInput
   }
 
   export type OrderUncheckedCreateWithoutCompetitionInput = {
     id?: string
     agentId: string
     portfolioId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -21323,6 +28538,112 @@ export namespace Prisma {
 
   export type OrderCreateManyCompetitionInputEnvelope = {
     data: OrderCreateManyCompetitionInput | OrderCreateManyCompetitionInput[]
+  }
+
+  export type TradingSessionCreateWithoutCompetitionInput = {
+    id?: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderCreateNestedManyWithoutTradingSessionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionUncheckedCreateWithoutCompetitionInput = {
+    id?: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutTradingSessionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionCreateOrConnectWithoutCompetitionInput = {
+    where: TradingSessionWhereUniqueInput
+    create: XOR<TradingSessionCreateWithoutCompetitionInput, TradingSessionUncheckedCreateWithoutCompetitionInput>
+  }
+
+  export type TradingSessionCreateManyCompetitionInputEnvelope = {
+    data: TradingSessionCreateManyCompetitionInput | TradingSessionCreateManyCompetitionInput[]
+  }
+
+  export type SettlementSnapshotCreateWithoutCompetitionInput = {
+    id?: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+    tradingSession?: TradingSessionCreateNestedOneWithoutSnapshotsInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutSnapshotsInput
+    portfolio: PortfolioCreateNestedOneWithoutSnapshotsInput
+  }
+
+  export type SettlementSnapshotUncheckedCreateWithoutCompetitionInput = {
+    id?: string
+    tradingSessionId?: string | null
+    participantId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotCreateOrConnectWithoutCompetitionInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    create: XOR<SettlementSnapshotCreateWithoutCompetitionInput, SettlementSnapshotUncheckedCreateWithoutCompetitionInput>
+  }
+
+  export type SettlementSnapshotCreateManyCompetitionInputEnvelope = {
+    data: SettlementSnapshotCreateManyCompetitionInput | SettlementSnapshotCreateManyCompetitionInput[]
+  }
+
+  export type CompetitionParticipantUpsertWithWhereUniqueWithoutCompetitionInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    update: XOR<CompetitionParticipantUpdateWithoutCompetitionInput, CompetitionParticipantUncheckedUpdateWithoutCompetitionInput>
+    create: XOR<CompetitionParticipantCreateWithoutCompetitionInput, CompetitionParticipantUncheckedCreateWithoutCompetitionInput>
+  }
+
+  export type CompetitionParticipantUpdateWithWhereUniqueWithoutCompetitionInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    data: XOR<CompetitionParticipantUpdateWithoutCompetitionInput, CompetitionParticipantUncheckedUpdateWithoutCompetitionInput>
+  }
+
+  export type CompetitionParticipantUpdateManyWithWhereWithoutCompetitionInput = {
+    where: CompetitionParticipantScalarWhereInput
+    data: XOR<CompetitionParticipantUpdateManyMutationInput, CompetitionParticipantUncheckedUpdateManyWithoutCompetitionInput>
   }
 
   export type PortfolioUpsertWithWhereUniqueWithoutCompetitionInput = {
@@ -21357,6 +28678,80 @@ export namespace Prisma {
     data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutCompetitionInput>
   }
 
+  export type TradingSessionUpsertWithWhereUniqueWithoutCompetitionInput = {
+    where: TradingSessionWhereUniqueInput
+    update: XOR<TradingSessionUpdateWithoutCompetitionInput, TradingSessionUncheckedUpdateWithoutCompetitionInput>
+    create: XOR<TradingSessionCreateWithoutCompetitionInput, TradingSessionUncheckedCreateWithoutCompetitionInput>
+  }
+
+  export type TradingSessionUpdateWithWhereUniqueWithoutCompetitionInput = {
+    where: TradingSessionWhereUniqueInput
+    data: XOR<TradingSessionUpdateWithoutCompetitionInput, TradingSessionUncheckedUpdateWithoutCompetitionInput>
+  }
+
+  export type TradingSessionUpdateManyWithWhereWithoutCompetitionInput = {
+    where: TradingSessionScalarWhereInput
+    data: XOR<TradingSessionUpdateManyMutationInput, TradingSessionUncheckedUpdateManyWithoutCompetitionInput>
+  }
+
+  export type TradingSessionScalarWhereInput = {
+    AND?: TradingSessionScalarWhereInput | TradingSessionScalarWhereInput[]
+    OR?: TradingSessionScalarWhereInput[]
+    NOT?: TradingSessionScalarWhereInput | TradingSessionScalarWhereInput[]
+    id?: StringFilter<"TradingSession"> | string
+    competitionId?: StringFilter<"TradingSession"> | string
+    tradingDate?: StringFilter<"TradingSession"> | string
+    sessionType?: EnumTradingSessionTypeFilter<"TradingSession"> | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFilter<"TradingSession"> | $Enums.TradingSessionStatus
+    openAt?: DateTimeFilter<"TradingSession"> | Date | string
+    closeAt?: DateTimeFilter<"TradingSession"> | Date | string
+    marketSnapshotJson?: StringNullableFilter<"TradingSession"> | string | null
+    leaderboardSnapshotJson?: StringNullableFilter<"TradingSession"> | string | null
+    createdAt?: DateTimeFilter<"TradingSession"> | Date | string
+    updatedAt?: DateTimeFilter<"TradingSession"> | Date | string
+  }
+
+  export type SettlementSnapshotUpsertWithWhereUniqueWithoutCompetitionInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    update: XOR<SettlementSnapshotUpdateWithoutCompetitionInput, SettlementSnapshotUncheckedUpdateWithoutCompetitionInput>
+    create: XOR<SettlementSnapshotCreateWithoutCompetitionInput, SettlementSnapshotUncheckedCreateWithoutCompetitionInput>
+  }
+
+  export type SettlementSnapshotUpdateWithWhereUniqueWithoutCompetitionInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    data: XOR<SettlementSnapshotUpdateWithoutCompetitionInput, SettlementSnapshotUncheckedUpdateWithoutCompetitionInput>
+  }
+
+  export type SettlementSnapshotUpdateManyWithWhereWithoutCompetitionInput = {
+    where: SettlementSnapshotScalarWhereInput
+    data: XOR<SettlementSnapshotUpdateManyMutationInput, SettlementSnapshotUncheckedUpdateManyWithoutCompetitionInput>
+  }
+
+  export type SettlementSnapshotScalarWhereInput = {
+    AND?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+    OR?: SettlementSnapshotScalarWhereInput[]
+    NOT?: SettlementSnapshotScalarWhereInput | SettlementSnapshotScalarWhereInput[]
+    id?: StringFilter<"SettlementSnapshot"> | string
+    competitionId?: StringFilter<"SettlementSnapshot"> | string
+    tradingSessionId?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    participantId?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    portfolioId?: StringFilter<"SettlementSnapshot"> | string
+    snapshotAt?: DateTimeFilter<"SettlementSnapshot"> | Date | string
+    cash?: FloatFilter<"SettlementSnapshot"> | number
+    marketValue?: FloatFilter<"SettlementSnapshot"> | number
+    totalValue?: FloatFilter<"SettlementSnapshot"> | number
+    realizedPnL?: FloatFilter<"SettlementSnapshot"> | number
+    unrealizedPnL?: FloatFilter<"SettlementSnapshot"> | number
+    returnPct?: FloatFilter<"SettlementSnapshot"> | number
+    drawdownPct?: FloatFilter<"SettlementSnapshot"> | number
+    turnoverPct?: FloatFilter<"SettlementSnapshot"> | number
+    rank?: IntNullableFilter<"SettlementSnapshot"> | number | null
+    holdingSymbol?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    positionJson?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    metricsJson?: StringNullableFilter<"SettlementSnapshot"> | string | null
+    createdAt?: DateTimeFilter<"SettlementSnapshot"> | Date | string
+  }
+
   export type AgentCreateWithoutPortfoliosInput = {
     id?: string
     name: string
@@ -21370,6 +28765,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     trades?: TradeCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     orders?: OrderCreateNestedManyWithoutAgentInput
     logs?: LogEntryCreateNestedManyWithoutAgentInput
     comments?: CommentCreateNestedManyWithoutAgentInput
@@ -21389,6 +28785,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
     logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
     comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
@@ -21410,9 +28807,24 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    participants?: CompetitionParticipantCreateNestedManyWithoutCompetitionInput
     orders?: OrderCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutCompetitionInput
   }
 
   export type CompetitionUncheckedCreateWithoutPortfoliosInput = {
@@ -21425,14 +28837,74 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutCompetitionInput
     orders?: OrderUncheckedCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionUncheckedCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutCompetitionInput
   }
 
   export type CompetitionCreateOrConnectWithoutPortfoliosInput = {
     where: CompetitionWhereUniqueInput
     create: XOR<CompetitionCreateWithoutPortfoliosInput, CompetitionUncheckedCreateWithoutPortfoliosInput>
+  }
+
+  export type CompetitionParticipantCreateWithoutPortfolioInput = {
+    id?: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutParticipantsInput
+    agent: AgentCreateNestedOneWithoutParticipantsInput
+    orders?: OrderCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUncheckedCreateWithoutPortfolioInput = {
+    id?: string
+    competitionId: string
+    agentId: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutParticipantInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantCreateOrConnectWithoutPortfolioInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    create: XOR<CompetitionParticipantCreateWithoutPortfolioInput, CompetitionParticipantUncheckedCreateWithoutPortfolioInput>
   }
 
   export type PositionCreateWithoutPortfolioInput = {
@@ -21471,22 +28943,32 @@ export namespace Prisma {
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
     agent: AgentCreateNestedOneWithoutOrdersInput
     competition: CompetitionCreateNestedOneWithoutOrdersInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutOrdersInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutOrdersInput
   }
 
   export type OrderUncheckedCreateWithoutPortfolioInput = {
     id?: string
     agentId: string
     competitionId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -21532,6 +29014,57 @@ export namespace Prisma {
     data: DailySettlementCreateManyPortfolioInput | DailySettlementCreateManyPortfolioInput[]
   }
 
+  export type SettlementSnapshotCreateWithoutPortfolioInput = {
+    id?: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutSnapshotsInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutSnapshotsInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutSnapshotsInput
+  }
+
+  export type SettlementSnapshotUncheckedCreateWithoutPortfolioInput = {
+    id?: string
+    competitionId: string
+    tradingSessionId?: string | null
+    participantId?: string | null
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotCreateOrConnectWithoutPortfolioInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    create: XOR<SettlementSnapshotCreateWithoutPortfolioInput, SettlementSnapshotUncheckedCreateWithoutPortfolioInput>
+  }
+
+  export type SettlementSnapshotCreateManyPortfolioInputEnvelope = {
+    data: SettlementSnapshotCreateManyPortfolioInput | SettlementSnapshotCreateManyPortfolioInput[]
+  }
+
   export type AgentUpsertWithoutPortfoliosInput = {
     update: XOR<AgentUpdateWithoutPortfoliosInput, AgentUncheckedUpdateWithoutPortfoliosInput>
     create: XOR<AgentCreateWithoutPortfoliosInput, AgentUncheckedCreateWithoutPortfoliosInput>
@@ -21556,6 +29089,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     orders?: OrderUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUpdateManyWithoutAgentNestedInput
     comments?: CommentUpdateManyWithoutAgentNestedInput
@@ -21575,6 +29109,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
     comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
@@ -21602,9 +29137,24 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUpdateManyWithoutCompetitionNestedInput
     orders?: OrderUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutCompetitionNestedInput
   }
 
   export type CompetitionUncheckedUpdateWithoutPortfoliosInput = {
@@ -21617,9 +29167,75 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutCompetitionNestedInput
     orders?: OrderUncheckedUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUncheckedUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type CompetitionParticipantUpsertWithoutPortfolioInput = {
+    update: XOR<CompetitionParticipantUpdateWithoutPortfolioInput, CompetitionParticipantUncheckedUpdateWithoutPortfolioInput>
+    create: XOR<CompetitionParticipantCreateWithoutPortfolioInput, CompetitionParticipantUncheckedCreateWithoutPortfolioInput>
+    where?: CompetitionParticipantWhereInput
+  }
+
+  export type CompetitionParticipantUpdateToOneWithWhereWithoutPortfolioInput = {
+    where?: CompetitionParticipantWhereInput
+    data: XOR<CompetitionParticipantUpdateWithoutPortfolioInput, CompetitionParticipantUncheckedUpdateWithoutPortfolioInput>
+  }
+
+  export type CompetitionParticipantUpdateWithoutPortfolioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutParticipantsNestedInput
+    agent?: AgentUpdateOneRequiredWithoutParticipantsNestedInput
+    orders?: OrderUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateWithoutPortfolioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutParticipantNestedInput
   }
 
   export type PositionUpsertWithWhereUniqueWithoutPortfolioInput = {
@@ -21699,16 +29315,37 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"DailySettlement"> | Date | string
   }
 
+  export type SettlementSnapshotUpsertWithWhereUniqueWithoutPortfolioInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    update: XOR<SettlementSnapshotUpdateWithoutPortfolioInput, SettlementSnapshotUncheckedUpdateWithoutPortfolioInput>
+    create: XOR<SettlementSnapshotCreateWithoutPortfolioInput, SettlementSnapshotUncheckedCreateWithoutPortfolioInput>
+  }
+
+  export type SettlementSnapshotUpdateWithWhereUniqueWithoutPortfolioInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    data: XOR<SettlementSnapshotUpdateWithoutPortfolioInput, SettlementSnapshotUncheckedUpdateWithoutPortfolioInput>
+  }
+
+  export type SettlementSnapshotUpdateManyWithWhereWithoutPortfolioInput = {
+    where: SettlementSnapshotScalarWhereInput
+    data: XOR<SettlementSnapshotUpdateManyMutationInput, SettlementSnapshotUncheckedUpdateManyWithoutPortfolioInput>
+  }
+
   export type PortfolioCreateWithoutPositionsInput = {
     id?: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     agent: AgentCreateNestedOneWithoutPortfoliosInput
     competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
     orders?: OrderCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUncheckedCreateWithoutPositionsInput = {
@@ -21717,10 +29354,15 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
     orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioCreateOrConnectWithoutPositionsInput = {
@@ -21743,12 +29385,17 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
     competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
     orders?: OrderUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateWithoutPositionsInput = {
@@ -21757,10 +29404,15 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
     orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
   }
 
   export type AgentCreateWithoutTradesInput = {
@@ -21776,6 +29428,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     orders?: OrderCreateNestedManyWithoutAgentInput
     logs?: LogEntryCreateNestedManyWithoutAgentInput
     comments?: CommentCreateNestedManyWithoutAgentInput
@@ -21795,6 +29448,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
     logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
     comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
@@ -21830,6 +29484,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     orders?: OrderUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUpdateManyWithoutAgentNestedInput
     comments?: CommentUpdateManyWithoutAgentNestedInput
@@ -21849,6 +29504,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
     comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
@@ -22004,6 +29660,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     orders?: OrderCreateNestedManyWithoutAgentInput
     logs?: LogEntryCreateNestedManyWithoutAgentInput
     comments?: CommentCreateNestedManyWithoutAgentInput
@@ -22023,6 +29680,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
     logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
     comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
@@ -22091,6 +29749,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     orders?: OrderUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUpdateManyWithoutAgentNestedInput
     comments?: CommentUpdateManyWithoutAgentNestedInput
@@ -22110,6 +29769,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
     comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
@@ -22201,6 +29861,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     orders?: OrderCreateNestedManyWithoutAgentInput
     logs?: LogEntryCreateNestedManyWithoutAgentInput
     deliveries?: DeliveryCreateNestedManyWithoutAgentInput
@@ -22220,6 +29881,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
     logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutAgentInput
@@ -22294,6 +29956,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     orders?: OrderUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUpdateManyWithoutAgentNestedInput
     deliveries?: DeliveryUpdateManyWithoutAgentNestedInput
@@ -22313,6 +29976,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutAgentNestedInput
@@ -22365,6 +30029,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     orders?: OrderCreateNestedManyWithoutAgentInput
     comments?: CommentCreateNestedManyWithoutAgentInput
     deliveries?: DeliveryCreateNestedManyWithoutAgentInput
@@ -22384,6 +30049,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
     comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutAgentInput
@@ -22458,6 +30124,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     orders?: OrderUpdateManyWithoutAgentNestedInput
     comments?: CommentUpdateManyWithoutAgentNestedInput
     deliveries?: DeliveryUpdateManyWithoutAgentNestedInput
@@ -22477,6 +30144,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
     comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutAgentNestedInput
@@ -22496,6 +30164,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantCreateNestedManyWithoutAgentInput
     logs?: LogEntryCreateNestedManyWithoutAgentInput
     comments?: CommentCreateNestedManyWithoutAgentInput
     deliveries?: DeliveryCreateNestedManyWithoutAgentInput
@@ -22515,6 +30184,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutAgentInput
     logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
     comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutAgentInput
@@ -22535,9 +30205,24 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    participants?: CompetitionParticipantCreateNestedManyWithoutCompetitionInput
     portfolios?: PortfolioCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutCompetitionInput
   }
 
   export type CompetitionUncheckedCreateWithoutOrdersInput = {
@@ -22550,9 +30235,24 @@ export namespace Prisma {
     initialCash?: number
     market?: string
     testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutCompetitionInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionUncheckedCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutCompetitionInput
   }
 
   export type CompetitionCreateOrConnectWithoutOrdersInput = {
@@ -22564,12 +30264,17 @@ export namespace Prisma {
     id?: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     agent: AgentCreateNestedOneWithoutPortfoliosInput
     competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
     positions?: PositionCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUncheckedCreateWithoutOrdersInput = {
@@ -22578,15 +30283,100 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
     positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
     settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioCreateOrConnectWithoutOrdersInput = {
     where: PortfolioWhereUniqueInput
     create: XOR<PortfolioCreateWithoutOrdersInput, PortfolioUncheckedCreateWithoutOrdersInput>
+  }
+
+  export type CompetitionParticipantCreateWithoutOrdersInput = {
+    id?: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutParticipantsInput
+    agent: AgentCreateNestedOneWithoutParticipantsInput
+    portfolio?: PortfolioCreateNestedOneWithoutParticipantInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUncheckedCreateWithoutOrdersInput = {
+    id?: string
+    competitionId: string
+    agentId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantCreateOrConnectWithoutOrdersInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    create: XOR<CompetitionParticipantCreateWithoutOrdersInput, CompetitionParticipantUncheckedCreateWithoutOrdersInput>
+  }
+
+  export type TradingSessionCreateWithoutOrdersInput = {
+    id?: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutTradingSessionsInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionUncheckedCreateWithoutOrdersInput = {
+    id?: string
+    competitionId: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionCreateOrConnectWithoutOrdersInput = {
+    where: TradingSessionWhereUniqueInput
+    create: XOR<TradingSessionCreateWithoutOrdersInput, TradingSessionUncheckedCreateWithoutOrdersInput>
   }
 
   export type AgentUpsertWithoutOrdersInput = {
@@ -22614,6 +30404,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUpdateManyWithoutAgentNestedInput
     comments?: CommentUpdateManyWithoutAgentNestedInput
     deliveries?: DeliveryUpdateManyWithoutAgentNestedInput
@@ -22633,6 +30424,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutAgentNestedInput
     logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
     comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutAgentNestedInput
@@ -22659,9 +30451,24 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUpdateManyWithoutCompetitionNestedInput
     portfolios?: PortfolioUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutCompetitionNestedInput
   }
 
   export type CompetitionUncheckedUpdateWithoutOrdersInput = {
@@ -22674,9 +30481,24 @@ export namespace Prisma {
     initialCash?: FloatFieldUpdateOperationsInput | number
     market?: StringFieldUpdateOperationsInput | string
     testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutCompetitionNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUncheckedUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutCompetitionNestedInput
   }
 
   export type PortfolioUpsertWithoutOrdersInput = {
@@ -22694,12 +30516,17 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
     competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateWithoutOrdersInput = {
@@ -22708,22 +30535,124 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
+  }
+
+  export type CompetitionParticipantUpsertWithoutOrdersInput = {
+    update: XOR<CompetitionParticipantUpdateWithoutOrdersInput, CompetitionParticipantUncheckedUpdateWithoutOrdersInput>
+    create: XOR<CompetitionParticipantCreateWithoutOrdersInput, CompetitionParticipantUncheckedCreateWithoutOrdersInput>
+    where?: CompetitionParticipantWhereInput
+  }
+
+  export type CompetitionParticipantUpdateToOneWithWhereWithoutOrdersInput = {
+    where?: CompetitionParticipantWhereInput
+    data: XOR<CompetitionParticipantUpdateWithoutOrdersInput, CompetitionParticipantUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type CompetitionParticipantUpdateWithoutOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutParticipantsNestedInput
+    agent?: AgentUpdateOneRequiredWithoutParticipantsNestedInput
+    portfolio?: PortfolioUpdateOneWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateWithoutOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type TradingSessionUpsertWithoutOrdersInput = {
+    update: XOR<TradingSessionUpdateWithoutOrdersInput, TradingSessionUncheckedUpdateWithoutOrdersInput>
+    create: XOR<TradingSessionCreateWithoutOrdersInput, TradingSessionUncheckedCreateWithoutOrdersInput>
+    where?: TradingSessionWhereInput
+  }
+
+  export type TradingSessionUpdateToOneWithWhereWithoutOrdersInput = {
+    where?: TradingSessionWhereInput
+    data: XOR<TradingSessionUpdateWithoutOrdersInput, TradingSessionUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type TradingSessionUpdateWithoutOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutTradingSessionsNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type TradingSessionUncheckedUpdateWithoutOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutTradingSessionNestedInput
   }
 
   export type PortfolioCreateWithoutSettlementsInput = {
     id?: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     agent: AgentCreateNestedOneWithoutPortfoliosInput
     competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
     positions?: PositionCreateNestedManyWithoutPortfolioInput
     orders?: OrderCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioUncheckedCreateWithoutSettlementsInput = {
@@ -22732,10 +30661,15 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
     positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
     orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
   }
 
   export type PortfolioCreateOrConnectWithoutSettlementsInput = {
@@ -22758,12 +30692,17 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
     competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateWithoutSettlementsInput = {
@@ -22772,10 +30711,1119 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
+    positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
+  }
+
+  export type CompetitionCreateWithoutParticipantsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    status?: $Enums.CompetitionStatus
+    startAt?: Date | string | null
+    endAt?: Date | string | null
+    initialCash?: number
+    market?: string
+    testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    portfolios?: PortfolioCreateNestedManyWithoutCompetitionInput
+    orders?: OrderCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutCompetitionInput
+  }
+
+  export type CompetitionUncheckedCreateWithoutParticipantsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    status?: $Enums.CompetitionStatus
+    startAt?: Date | string | null
+    endAt?: Date | string | null
+    initialCash?: number
+    market?: string
+    testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    portfolios?: PortfolioUncheckedCreateNestedManyWithoutCompetitionInput
+    orders?: OrderUncheckedCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionUncheckedCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutCompetitionInput
+  }
+
+  export type CompetitionCreateOrConnectWithoutParticipantsInput = {
+    where: CompetitionWhereUniqueInput
+    create: XOR<CompetitionCreateWithoutParticipantsInput, CompetitionUncheckedCreateWithoutParticipantsInput>
+  }
+
+  export type AgentCreateWithoutParticipantsInput = {
+    id?: string
+    name: string
+    apiKey: string
+    secretHash: string
+    status?: $Enums.AgentStatus
+    avatar?: string | null
+    description?: string | null
+    model?: string | null
+    market?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trades?: TradeCreateNestedManyWithoutAgentInput
+    portfolios?: PortfolioCreateNestedManyWithoutAgentInput
+    orders?: OrderCreateNestedManyWithoutAgentInput
+    logs?: LogEntryCreateNestedManyWithoutAgentInput
+    comments?: CommentCreateNestedManyWithoutAgentInput
+    deliveries?: DeliveryCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutParticipantsInput = {
+    id?: string
+    name: string
+    apiKey: string
+    secretHash: string
+    status?: $Enums.AgentStatus
+    avatar?: string | null
+    description?: string | null
+    model?: string | null
+    market?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trades?: TradeUncheckedCreateNestedManyWithoutAgentInput
+    portfolios?: PortfolioUncheckedCreateNestedManyWithoutAgentInput
+    orders?: OrderUncheckedCreateNestedManyWithoutAgentInput
+    logs?: LogEntryUncheckedCreateNestedManyWithoutAgentInput
+    comments?: CommentUncheckedCreateNestedManyWithoutAgentInput
+    deliveries?: DeliveryUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutParticipantsInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutParticipantsInput, AgentUncheckedCreateWithoutParticipantsInput>
+  }
+
+  export type PortfolioCreateWithoutParticipantInput = {
+    id?: string
+    cash?: number
+    totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agent: AgentCreateNestedOneWithoutPortfoliosInput
+    competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    positions?: PositionCreateNestedManyWithoutPortfolioInput
+    orders?: OrderCreateNestedManyWithoutPortfolioInput
+    settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutPortfolioInput
+  }
+
+  export type PortfolioUncheckedCreateWithoutParticipantInput = {
+    id?: string
+    agentId: string
+    competitionId: string
+    cash?: number
+    totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
+    orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
+    settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutPortfolioInput
+  }
+
+  export type PortfolioCreateOrConnectWithoutParticipantInput = {
+    where: PortfolioWhereUniqueInput
+    create: XOR<PortfolioCreateWithoutParticipantInput, PortfolioUncheckedCreateWithoutParticipantInput>
+  }
+
+  export type OrderCreateWithoutParticipantInput = {
+    id?: string
+    symbol: string
+    side: $Enums.TradeSide
+    quantity: number
+    note?: string | null
+    status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
+    rejectReason?: string | null
+    submittedAt?: Date | string
+    matchedAt?: Date | string | null
+    agent: AgentCreateNestedOneWithoutOrdersInput
+    competition: CompetitionCreateNestedOneWithoutOrdersInput
+    portfolio: PortfolioCreateNestedOneWithoutOrdersInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutOrdersInput
+  }
+
+  export type OrderUncheckedCreateWithoutParticipantInput = {
+    id?: string
+    agentId: string
+    competitionId: string
+    portfolioId: string
+    tradingSessionId?: string | null
+    symbol: string
+    side: $Enums.TradeSide
+    quantity: number
+    note?: string | null
+    status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
+    rejectReason?: string | null
+    submittedAt?: Date | string
+    matchedAt?: Date | string | null
+  }
+
+  export type OrderCreateOrConnectWithoutParticipantInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutParticipantInput, OrderUncheckedCreateWithoutParticipantInput>
+  }
+
+  export type OrderCreateManyParticipantInputEnvelope = {
+    data: OrderCreateManyParticipantInput | OrderCreateManyParticipantInput[]
+  }
+
+  export type SettlementSnapshotCreateWithoutParticipantInput = {
+    id?: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutSnapshotsInput
+    tradingSession?: TradingSessionCreateNestedOneWithoutSnapshotsInput
+    portfolio: PortfolioCreateNestedOneWithoutSnapshotsInput
+  }
+
+  export type SettlementSnapshotUncheckedCreateWithoutParticipantInput = {
+    id?: string
+    competitionId: string
+    tradingSessionId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotCreateOrConnectWithoutParticipantInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    create: XOR<SettlementSnapshotCreateWithoutParticipantInput, SettlementSnapshotUncheckedCreateWithoutParticipantInput>
+  }
+
+  export type SettlementSnapshotCreateManyParticipantInputEnvelope = {
+    data: SettlementSnapshotCreateManyParticipantInput | SettlementSnapshotCreateManyParticipantInput[]
+  }
+
+  export type CompetitionUpsertWithoutParticipantsInput = {
+    update: XOR<CompetitionUpdateWithoutParticipantsInput, CompetitionUncheckedUpdateWithoutParticipantsInput>
+    create: XOR<CompetitionCreateWithoutParticipantsInput, CompetitionUncheckedCreateWithoutParticipantsInput>
+    where?: CompetitionWhereInput
+  }
+
+  export type CompetitionUpdateToOneWithWhereWithoutParticipantsInput = {
+    where?: CompetitionWhereInput
+    data: XOR<CompetitionUpdateWithoutParticipantsInput, CompetitionUncheckedUpdateWithoutParticipantsInput>
+  }
+
+  export type CompetitionUpdateWithoutParticipantsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumCompetitionStatusFieldUpdateOperationsInput | $Enums.CompetitionStatus
+    startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialCash?: FloatFieldUpdateOperationsInput | number
+    market?: StringFieldUpdateOperationsInput | string
+    testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    portfolios?: PortfolioUpdateManyWithoutCompetitionNestedInput
+    orders?: OrderUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type CompetitionUncheckedUpdateWithoutParticipantsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumCompetitionStatusFieldUpdateOperationsInput | $Enums.CompetitionStatus
+    startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialCash?: FloatFieldUpdateOperationsInput | number
+    market?: StringFieldUpdateOperationsInput | string
+    testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    portfolios?: PortfolioUncheckedUpdateManyWithoutCompetitionNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUncheckedUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type AgentUpsertWithoutParticipantsInput = {
+    update: XOR<AgentUpdateWithoutParticipantsInput, AgentUncheckedUpdateWithoutParticipantsInput>
+    create: XOR<AgentCreateWithoutParticipantsInput, AgentUncheckedCreateWithoutParticipantsInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutParticipantsInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutParticipantsInput, AgentUncheckedUpdateWithoutParticipantsInput>
+  }
+
+  export type AgentUpdateWithoutParticipantsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    apiKey?: StringFieldUpdateOperationsInput | string
+    secretHash?: StringFieldUpdateOperationsInput | string
+    status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    market?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trades?: TradeUpdateManyWithoutAgentNestedInput
+    portfolios?: PortfolioUpdateManyWithoutAgentNestedInput
+    orders?: OrderUpdateManyWithoutAgentNestedInput
+    logs?: LogEntryUpdateManyWithoutAgentNestedInput
+    comments?: CommentUpdateManyWithoutAgentNestedInput
+    deliveries?: DeliveryUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutParticipantsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    apiKey?: StringFieldUpdateOperationsInput | string
+    secretHash?: StringFieldUpdateOperationsInput | string
+    status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    market?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trades?: TradeUncheckedUpdateManyWithoutAgentNestedInput
+    portfolios?: PortfolioUncheckedUpdateManyWithoutAgentNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutAgentNestedInput
+    logs?: LogEntryUncheckedUpdateManyWithoutAgentNestedInput
+    comments?: CommentUncheckedUpdateManyWithoutAgentNestedInput
+    deliveries?: DeliveryUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
+  export type PortfolioUpsertWithoutParticipantInput = {
+    update: XOR<PortfolioUpdateWithoutParticipantInput, PortfolioUncheckedUpdateWithoutParticipantInput>
+    create: XOR<PortfolioCreateWithoutParticipantInput, PortfolioUncheckedCreateWithoutParticipantInput>
+    where?: PortfolioWhereInput
+  }
+
+  export type PortfolioUpdateToOneWithWhereWithoutParticipantInput = {
+    where?: PortfolioWhereInput
+    data: XOR<PortfolioUpdateWithoutParticipantInput, PortfolioUncheckedUpdateWithoutParticipantInput>
+  }
+
+  export type PortfolioUpdateWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
+    competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    positions?: PositionUpdateManyWithoutPortfolioNestedInput
+    orders?: OrderUpdateManyWithoutPortfolioNestedInput
+    settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
+  }
+
+  export type PortfolioUncheckedUpdateWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
+    settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
+  }
+
+  export type OrderUpsertWithWhereUniqueWithoutParticipantInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutParticipantInput, OrderUncheckedUpdateWithoutParticipantInput>
+    create: XOR<OrderCreateWithoutParticipantInput, OrderUncheckedCreateWithoutParticipantInput>
+  }
+
+  export type OrderUpdateWithWhereUniqueWithoutParticipantInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutParticipantInput, OrderUncheckedUpdateWithoutParticipantInput>
+  }
+
+  export type OrderUpdateManyWithWhereWithoutParticipantInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutParticipantInput>
+  }
+
+  export type SettlementSnapshotUpsertWithWhereUniqueWithoutParticipantInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    update: XOR<SettlementSnapshotUpdateWithoutParticipantInput, SettlementSnapshotUncheckedUpdateWithoutParticipantInput>
+    create: XOR<SettlementSnapshotCreateWithoutParticipantInput, SettlementSnapshotUncheckedCreateWithoutParticipantInput>
+  }
+
+  export type SettlementSnapshotUpdateWithWhereUniqueWithoutParticipantInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    data: XOR<SettlementSnapshotUpdateWithoutParticipantInput, SettlementSnapshotUncheckedUpdateWithoutParticipantInput>
+  }
+
+  export type SettlementSnapshotUpdateManyWithWhereWithoutParticipantInput = {
+    where: SettlementSnapshotScalarWhereInput
+    data: XOR<SettlementSnapshotUpdateManyMutationInput, SettlementSnapshotUncheckedUpdateManyWithoutParticipantInput>
+  }
+
+  export type CompetitionCreateWithoutTradingSessionsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    status?: $Enums.CompetitionStatus
+    startAt?: Date | string | null
+    endAt?: Date | string | null
+    initialCash?: number
+    market?: string
+    testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    participants?: CompetitionParticipantCreateNestedManyWithoutCompetitionInput
+    portfolios?: PortfolioCreateNestedManyWithoutCompetitionInput
+    orders?: OrderCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotCreateNestedManyWithoutCompetitionInput
+  }
+
+  export type CompetitionUncheckedCreateWithoutTradingSessionsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    status?: $Enums.CompetitionStatus
+    startAt?: Date | string | null
+    endAt?: Date | string | null
+    initialCash?: number
+    market?: string
+    testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutCompetitionInput
+    portfolios?: PortfolioUncheckedCreateNestedManyWithoutCompetitionInput
+    orders?: OrderUncheckedCreateNestedManyWithoutCompetitionInput
+    snapshots?: SettlementSnapshotUncheckedCreateNestedManyWithoutCompetitionInput
+  }
+
+  export type CompetitionCreateOrConnectWithoutTradingSessionsInput = {
+    where: CompetitionWhereUniqueInput
+    create: XOR<CompetitionCreateWithoutTradingSessionsInput, CompetitionUncheckedCreateWithoutTradingSessionsInput>
+  }
+
+  export type OrderCreateWithoutTradingSessionInput = {
+    id?: string
+    symbol: string
+    side: $Enums.TradeSide
+    quantity: number
+    note?: string | null
+    status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
+    rejectReason?: string | null
+    submittedAt?: Date | string
+    matchedAt?: Date | string | null
+    agent: AgentCreateNestedOneWithoutOrdersInput
+    competition: CompetitionCreateNestedOneWithoutOrdersInput
+    portfolio: PortfolioCreateNestedOneWithoutOrdersInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutOrdersInput
+  }
+
+  export type OrderUncheckedCreateWithoutTradingSessionInput = {
+    id?: string
+    agentId: string
+    competitionId: string
+    portfolioId: string
+    participantId?: string | null
+    symbol: string
+    side: $Enums.TradeSide
+    quantity: number
+    note?: string | null
+    status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
+    rejectReason?: string | null
+    submittedAt?: Date | string
+    matchedAt?: Date | string | null
+  }
+
+  export type OrderCreateOrConnectWithoutTradingSessionInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutTradingSessionInput, OrderUncheckedCreateWithoutTradingSessionInput>
+  }
+
+  export type OrderCreateManyTradingSessionInputEnvelope = {
+    data: OrderCreateManyTradingSessionInput | OrderCreateManyTradingSessionInput[]
+  }
+
+  export type SettlementSnapshotCreateWithoutTradingSessionInput = {
+    id?: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutSnapshotsInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutSnapshotsInput
+    portfolio: PortfolioCreateNestedOneWithoutSnapshotsInput
+  }
+
+  export type SettlementSnapshotUncheckedCreateWithoutTradingSessionInput = {
+    id?: string
+    competitionId: string
+    participantId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotCreateOrConnectWithoutTradingSessionInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    create: XOR<SettlementSnapshotCreateWithoutTradingSessionInput, SettlementSnapshotUncheckedCreateWithoutTradingSessionInput>
+  }
+
+  export type SettlementSnapshotCreateManyTradingSessionInputEnvelope = {
+    data: SettlementSnapshotCreateManyTradingSessionInput | SettlementSnapshotCreateManyTradingSessionInput[]
+  }
+
+  export type CompetitionUpsertWithoutTradingSessionsInput = {
+    update: XOR<CompetitionUpdateWithoutTradingSessionsInput, CompetitionUncheckedUpdateWithoutTradingSessionsInput>
+    create: XOR<CompetitionCreateWithoutTradingSessionsInput, CompetitionUncheckedCreateWithoutTradingSessionsInput>
+    where?: CompetitionWhereInput
+  }
+
+  export type CompetitionUpdateToOneWithWhereWithoutTradingSessionsInput = {
+    where?: CompetitionWhereInput
+    data: XOR<CompetitionUpdateWithoutTradingSessionsInput, CompetitionUncheckedUpdateWithoutTradingSessionsInput>
+  }
+
+  export type CompetitionUpdateWithoutTradingSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumCompetitionStatusFieldUpdateOperationsInput | $Enums.CompetitionStatus
+    startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialCash?: FloatFieldUpdateOperationsInput | number
+    market?: StringFieldUpdateOperationsInput | string
+    testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUpdateManyWithoutCompetitionNestedInput
+    portfolios?: PortfolioUpdateManyWithoutCompetitionNestedInput
+    orders?: OrderUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type CompetitionUncheckedUpdateWithoutTradingSessionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumCompetitionStatusFieldUpdateOperationsInput | $Enums.CompetitionStatus
+    startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialCash?: FloatFieldUpdateOperationsInput | number
+    market?: StringFieldUpdateOperationsInput | string
+    testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutCompetitionNestedInput
+    portfolios?: PortfolioUncheckedUpdateManyWithoutCompetitionNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutCompetitionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type OrderUpsertWithWhereUniqueWithoutTradingSessionInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutTradingSessionInput, OrderUncheckedUpdateWithoutTradingSessionInput>
+    create: XOR<OrderCreateWithoutTradingSessionInput, OrderUncheckedCreateWithoutTradingSessionInput>
+  }
+
+  export type OrderUpdateWithWhereUniqueWithoutTradingSessionInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutTradingSessionInput, OrderUncheckedUpdateWithoutTradingSessionInput>
+  }
+
+  export type OrderUpdateManyWithWhereWithoutTradingSessionInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutTradingSessionInput>
+  }
+
+  export type SettlementSnapshotUpsertWithWhereUniqueWithoutTradingSessionInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    update: XOR<SettlementSnapshotUpdateWithoutTradingSessionInput, SettlementSnapshotUncheckedUpdateWithoutTradingSessionInput>
+    create: XOR<SettlementSnapshotCreateWithoutTradingSessionInput, SettlementSnapshotUncheckedCreateWithoutTradingSessionInput>
+  }
+
+  export type SettlementSnapshotUpdateWithWhereUniqueWithoutTradingSessionInput = {
+    where: SettlementSnapshotWhereUniqueInput
+    data: XOR<SettlementSnapshotUpdateWithoutTradingSessionInput, SettlementSnapshotUncheckedUpdateWithoutTradingSessionInput>
+  }
+
+  export type SettlementSnapshotUpdateManyWithWhereWithoutTradingSessionInput = {
+    where: SettlementSnapshotScalarWhereInput
+    data: XOR<SettlementSnapshotUpdateManyMutationInput, SettlementSnapshotUncheckedUpdateManyWithoutTradingSessionInput>
+  }
+
+  export type CompetitionCreateWithoutSnapshotsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    status?: $Enums.CompetitionStatus
+    startAt?: Date | string | null
+    endAt?: Date | string | null
+    initialCash?: number
+    market?: string
+    testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    participants?: CompetitionParticipantCreateNestedManyWithoutCompetitionInput
+    portfolios?: PortfolioCreateNestedManyWithoutCompetitionInput
+    orders?: OrderCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionCreateNestedManyWithoutCompetitionInput
+  }
+
+  export type CompetitionUncheckedCreateWithoutSnapshotsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    status?: $Enums.CompetitionStatus
+    startAt?: Date | string | null
+    endAt?: Date | string | null
+    initialCash?: number
+    market?: string
+    testMode?: boolean
+    mode?: string
+    entryRule?: string
+    tradableSymbolsJson?: string | null
+    maxPositionPct?: number
+    maxHoldingSymbols?: number
+    switchRequiresFlat?: boolean
+    commissionRate?: number
+    slippageBps?: number
+    allowShort?: boolean
+    scoreFormula?: string | null
+    phase?: string
+    tradingCalendar?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    participants?: CompetitionParticipantUncheckedCreateNestedManyWithoutCompetitionInput
+    portfolios?: PortfolioUncheckedCreateNestedManyWithoutCompetitionInput
+    orders?: OrderUncheckedCreateNestedManyWithoutCompetitionInput
+    tradingSessions?: TradingSessionUncheckedCreateNestedManyWithoutCompetitionInput
+  }
+
+  export type CompetitionCreateOrConnectWithoutSnapshotsInput = {
+    where: CompetitionWhereUniqueInput
+    create: XOR<CompetitionCreateWithoutSnapshotsInput, CompetitionUncheckedCreateWithoutSnapshotsInput>
+  }
+
+  export type TradingSessionCreateWithoutSnapshotsInput = {
+    id?: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutTradingSessionsInput
+    orders?: OrderCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionUncheckedCreateWithoutSnapshotsInput = {
+    id?: string
+    competitionId: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutTradingSessionInput
+  }
+
+  export type TradingSessionCreateOrConnectWithoutSnapshotsInput = {
+    where: TradingSessionWhereUniqueInput
+    create: XOR<TradingSessionCreateWithoutSnapshotsInput, TradingSessionUncheckedCreateWithoutSnapshotsInput>
+  }
+
+  export type CompetitionParticipantCreateWithoutSnapshotsInput = {
+    id?: string
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    competition: CompetitionCreateNestedOneWithoutParticipantsInput
+    agent: AgentCreateNestedOneWithoutParticipantsInput
+    portfolio?: PortfolioCreateNestedOneWithoutParticipantInput
+    orders?: OrderCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantUncheckedCreateWithoutSnapshotsInput = {
+    id?: string
+    competitionId: string
+    agentId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutParticipantInput
+  }
+
+  export type CompetitionParticipantCreateOrConnectWithoutSnapshotsInput = {
+    where: CompetitionParticipantWhereUniqueInput
+    create: XOR<CompetitionParticipantCreateWithoutSnapshotsInput, CompetitionParticipantUncheckedCreateWithoutSnapshotsInput>
+  }
+
+  export type PortfolioCreateWithoutSnapshotsInput = {
+    id?: string
+    cash?: number
+    totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agent: AgentCreateNestedOneWithoutPortfoliosInput
+    competition: CompetitionCreateNestedOneWithoutPortfoliosInput
+    participant?: CompetitionParticipantCreateNestedOneWithoutPortfolioInput
+    positions?: PositionCreateNestedManyWithoutPortfolioInput
+    orders?: OrderCreateNestedManyWithoutPortfolioInput
+    settlements?: DailySettlementCreateNestedManyWithoutPortfolioInput
+  }
+
+  export type PortfolioUncheckedCreateWithoutSnapshotsInput = {
+    id?: string
+    agentId: string
+    competitionId: string
+    cash?: number
+    totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    participant?: CompetitionParticipantUncheckedCreateNestedOneWithoutPortfolioInput
+    positions?: PositionUncheckedCreateNestedManyWithoutPortfolioInput
+    orders?: OrderUncheckedCreateNestedManyWithoutPortfolioInput
+    settlements?: DailySettlementUncheckedCreateNestedManyWithoutPortfolioInput
+  }
+
+  export type PortfolioCreateOrConnectWithoutSnapshotsInput = {
+    where: PortfolioWhereUniqueInput
+    create: XOR<PortfolioCreateWithoutSnapshotsInput, PortfolioUncheckedCreateWithoutSnapshotsInput>
+  }
+
+  export type CompetitionUpsertWithoutSnapshotsInput = {
+    update: XOR<CompetitionUpdateWithoutSnapshotsInput, CompetitionUncheckedUpdateWithoutSnapshotsInput>
+    create: XOR<CompetitionCreateWithoutSnapshotsInput, CompetitionUncheckedCreateWithoutSnapshotsInput>
+    where?: CompetitionWhereInput
+  }
+
+  export type CompetitionUpdateToOneWithWhereWithoutSnapshotsInput = {
+    where?: CompetitionWhereInput
+    data: XOR<CompetitionUpdateWithoutSnapshotsInput, CompetitionUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type CompetitionUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumCompetitionStatusFieldUpdateOperationsInput | $Enums.CompetitionStatus
+    startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialCash?: FloatFieldUpdateOperationsInput | number
+    market?: StringFieldUpdateOperationsInput | string
+    testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUpdateManyWithoutCompetitionNestedInput
+    portfolios?: PortfolioUpdateManyWithoutCompetitionNestedInput
+    orders?: OrderUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type CompetitionUncheckedUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumCompetitionStatusFieldUpdateOperationsInput | $Enums.CompetitionStatus
+    startAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialCash?: FloatFieldUpdateOperationsInput | number
+    market?: StringFieldUpdateOperationsInput | string
+    testMode?: BoolFieldUpdateOperationsInput | boolean
+    mode?: StringFieldUpdateOperationsInput | string
+    entryRule?: StringFieldUpdateOperationsInput | string
+    tradableSymbolsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    maxPositionPct?: FloatFieldUpdateOperationsInput | number
+    maxHoldingSymbols?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    commissionRate?: FloatFieldUpdateOperationsInput | number
+    slippageBps?: IntFieldUpdateOperationsInput | number
+    allowShort?: BoolFieldUpdateOperationsInput | boolean
+    scoreFormula?: NullableStringFieldUpdateOperationsInput | string | null
+    phase?: StringFieldUpdateOperationsInput | string
+    tradingCalendar?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: CompetitionParticipantUncheckedUpdateManyWithoutCompetitionNestedInput
+    portfolios?: PortfolioUncheckedUpdateManyWithoutCompetitionNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutCompetitionNestedInput
+    tradingSessions?: TradingSessionUncheckedUpdateManyWithoutCompetitionNestedInput
+  }
+
+  export type TradingSessionUpsertWithoutSnapshotsInput = {
+    update: XOR<TradingSessionUpdateWithoutSnapshotsInput, TradingSessionUncheckedUpdateWithoutSnapshotsInput>
+    create: XOR<TradingSessionCreateWithoutSnapshotsInput, TradingSessionUncheckedCreateWithoutSnapshotsInput>
+    where?: TradingSessionWhereInput
+  }
+
+  export type TradingSessionUpdateToOneWithWhereWithoutSnapshotsInput = {
+    where?: TradingSessionWhereInput
+    data: XOR<TradingSessionUpdateWithoutSnapshotsInput, TradingSessionUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type TradingSessionUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutTradingSessionsNestedInput
+    orders?: OrderUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type TradingSessionUncheckedUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type CompetitionParticipantUpsertWithoutSnapshotsInput = {
+    update: XOR<CompetitionParticipantUpdateWithoutSnapshotsInput, CompetitionParticipantUncheckedUpdateWithoutSnapshotsInput>
+    create: XOR<CompetitionParticipantCreateWithoutSnapshotsInput, CompetitionParticipantUncheckedCreateWithoutSnapshotsInput>
+    where?: CompetitionParticipantWhereInput
+  }
+
+  export type CompetitionParticipantUpdateToOneWithWhereWithoutSnapshotsInput = {
+    where?: CompetitionParticipantWhereInput
+    data: XOR<CompetitionParticipantUpdateWithoutSnapshotsInput, CompetitionParticipantUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type CompetitionParticipantUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutParticipantsNestedInput
+    agent?: AgentUpdateOneRequiredWithoutParticipantsNestedInput
+    portfolio?: PortfolioUpdateOneWithoutParticipantNestedInput
+    orders?: OrderUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type PortfolioUpsertWithoutSnapshotsInput = {
+    update: XOR<PortfolioUpdateWithoutSnapshotsInput, PortfolioUncheckedUpdateWithoutSnapshotsInput>
+    create: XOR<PortfolioCreateWithoutSnapshotsInput, PortfolioUncheckedCreateWithoutSnapshotsInput>
+    where?: PortfolioWhereInput
+  }
+
+  export type PortfolioUpdateToOneWithWhereWithoutSnapshotsInput = {
+    where?: PortfolioWhereInput
+    data: XOR<PortfolioUpdateWithoutSnapshotsInput, PortfolioUncheckedUpdateWithoutSnapshotsInput>
+  }
+
+  export type PortfolioUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
+    competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
+    positions?: PositionUpdateManyWithoutPortfolioNestedInput
+    orders?: OrderUpdateManyWithoutPortfolioNestedInput
+    settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+  }
+
+  export type PortfolioUncheckedUpdateWithoutSnapshotsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
+    positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
+    settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
   }
 
   export type TradeCreateManyAgentInput = {
@@ -22800,6 +31848,27 @@ export namespace Prisma {
     competitionId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CompetitionParticipantCreateManyAgentInput = {
+    id?: string
+    competitionId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22808,11 +31877,16 @@ export namespace Prisma {
     id?: string
     competitionId: string
     portfolioId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -22903,12 +31977,17 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     competition?: CompetitionUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateWithoutAgentInput = {
@@ -22916,11 +31995,16 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateManyWithoutAgentInput = {
@@ -22928,6 +32012,67 @@ export namespace Prisma {
     competitionId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CompetitionParticipantUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutParticipantsNestedInput
+    portfolio?: PortfolioUpdateOneWithoutParticipantNestedInput
+    orders?: OrderUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22939,22 +32084,32 @@ export namespace Prisma {
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     competition?: CompetitionUpdateOneRequiredWithoutOrdersNestedInput
     portfolio?: PortfolioUpdateOneRequiredWithoutOrdersNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutOrdersNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutOrdersNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
     competitionId?: StringFieldUpdateOperationsInput | string
     portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22964,11 +32119,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     competitionId?: StringFieldUpdateOperationsInput | string
     portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23064,11 +32224,32 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CompetitionParticipantCreateManyCompetitionInput = {
+    id?: string
+    agentId: string
+    portfolioId?: string | null
+    status?: $Enums.ParticipantStatus
+    displayName?: string | null
+    tagline?: string | null
+    strategyTagsJson?: string | null
+    riskLevel?: string | null
+    webhookUrl?: string | null
+    apiVersion?: string | null
+    joinedAt?: Date | string
+    approvedAt?: Date | string | null
+    eliminatedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type PortfolioCreateManyCompetitionInput = {
     id?: string
     agentId: string
     cash?: number
     totalValue?: number
+    holdingSymbol?: string | null
+    holdingCount?: number
+    switchRequiresFlat?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -23077,26 +32258,128 @@ export namespace Prisma {
     id?: string
     agentId: string
     portfolioId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
+  }
+
+  export type TradingSessionCreateManyCompetitionInput = {
+    id?: string
+    tradingDate: string
+    sessionType: $Enums.TradingSessionType
+    status?: $Enums.TradingSessionStatus
+    openAt: Date | string
+    closeAt: Date | string
+    marketSnapshotJson?: string | null
+    leaderboardSnapshotJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SettlementSnapshotCreateManyCompetitionInput = {
+    id?: string
+    tradingSessionId?: string | null
+    participantId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type CompetitionParticipantUpdateWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutParticipantsNestedInput
+    portfolio?: PortfolioUpdateOneWithoutParticipantNestedInput
+    orders?: OrderUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutParticipantNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutParticipantNestedInput
+  }
+
+  export type CompetitionParticipantUncheckedUpdateManyWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumParticipantStatusFieldUpdateOperationsInput | $Enums.ParticipantStatus
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    strategyTagsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    apiVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    eliminatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PortfolioUpdateWithoutCompetitionInput = {
     id?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agent?: AgentUpdateOneRequiredWithoutPortfoliosNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateWithoutCompetitionInput = {
@@ -23104,11 +32387,16 @@ export namespace Prisma {
     agentId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participant?: CompetitionParticipantUncheckedUpdateOneWithoutPortfolioNestedInput
     positions?: PositionUncheckedUpdateManyWithoutPortfolioNestedInput
     orders?: OrderUncheckedUpdateManyWithoutPortfolioNestedInput
     settlements?: DailySettlementUncheckedUpdateManyWithoutPortfolioNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutPortfolioNestedInput
   }
 
   export type PortfolioUncheckedUpdateManyWithoutCompetitionInput = {
@@ -23116,6 +32404,9 @@ export namespace Prisma {
     agentId?: StringFieldUpdateOperationsInput | string
     cash?: FloatFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCount?: IntFieldUpdateOperationsInput | number
+    switchRequiresFlat?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23127,22 +32418,32 @@ export namespace Prisma {
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     agent?: AgentUpdateOneRequiredWithoutOrdersNestedInput
     portfolio?: PortfolioUpdateOneRequiredWithoutOrdersNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutOrdersNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutOrdersNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutCompetitionInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentId?: StringFieldUpdateOperationsInput | string
     portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23152,14 +32453,125 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     agentId?: StringFieldUpdateOperationsInput | string
     portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type TradingSessionUpdateWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUpdateManyWithoutTradingSessionNestedInput
+    snapshots?: SettlementSnapshotUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type TradingSessionUncheckedUpdateWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutTradingSessionNestedInput
+    snapshots?: SettlementSnapshotUncheckedUpdateManyWithoutTradingSessionNestedInput
+  }
+
+  export type TradingSessionUncheckedUpdateManyWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingDate?: StringFieldUpdateOperationsInput | string
+    sessionType?: EnumTradingSessionTypeFieldUpdateOperationsInput | $Enums.TradingSessionType
+    status?: EnumTradingSessionStatusFieldUpdateOperationsInput | $Enums.TradingSessionStatus
+    openAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closeAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    marketSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    leaderboardSnapshotJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUpdateWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tradingSession?: TradingSessionUpdateOneWithoutSnapshotsNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutSnapshotsNestedInput
+    portfolio?: PortfolioUpdateOneRequiredWithoutSnapshotsNestedInput
+  }
+
+  export type SettlementSnapshotUncheckedUpdateWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutCompetitionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PositionCreateManyPortfolioInput = {
@@ -23176,11 +32588,16 @@ export namespace Prisma {
     id?: string
     agentId: string
     competitionId: string
+    participantId?: string | null
+    tradingSessionId?: string | null
     symbol: string
     side: $Enums.TradeSide
     quantity: number
     note?: string | null
     status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
     rejectReason?: string | null
     submittedAt?: Date | string
     matchedAt?: Date | string | null
@@ -23194,6 +32611,27 @@ export namespace Prisma {
     positionDays?: number
     totalValue: number
     returnPct: number
+    createdAt?: Date | string
+  }
+
+  export type SettlementSnapshotCreateManyPortfolioInput = {
+    id?: string
+    competitionId: string
+    tradingSessionId?: string | null
+    participantId?: string | null
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
     createdAt?: Date | string
   }
 
@@ -23234,22 +32672,32 @@ export namespace Prisma {
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     agent?: AgentUpdateOneRequiredWithoutOrdersNestedInput
     competition?: CompetitionUpdateOneRequiredWithoutOrdersNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutOrdersNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutOrdersNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutPortfolioInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentId?: StringFieldUpdateOperationsInput | string
     competitionId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23259,11 +32707,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     agentId?: StringFieldUpdateOperationsInput | string
     competitionId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
     symbol?: StringFieldUpdateOperationsInput | string
     side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
     quantity?: FloatFieldUpdateOperationsInput | number
     note?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
     rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
     submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23299,6 +32752,69 @@ export namespace Prisma {
     positionDays?: IntFieldUpdateOperationsInput | number
     totalValue?: FloatFieldUpdateOperationsInput | number
     returnPct?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUpdateWithoutPortfolioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutSnapshotsNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutSnapshotsNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutSnapshotsNestedInput
+  }
+
+  export type SettlementSnapshotUncheckedUpdateWithoutPortfolioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutPortfolioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -23419,6 +32935,326 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     level?: StringFieldUpdateOperationsInput | string
     agentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderCreateManyParticipantInput = {
+    id?: string
+    agentId: string
+    competitionId: string
+    portfolioId: string
+    tradingSessionId?: string | null
+    symbol: string
+    side: $Enums.TradeSide
+    quantity: number
+    note?: string | null
+    status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
+    rejectReason?: string | null
+    submittedAt?: Date | string
+    matchedAt?: Date | string | null
+  }
+
+  export type SettlementSnapshotCreateManyParticipantInput = {
+    id?: string
+    competitionId: string
+    tradingSessionId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type OrderUpdateWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symbol?: StringFieldUpdateOperationsInput | string
+    side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
+    quantity?: FloatFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent?: AgentUpdateOneRequiredWithoutOrdersNestedInput
+    competition?: CompetitionUpdateOneRequiredWithoutOrdersNestedInput
+    portfolio?: PortfolioUpdateOneRequiredWithoutOrdersNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutOrdersNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    symbol?: StringFieldUpdateOperationsInput | string
+    side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
+    quantity?: FloatFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OrderUncheckedUpdateManyWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    symbol?: StringFieldUpdateOperationsInput | string
+    side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
+    quantity?: FloatFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type SettlementSnapshotUpdateWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutSnapshotsNestedInput
+    tradingSession?: TradingSessionUpdateOneWithoutSnapshotsNestedInput
+    portfolio?: PortfolioUpdateOneRequiredWithoutSnapshotsNestedInput
+  }
+
+  export type SettlementSnapshotUncheckedUpdateWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutParticipantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    tradingSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderCreateManyTradingSessionInput = {
+    id?: string
+    agentId: string
+    competitionId: string
+    portfolioId: string
+    participantId?: string | null
+    symbol: string
+    side: $Enums.TradeSide
+    quantity: number
+    note?: string | null
+    status?: string
+    intent?: $Enums.OrderIntent
+    riskCheckStatus?: $Enums.RiskCheckStatus
+    riskRejectCode?: string | null
+    rejectReason?: string | null
+    submittedAt?: Date | string
+    matchedAt?: Date | string | null
+  }
+
+  export type SettlementSnapshotCreateManyTradingSessionInput = {
+    id?: string
+    competitionId: string
+    participantId?: string | null
+    portfolioId: string
+    snapshotAt?: Date | string
+    cash: number
+    marketValue: number
+    totalValue: number
+    realizedPnL?: number
+    unrealizedPnL?: number
+    returnPct: number
+    drawdownPct?: number
+    turnoverPct?: number
+    rank?: number | null
+    holdingSymbol?: string | null
+    positionJson?: string | null
+    metricsJson?: string | null
+    createdAt?: Date | string
+  }
+
+  export type OrderUpdateWithoutTradingSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symbol?: StringFieldUpdateOperationsInput | string
+    side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
+    quantity?: FloatFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent?: AgentUpdateOneRequiredWithoutOrdersNestedInput
+    competition?: CompetitionUpdateOneRequiredWithoutOrdersNestedInput
+    portfolio?: PortfolioUpdateOneRequiredWithoutOrdersNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutOrdersNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutTradingSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    symbol?: StringFieldUpdateOperationsInput | string
+    side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
+    quantity?: FloatFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type OrderUncheckedUpdateManyWithoutTradingSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    symbol?: StringFieldUpdateOperationsInput | string
+    side?: EnumTradeSideFieldUpdateOperationsInput | $Enums.TradeSide
+    quantity?: FloatFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    intent?: EnumOrderIntentFieldUpdateOperationsInput | $Enums.OrderIntent
+    riskCheckStatus?: EnumRiskCheckStatusFieldUpdateOperationsInput | $Enums.RiskCheckStatus
+    riskRejectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    submittedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type SettlementSnapshotUpdateWithoutTradingSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    competition?: CompetitionUpdateOneRequiredWithoutSnapshotsNestedInput
+    participant?: CompetitionParticipantUpdateOneWithoutSnapshotsNestedInput
+    portfolio?: PortfolioUpdateOneRequiredWithoutSnapshotsNestedInput
+  }
+
+  export type SettlementSnapshotUncheckedUpdateWithoutTradingSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettlementSnapshotUncheckedUpdateManyWithoutTradingSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    competitionId?: StringFieldUpdateOperationsInput | string
+    participantId?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioId?: StringFieldUpdateOperationsInput | string
+    snapshotAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cash?: FloatFieldUpdateOperationsInput | number
+    marketValue?: FloatFieldUpdateOperationsInput | number
+    totalValue?: FloatFieldUpdateOperationsInput | number
+    realizedPnL?: FloatFieldUpdateOperationsInput | number
+    unrealizedPnL?: FloatFieldUpdateOperationsInput | number
+    returnPct?: FloatFieldUpdateOperationsInput | number
+    drawdownPct?: FloatFieldUpdateOperationsInput | number
+    turnoverPct?: FloatFieldUpdateOperationsInput | number
+    rank?: NullableIntFieldUpdateOperationsInput | number | null
+    holdingSymbol?: NullableStringFieldUpdateOperationsInput | string | null
+    positionJson?: NullableStringFieldUpdateOperationsInput | string | null
+    metricsJson?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

@@ -40,7 +40,44 @@ enum AgentStatus {
 enum CompetitionStatus {
   PENDING
   RUNNING
+  PAUSED
   FINISHED
+}
+
+enum ParticipantStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  ELIMINATED
+  QUIT
+}
+
+enum TradingSessionType {
+  CALL_AUCTION_OPEN
+  MORNING
+  AFTERNOON
+  CALL_AUCTION_CLOSE
+  CLOSED
+}
+
+enum TradingSessionStatus {
+  PENDING
+  OPEN
+  PAUSED
+  CLOSED
+}
+
+enum OrderIntent {
+  OPEN
+  CLOSE
+  SWITCH
+}
+
+enum RiskCheckStatus {
+  PENDING
+  PASSED
+  REJECTED
 }
 
 model Agent {
@@ -56,50 +93,72 @@ model Agent {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  trades     Trade[]
-  portfolios Portfolio[]
-  orders     Order[]
-  logs       LogEntry[]
-  comments   Comment[]
-  deliveries Delivery[]
+  trades       Trade[]
+  portfolios   Portfolio[]
+  participants CompetitionParticipant[]
+  orders       Order[]
+  logs         LogEntry[]
+  comments     Comment[]
+  deliveries   Delivery[]
 
   @@index([apiKey])
 }
 
 model Competition {
-  id          String            @id @default(cuid())
-  name        String
-  description String?
-  status      CompetitionStatus @default(PENDING)
-  startAt     DateTime?
-  endAt       DateTime?
-  initialCash Float             @default(1000000)
-  market      String            @default("A")
-  testMode    Boolean           @default(false)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  id                  String            @id @default(cuid())
+  name                String
+  description         String?
+  status              CompetitionStatus @default(PENDING)
+  startAt             DateTime?
+  endAt               DateTime?
+  initialCash         Float             @default(1000000)
+  market              String            @default("A")
+  testMode            Boolean           @default(false)
+  mode                String            @default("REALTIME")
+  entryRule           String            @default("INVITE_ONLY")
+  tradableSymbolsJson String?
+  maxPositionPct      Float             @default(1)
+  maxHoldingSymbols   Int               @default(1)
+  switchRequiresFlat  Boolean           @default(true)
+  commissionRate      Float             @default(0)
+  slippageBps         Int               @default(0)
+  allowShort          Boolean           @default(false)
+  scoreFormula        String?
+  phase               String            @default("REGISTRATION")
+  tradingCalendar     String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
-  portfolios Portfolio[]
-  orders     Order[]
+  participants    CompetitionParticipant[]
+  portfolios      Portfolio[]
+  orders          Order[]
+  tradingSessions TradingSession[]
+  snapshots       SettlementSnapshot[]
 }
 
 model Portfolio {
-  id            String   @id @default(cuid())
-  agentId       String
-  competitionId String
-  cash          Float    @default(1000000)
-  totalValue    Float    @default(1000000)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  agentId            String
+  competitionId      String
+  cash               Float    @default(1000000)
+  totalValue         Float    @default(1000000)
+  holdingSymbol      String?
+  holdingCount       Int      @default(0)
+  switchRequiresFlat Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  agent       Agent             @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  competition Competition       @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  agent       Agent                   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition Competition             @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  participant CompetitionParticipant?
   positions   Position[]
   orders      Order[]
   settlements DailySettlement[]
+  snapshots   SettlementSnapshot[]
 
   @@unique([agentId, competitionId])
   @@index([competitionId])
+  @@index([holdingSymbol])
 }
 
 model Position {
@@ -220,26 +279,35 @@ model LogEntry {
 }
 
 model Order {
-  id            String    @id @default(cuid())
-  agentId       String
-  competitionId String
-  portfolioId   String
-  symbol        String
-  side          TradeSide
-  quantity      Float
-  note          String?
-  status        String    @default("PENDING")
-  rejectReason  String?
-  submittedAt   DateTime  @default(now())
-  matchedAt     DateTime?
+  id               String          @id @default(cuid())
+  agentId          String
+  competitionId    String
+  portfolioId      String
+  participantId    String?
+  tradingSessionId String?
+  symbol           String
+  side             TradeSide
+  quantity         Float
+  note             String?
+  status           String          @default("PENDING")
+  intent           OrderIntent     @default(OPEN)
+  riskCheckStatus  RiskCheckStatus @default(PENDING)
+  riskRejectCode   String?
+  rejectReason     String?
+  submittedAt      DateTime        @default(now())
+  matchedAt        DateTime?
 
-  agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
-  portfolio   Portfolio   @relation(fields: [portfolioId], references: [id])
+  agent          Agent                   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  competition    Competition             @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  portfolio      Portfolio               @relation(fields: [portfolioId], references: [id])
+  participant    CompetitionParticipant? @relation(fields: [participantId], references: [id])
+  tradingSession TradingSession?         @relation(fields: [tradingSessionId], references: [id])
 
   @@index([agentId, submittedAt])
   @@index([competitionId, status])
   @@index([portfolioId])
+  @@index([participantId])
+  @@index([tradingSessionId])
 }
 
 model DailySettlement {
@@ -257,4 +325,86 @@ model DailySettlement {
 
   @@unique([portfolioId, date])
   @@index([portfolioId])
+}
+
+model CompetitionParticipant {
+  id               String            @id @default(cuid())
+  competitionId    String
+  agentId          String
+  portfolioId      String?           @unique
+  status           ParticipantStatus @default(PENDING)
+  displayName      String?
+  tagline          String?
+  strategyTagsJson String?
+  riskLevel        String?
+  webhookUrl       String?
+  apiVersion       String?
+  joinedAt         DateTime          @default(now())
+  approvedAt       DateTime?
+  eliminatedAt     DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  competition Competition          @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  agent       Agent                @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  portfolio   Portfolio?           @relation(fields: [portfolioId], references: [id])
+  orders      Order[]
+  snapshots   SettlementSnapshot[]
+
+  @@unique([competitionId, agentId])
+  @@index([competitionId, status])
+  @@index([agentId, status])
+}
+
+model TradingSession {
+  id                      String               @id @default(cuid())
+  competitionId           String
+  tradingDate             String
+  sessionType             TradingSessionType
+  status                  TradingSessionStatus @default(PENDING)
+  openAt                  DateTime
+  closeAt                 DateTime
+  marketSnapshotJson      String?
+  leaderboardSnapshotJson String?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+
+  competition Competition          @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  orders      Order[]
+  snapshots   SettlementSnapshot[]
+
+  @@unique([competitionId, tradingDate, sessionType])
+  @@index([competitionId, tradingDate])
+  @@index([competitionId, status])
+}
+
+model SettlementSnapshot {
+  id               String   @id @default(cuid())
+  competitionId    String
+  tradingSessionId String?
+  participantId    String?
+  portfolioId      String
+  snapshotAt       DateTime @default(now())
+  cash             Float
+  marketValue      Float
+  totalValue       Float
+  realizedPnL      Float    @default(0)
+  unrealizedPnL    Float    @default(0)
+  returnPct        Float
+  drawdownPct      Float    @default(0)
+  turnoverPct      Float    @default(0)
+  rank             Int?
+  holdingSymbol    String?
+  positionJson     String?
+  metricsJson      String?
+  createdAt        DateTime @default(now())
+
+  competition    Competition             @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  tradingSession TradingSession?         @relation(fields: [tradingSessionId], references: [id])
+  participant    CompetitionParticipant? @relation(fields: [participantId], references: [id])
+  portfolio      Portfolio               @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([competitionId, snapshotAt])
+  @@index([portfolioId, snapshotAt])
+  @@index([participantId, snapshotAt])
 }

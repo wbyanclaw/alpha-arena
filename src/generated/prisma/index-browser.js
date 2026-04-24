@@ -142,6 +142,18 @@ exports.Prisma.CompetitionScalarFieldEnum = {
   initialCash: 'initialCash',
   market: 'market',
   testMode: 'testMode',
+  mode: 'mode',
+  entryRule: 'entryRule',
+  tradableSymbolsJson: 'tradableSymbolsJson',
+  maxPositionPct: 'maxPositionPct',
+  maxHoldingSymbols: 'maxHoldingSymbols',
+  switchRequiresFlat: 'switchRequiresFlat',
+  commissionRate: 'commissionRate',
+  slippageBps: 'slippageBps',
+  allowShort: 'allowShort',
+  scoreFormula: 'scoreFormula',
+  phase: 'phase',
+  tradingCalendar: 'tradingCalendar',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -152,6 +164,9 @@ exports.Prisma.PortfolioScalarFieldEnum = {
   competitionId: 'competitionId',
   cash: 'cash',
   totalValue: 'totalValue',
+  holdingSymbol: 'holdingSymbol',
+  holdingCount: 'holdingCount',
+  switchRequiresFlat: 'switchRequiresFlat',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -244,11 +259,16 @@ exports.Prisma.OrderScalarFieldEnum = {
   agentId: 'agentId',
   competitionId: 'competitionId',
   portfolioId: 'portfolioId',
+  participantId: 'participantId',
+  tradingSessionId: 'tradingSessionId',
   symbol: 'symbol',
   side: 'side',
   quantity: 'quantity',
   note: 'note',
   status: 'status',
+  intent: 'intent',
+  riskCheckStatus: 'riskCheckStatus',
+  riskRejectCode: 'riskRejectCode',
   rejectReason: 'rejectReason',
   submittedAt: 'submittedAt',
   matchedAt: 'matchedAt'
@@ -263,6 +283,61 @@ exports.Prisma.DailySettlementScalarFieldEnum = {
   positionDays: 'positionDays',
   totalValue: 'totalValue',
   returnPct: 'returnPct',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.CompetitionParticipantScalarFieldEnum = {
+  id: 'id',
+  competitionId: 'competitionId',
+  agentId: 'agentId',
+  portfolioId: 'portfolioId',
+  status: 'status',
+  displayName: 'displayName',
+  tagline: 'tagline',
+  strategyTagsJson: 'strategyTagsJson',
+  riskLevel: 'riskLevel',
+  webhookUrl: 'webhookUrl',
+  apiVersion: 'apiVersion',
+  joinedAt: 'joinedAt',
+  approvedAt: 'approvedAt',
+  eliminatedAt: 'eliminatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TradingSessionScalarFieldEnum = {
+  id: 'id',
+  competitionId: 'competitionId',
+  tradingDate: 'tradingDate',
+  sessionType: 'sessionType',
+  status: 'status',
+  openAt: 'openAt',
+  closeAt: 'closeAt',
+  marketSnapshotJson: 'marketSnapshotJson',
+  leaderboardSnapshotJson: 'leaderboardSnapshotJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SettlementSnapshotScalarFieldEnum = {
+  id: 'id',
+  competitionId: 'competitionId',
+  tradingSessionId: 'tradingSessionId',
+  participantId: 'participantId',
+  portfolioId: 'portfolioId',
+  snapshotAt: 'snapshotAt',
+  cash: 'cash',
+  marketValue: 'marketValue',
+  totalValue: 'totalValue',
+  realizedPnL: 'realizedPnL',
+  unrealizedPnL: 'unrealizedPnL',
+  returnPct: 'returnPct',
+  drawdownPct: 'drawdownPct',
+  turnoverPct: 'turnoverPct',
+  rank: 'rank',
+  holdingSymbol: 'holdingSymbol',
+  positionJson: 'positionJson',
+  metricsJson: 'metricsJson',
   createdAt: 'createdAt'
 };
 
@@ -284,6 +359,7 @@ exports.AgentStatus = exports.$Enums.AgentStatus = {
 exports.CompetitionStatus = exports.$Enums.CompetitionStatus = {
   PENDING: 'PENDING',
   RUNNING: 'RUNNING',
+  PAUSED: 'PAUSED',
   FINISHED: 'FINISHED'
 };
 
@@ -310,6 +386,42 @@ exports.DeliverySide = exports.$Enums.DeliverySide = {
   SELL: 'SELL'
 };
 
+exports.OrderIntent = exports.$Enums.OrderIntent = {
+  OPEN: 'OPEN',
+  CLOSE: 'CLOSE',
+  SWITCH: 'SWITCH'
+};
+
+exports.RiskCheckStatus = exports.$Enums.RiskCheckStatus = {
+  PENDING: 'PENDING',
+  PASSED: 'PASSED',
+  REJECTED: 'REJECTED'
+};
+
+exports.ParticipantStatus = exports.$Enums.ParticipantStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  ACTIVE: 'ACTIVE',
+  ELIMINATED: 'ELIMINATED',
+  QUIT: 'QUIT'
+};
+
+exports.TradingSessionType = exports.$Enums.TradingSessionType = {
+  CALL_AUCTION_OPEN: 'CALL_AUCTION_OPEN',
+  MORNING: 'MORNING',
+  AFTERNOON: 'AFTERNOON',
+  CALL_AUCTION_CLOSE: 'CALL_AUCTION_CLOSE',
+  CLOSED: 'CLOSED'
+};
+
+exports.TradingSessionStatus = exports.$Enums.TradingSessionStatus = {
+  PENDING: 'PENDING',
+  OPEN: 'OPEN',
+  PAUSED: 'PAUSED',
+  CLOSED: 'CLOSED'
+};
+
 exports.Prisma.ModelName = {
   Agent: 'Agent',
   Competition: 'Competition',
@@ -322,7 +434,10 @@ exports.Prisma.ModelName = {
   Comment: 'Comment',
   LogEntry: 'LogEntry',
   Order: 'Order',
-  DailySettlement: 'DailySettlement'
+  DailySettlement: 'DailySettlement',
+  CompetitionParticipant: 'CompetitionParticipant',
+  TradingSession: 'TradingSession',
+  SettlementSnapshot: 'SettlementSnapshot'
 };
 
 /**
