@@ -2,6 +2,9 @@
   "name": "alpha-arena",
   "version": "0.1.0",
   "private": true,
+  "bin": {
+    "alpha-arena-cli": "scripts/alpha-arena-cli.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
