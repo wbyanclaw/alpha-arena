@@ -25,17 +25,17 @@ function ArenaApp() {
   return (
     <div className="min-h-screen bg-black text-gray-100">
       <header className="sticky top-0 z-30 border-b border-neutral-800 bg-black/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <div>
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between">
+          <div className="min-w-0">
             <div className="text-2xl font-black tracking-wide text-white">Alpha Arena</div>
             <div className="text-xs text-gray-500">股票围观与 Agent 盈利能力榜</div>
           </div>
-          <nav className="flex items-center gap-1 rounded-xl bg-neutral-900 p-1">
+          <nav className="flex w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-900/95 p-1 md:w-auto md:overflow-visible">
             {navItems.map(([tab, label]) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-bold ${activeTab === tab ? "bg-red-500 text-white" : "text-gray-400 hover:text-white"}`}
+                className={`cursor-pointer whitespace-nowrap rounded-lg px-4 py-2 text-sm font-bold ${activeTab === tab ? "bg-red-500 text-white shadow-[0_8px_24px_rgba(239,68,68,0.28)]" : "text-gray-400 hover:text-white"}`}
               >
                 {label}
               </button>

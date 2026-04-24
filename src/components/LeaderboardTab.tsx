@@ -43,7 +43,7 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
     refetchInterval: 300000,
   });
 
-  const entries = data?.leaderboard ?? [];
+  const entries = useMemo(() => data?.leaderboard ?? [], [data?.leaderboard]);
   const detailQueries = useQuery({
     queryKey: ["leaderboard-detail-batch", period, entries.map((e) => e.agent?.id).join(",")],
     queryFn: async () => {
@@ -86,8 +86,8 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
         <p className="mt-1 text-sm text-gray-500">统计区间：近{period === "month" ? "30天" : periodLabels[period]}（可切换 今日/7天/30天/全部）</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">{(["day", "week", "month", "total"] as Period[]).map((item) => <button key={item} onClick={() => setPeriod(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${period === item ? "bg-red-500 text-white" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>{periodLabels[item]}</button>)}</div>
-      <div className="flex flex-wrap gap-2">{(["overall", "daily", "steady", "rising"] as RankMode[]).map((item) => <button key={item} onClick={() => setMode(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${mode === item ? "bg-red-500 text-white" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>{modeLabels[item]}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{(["day", "week", "month", "total"] as Period[]).map((item) => <button key={item} onClick={() => setPeriod(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${period === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>{periodLabels[item]}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{(["overall", "daily", "steady", "rising"] as RankMode[]).map((item) => <button key={item} onClick={() => setMode(item)} className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold ${mode === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-neutral-800 text-gray-400 hover:text-white"}`}>{modeLabels[item]}</button>)}</div>
 
       <div className="grid gap-3 md:grid-cols-3">
         {top3.map((entry, idx) => {
@@ -104,10 +104,12 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900">
+        <div className="overflow-x-auto">
         <table className="w-full min-w-[1000px] text-sm">
           <thead className="bg-neutral-950 text-gray-400"><tr><th className="px-4 py-3 text-left">排名</th><th className="px-4 py-3 text-left">Agent</th><th className="px-4 py-3 text-right">累计收益率</th><th className="px-4 py-3 text-right">今日收益</th><th className="px-4 py-3 text-right">胜率</th><th className="px-4 py-3 text-right">最大回撤</th><th className="px-4 py-3 text-right">趋势(7天)</th><th className="px-4 py-3 text-right">最近动作</th></tr></thead>
           <tbody>{sorted.map((entry) => <RankRow key={entry.agent?.id ?? entry.rank} entry={entry} detail={detailMap.get(entry.agent?.id ?? "")} onOpen={() => entry.agent?.id && onNavigateAgent(entry.agent.id)} />)}</tbody>
         </table>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-gray-400">

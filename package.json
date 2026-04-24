@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start:prod": "HOSTNAME=0.0.0.0 PORT=${PORT:-3000} next start",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -13,8 +14,8 @@
     "db:studio": "prisma studio",
     "db:seed": "npx tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "deploy:prod": "bash scripts/deploy-prod.sh",
-    "verify:prod": "bash scripts/verify-prod.sh"
+    "verify": "npm run build && npm run lint",
+    "verify:prod": "npm run verify"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",

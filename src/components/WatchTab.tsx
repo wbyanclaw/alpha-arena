@@ -129,7 +129,7 @@ function StockDetailPanel({ symbol, overview, onOpenAgent }: { symbol: string; o
         <div className="mb-3 text-sm font-bold text-gray-400">所有 Agent 买卖</div>
         <div className="space-y-2">
           {stock.actions.length === 0 ? <div className="text-sm text-gray-500">暂无 Agent 动作</div> : stock.actions.map((action, idx) => (
-            <button key={`${action.agentId ?? action.agentName}-${idx}`} onClick={() => action.agentId && onOpenAgent(action.agentId)} className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50">
+            <button key={`${action.agentId ?? action.agentName}-${idx}`} onClick={() => action.agentId && onOpenAgent(action.agentId)} className="flex w-full cursor-pointer flex-col gap-3 rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="font-bold text-white">{action.agentName}</div>
                 <div className="text-xs text-gray-500">{action.action === "BUY" ? "买入" : action.action === "SELL" ? "卖出" : "持有"} · {action.quantity} 股</div>
@@ -207,14 +207,14 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
         <p className="mt-2 text-sm leading-6 text-gray-400">日期：{data.date} 市场：{data.market === "A" ? "A股" : data.market} 更新时间：{fmtTime(data.updatedAt)}</p>
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <div className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-900/95 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
         <div className="space-y-2">
           <div className="text-sm font-bold text-gray-400">时间范围</div>
-          <div className="flex flex-wrap gap-2">{(["day", "hour"] as Range[]).map((item) => <button key={item} onClick={() => setRange(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${range === item ? "bg-red-500 text-white" : "bg-black/30 text-gray-300"}`}>{rangeLabels[item]}</button>)}</div>
+          <div className="flex flex-wrap gap-2">{(["day", "hour"] as Range[]).map((item) => <button key={item} onClick={() => setRange(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${range === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-black/30 text-gray-300 hover:bg-black/50"}`}>{rangeLabels[item]}</button>)}</div>
         </div>
         <div className="space-y-2">
           <div className="text-sm font-bold text-gray-400">排序</div>
-          <div className="flex flex-wrap gap-2">{(["heat", "divergence", "latest"] as SortKey[]).map((item) => <button key={item} onClick={() => setSortKey(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${sortKey === item ? "bg-red-500 text-white" : "bg-black/30 text-gray-300"}`}>{sortLabels[item]}</button>)}</div>
+          <div className="flex flex-wrap gap-2">{(["heat", "divergence", "latest"] as SortKey[]).map((item) => <button key={item} onClick={() => setSortKey(item)} className={`cursor-pointer rounded-full px-4 py-2 text-sm font-bold ${sortKey === item ? "bg-red-500 text-white shadow-[0_10px_24px_rgba(239,68,68,0.28)]" : "bg-black/30 text-gray-300 hover:bg-black/50"}`}>{sortLabels[item]}</button>)}</div>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 pb-24 sm:pb-4">
         <div className="mb-3 text-sm font-bold text-gray-400">模块C · 头部Agent最新交易流</div>
         {data.latestFlows.length === 0 ? <div className="text-sm text-gray-500">当前暂无最新交易流</div> : <div className="space-y-2">{data.latestFlows.slice(0, 10).map((flow, idx) => (
           <button key={`${flow.agentId ?? flow.agentName}-${idx}`} onClick={() => flow.agentId && onNavigate({ type: "agent-detail", agentId: flow.agentId, fromSymbol: flow.symbol })} className="flex w-full cursor-pointer flex-col gap-1 rounded-lg border border-neutral-800 bg-black/20 px-4 py-3 text-left hover:border-red-500/50 sm:flex-row sm:items-center sm:justify-between">
