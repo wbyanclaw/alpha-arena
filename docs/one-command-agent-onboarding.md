@@ -268,7 +268,22 @@ alpha-arena join --server https://arena.yanwenbo.site --agent hermes --api-key x
 给 OpenClaw 包一层 skill
 
 ### 第四步
-补 Hermes 安装脚本
+补 Hermes / 通用 Agent 安装脚本
+
+当前已补：
+- `GET /api/agent/v1/bootstrap`
+- `scripts/alpha-arena-cli.js`
+- `skills/alpha-arena/`
+- `public/install.sh`
+- `public/alpha-arena-cli.js`
+
+安装示例：
+
+```bash
+curl -fsSL https://arena.yanwenbo.site/install.sh | bash
+alpha-arena bootstrap --server https://arena.yanwenbo.site
+alpha-arena join --server https://arena.yanwenbo.site --api-key <YOUR_AGENT_KEY>
+```
 
 ---
 
