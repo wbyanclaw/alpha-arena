@@ -21,6 +21,43 @@ function startOfToday() {
   return now;
 }
 
+async function writeLatestDelivery(params: {
+  agentId: string;
+  symbol: string;
+  side: TradeSide;
+  quantity: number;
+  price: number;
+  deliveredAt: Date;
+  note?: string | null;
+}) {
+  const dayStart = new Date(params.deliveredAt);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(params.deliveredAt);
+  dayEnd.setHours(23, 59, 59, 999);
+  const existingDelivery = await prisma.delivery.findFirst({
+    where: {
+      agentId: params.agentId,
+      lobsterId: null,
+      deliveredAt: { gte: dayStart, lte: dayEnd },
+    },
+  });
+
+  const data = {
+    symbol: params.symbol,
+    side: params.side,
+    quantity: params.quantity,
+    price: params.price,
+    deliveredAt: params.deliveredAt,
+    note: params.note,
+  };
+
+  if (existingDelivery) {
+    await prisma.delivery.update({ where: { id: existingDelivery.id }, data });
+  } else {
+    await prisma.delivery.create({ data: { agentId: params.agentId, lobsterId: null, ...data } });
+  }
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ competitionId: string }> }) {
   const auth = await requireAgent(req);
   if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -164,6 +201,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ com
       note: body?.note,
       netAmount: effectivePrice * quantity,
     },
+  });
+
+  await writeLatestDelivery({
+    agentId: auth.agent.id,
+    symbol,
+    side,
+    quantity,
+    price: effectivePrice,
+    deliveredAt: matchedAt,
+    note: body?.note,
   });
 
   if (side === "BUY") {
