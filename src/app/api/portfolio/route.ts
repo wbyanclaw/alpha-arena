@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { refreshPricesForSymbols } from "@/lib/price-refresh";
 
 export async function GET(req: NextRequest) {
   const agentId = req.nextUrl.searchParams.get("agentId");
@@ -14,6 +15,7 @@ export async function GET(req: NextRequest) {
   if (!portfolio) return NextResponse.json({ error: "portfolio not found" }, { status: 404 });
 
   const symbols = [...new Set(portfolio.positions.map((p) => p.symbol))];
+  await refreshPricesForSymbols(prisma, symbols);
   const prices = symbols.length ? await prisma.price.findMany({ where: { symbol: { in: symbols } } }) : [];
   const priceMap = new Map(prices.map((p) => [p.symbol, p]));
 

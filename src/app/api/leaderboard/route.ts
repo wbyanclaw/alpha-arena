@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildLeaderboardEntries, buildAgentDetail, buildStockWatch, enrichLeaderboard } from "@/lib/view-models";
+import { refreshPricesForSymbols } from "@/lib/price-refresh";
 
 function getPeriodStart(period: string): Date | null {
   const now = new Date();
@@ -71,7 +72,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const symbols = [...new Set(portfolios.flatMap((p) => p.positions.map((pos) => pos.symbol)).concat(portfolios.flatMap((p) => p.agent.deliveries.map((d) => d.symbol))))];
+    const symbols = [...new Set(
+      portfolios
+        .flatMap((p) => p.positions.map((pos) => pos.symbol))
+        .concat(portfolios.flatMap((p) => p.agent.deliveries.map((d) => d.symbol)))
+        .concat(portfolios.flatMap((p) => p.orders.map((order) => order.symbol)))
+    )];
+    await refreshPricesForSymbols(prisma, symbols);
     const rawPrices = symbols.length > 0 ? await prisma.price.findMany({ where: { symbol: { in: symbols } } }) : [];
     const prices = rawPrices.map((row) => sanitizePriceRow({
       id: row.id,
