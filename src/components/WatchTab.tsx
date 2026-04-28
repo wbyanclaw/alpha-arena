@@ -60,7 +60,7 @@ function StockCard({ item, rank, onOpen }: { item: StockWatchItem; rank: number;
   );
 }
 
-function AgentDetailPanel({ agentId, fromSymbol, onBackToStock }: { agentId: string; fromSymbol?: string; onBackToStock: () => void }) {
+function AgentDetailPanel({ agentId, fromSymbol, onBack }: { agentId: string; fromSymbol?: string; onBack: () => void }) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["agent-detail", agentId],
     queryFn: async () => {
@@ -83,7 +83,7 @@ function AgentDetailPanel({ agentId, fromSymbol, onBackToStock }: { agentId: str
           <h2 className="text-xl font-black text-white">Agent详情 | {entry.agent?.name ?? "—"}</h2>
           <p className="text-sm text-gray-500">历史收益、当前持仓、当日交易链路</p>
         </div>
-        {fromSymbol && <button onClick={onBackToStock} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-2 text-sm text-gray-300 hover:text-white">回围观相关股票</button>}
+        <button onClick={onBack} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-2 text-sm text-gray-300 hover:text-white">{fromSymbol ? "回围观相关股票" : "返回围观列表"}</button>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4"><div className="text-xs text-gray-500">累计收益</div><div className={`mt-1 text-lg font-black ${entry.returnPct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(entry.returnPct)}</div></div>
@@ -100,6 +100,7 @@ function AgentDetailPanel({ agentId, fromSymbol, onBackToStock }: { agentId: str
               <div key={pos.symbol} className="rounded-lg bg-black/20 p-3 text-sm text-gray-300">
                 <div className="font-bold text-white">{pos.name ?? pos.symbol} <span className="text-gray-500">{pos.symbol}</span></div>
                 <div className="mt-1">持仓 {pos.quantity} 股，成本 ¥{pos.avgCost.toFixed(2)}，现价 ¥{(pos.currentPrice ?? pos.avgCost).toFixed(2)}</div>
+                <div className={`mt-1 font-bold ${((pos.currentPrice ?? pos.avgCost) - pos.avgCost) >= 0 ? "text-red-400" : "text-green-400"}`}>浮动盈亏 ¥{(((pos.currentPrice ?? pos.avgCost) - pos.avgCost) * pos.quantity).toFixed(2)} · {fmtPct((((pos.currentPrice ?? pos.avgCost) - pos.avgCost) / pos.avgCost) * 100)}</div>
               </div>
             ))}
           </div>
@@ -110,7 +111,7 @@ function AgentDetailPanel({ agentId, fromSymbol, onBackToStock }: { agentId: str
   );
 }
 
-function StockDetailPanel({ symbol, overview, onOpenAgent }: { symbol: string; overview: WatchOverviewResponse | undefined; onOpenAgent: (agentId: string) => void }) {
+function StockDetailPanel({ symbol, overview, onOpenAgent, onBack }: { symbol: string; overview: WatchOverviewResponse | undefined; onOpenAgent: (agentId: string) => void; onBack: () => void }) {
   const stock = overview?.stocks.find((item) => item.symbol === symbol);
   if (!stock) return <div className="text-sm text-gray-500">未找到该股票详情</div>;
 
@@ -122,7 +123,10 @@ function StockDetailPanel({ symbol, overview, onOpenAgent }: { symbol: string; o
             <h2 className="text-xl font-black text-white">{stock.name} <span className="text-sm text-gray-500">{stock.symbol}</span></h2>
             <div className={`mt-1 text-sm font-bold ${stock.changePct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(stock.changePct)} · 热度 {stock.heat} · 分歧指数 {stock.divergence.toFixed(1)}</div>
           </div>
-          <div className="text-xs text-gray-500">最新动作 {fmtTime(stock.latestActionAt)}</div>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <div className="text-xs text-gray-500">最新动作 {fmtTime(stock.latestActionAt)}</div>
+            <button onClick={onBack} className="cursor-pointer rounded-lg border border-neutral-700 px-3 py-2 text-sm text-gray-300 hover:text-white">返回围观列表</button>
+          </div>
         </div>
       </div>
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
@@ -193,11 +197,11 @@ export default function WatchTab({ viewState, onNavigate }: Props) {
   if (isError || !data) return <div className="text-sm text-red-400">围观页加载失败</div>;
 
   if (viewState.type === "stock-detail") {
-    return <StockDetailPanel symbol={viewState.symbol} overview={data} onOpenAgent={(agentId) => onNavigate({ type: "agent-detail", agentId, fromSymbol: viewState.symbol })} />;
+    return <StockDetailPanel symbol={viewState.symbol} overview={data} onBack={() => onNavigate({ type: "watch-list" })} onOpenAgent={(agentId) => onNavigate({ type: "agent-detail", agentId, fromSymbol: viewState.symbol })} />;
   }
 
   if (viewState.type === "agent-detail") {
-    return <AgentDetailPanel agentId={viewState.agentId} fromSymbol={viewState.fromSymbol} onBackToStock={() => onNavigate({ type: "stock-detail", symbol: viewState.fromSymbol ?? sortedStocks[0]?.symbol ?? "" })} />;
+    return <AgentDetailPanel agentId={viewState.agentId} fromSymbol={viewState.fromSymbol} onBack={() => viewState.fromSymbol ? onNavigate({ type: "stock-detail", symbol: viewState.fromSymbol }) : onNavigate({ type: "watch-list" })} />;
   }
 
   return (
