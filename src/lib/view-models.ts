@@ -171,19 +171,53 @@ export function buildAgentDetail(entry: LeaderboardEntry, deliveries: DeliveryIt
   };
 }
 
+function pickLatestTradeAction(entry: LeaderboardEntry) {
+  const delivery = entry.latestDelivery;
+  const order = entry.todayOrder;
+  const orderIsVisible = order && order.status !== "CANCELLED" && order.status !== "REJECTED";
+
+  if (!delivery && !orderIsVisible) return null;
+  if (delivery && !orderIsVisible) {
+    return {
+      source: "delivery" as const,
+      symbol: delivery.symbol,
+      side: delivery.side,
+      quantity: delivery.quantity,
+      price: delivery.price,
+      at: delivery.deliveredAt,
+    };
+  }
+  if (!delivery && orderIsVisible) {
+    return {
+      source: "order" as const,
+      symbol: order.symbol,
+      side: order.side,
+      quantity: order.quantity,
+      price: null,
+      at: order.submittedAt,
+    };
+  }
+
+  return new Date(order!.submittedAt).getTime() > new Date(delivery!.deliveredAt).getTime()
+    ? { source: "order" as const, symbol: order!.symbol, side: order!.side, quantity: order!.quantity, price: null, at: order!.submittedAt }
+    : { source: "delivery" as const, symbol: delivery!.symbol, side: delivery!.side, quantity: delivery!.quantity, price: delivery!.price, at: delivery!.deliveredAt };
+}
+
 export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): { stocks: StockWatchItem[]; latestFlows: AgentRecentAction[] } {
+  const priceBySymbol = new Map(stocks.map((p) => [p.symbol, p]));
   const latestFlows: AgentRecentAction[] = entries
     .flatMap((entry) => {
-      const d = entry.latestDelivery;
-      if (!d) return [];
+      const action = pickLatestTradeAction(entry);
+      if (!action) return [];
+      const price = priceBySymbol.get(action.symbol);
       return [{
         agentId: entry.agent?.id,
         agentName: entry.agent?.name ?? "—",
-        symbol: d.symbol,
-        stockName: d.name ?? d.symbol,
-        action: d.side === "BUY" ? "买入" : "卖出",
-        quantity: d.quantity,
-        deliveredAt: d.deliveredAt,
+        symbol: action.symbol,
+        stockName: price?.name ?? action.symbol,
+        action: action.side === "BUY" ? "买入" : "卖出",
+        quantity: action.quantity,
+        deliveredAt: action.at,
       }];
     })
     .sort((a, b) => new Date(b.deliveredAt).getTime() - new Date(a.deliveredAt).getTime())
@@ -218,11 +252,12 @@ export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): {
 
   for (const entry of entries) {
     const touched = new Set<string>();
-    const latest = entry.latestDelivery;
+    const latest = pickLatestTradeAction(entry);
     if (latest) {
       touched.add(latest.symbol);
       const item = stockMap.get(latest.symbol);
       if (item) {
+        const heldPosition = entry.positions?.find((p) => p.symbol === latest.symbol);
         const action: StockAgentAction = {
           agentId: entry.agent?.id,
           agentName: entry.agent?.name ?? "—",
@@ -230,14 +265,14 @@ export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): {
           quantity: latest.quantity,
           price: latest.price,
           returnPct: entry.returnPct,
-          deliveredAt: latest.deliveredAt,
-          hasPosition: !!entry.positions?.some((p) => p.symbol === latest.symbol),
-          positionQty: entry.positions?.find((p) => p.symbol === latest.symbol)?.quantity ?? 0,
+          deliveredAt: latest.at,
+          hasPosition: !!heldPosition,
+          positionQty: heldPosition?.quantity ?? 0,
         };
         item.actions.push(action);
         if (latest.side === "BUY") item.buyCount += 1;
         if (latest.side === "SELL") item.sellCount += 1;
-        item.latestActionAt = latest.deliveredAt;
+        item.latestActionAt = latest.at;
       }
     }
 

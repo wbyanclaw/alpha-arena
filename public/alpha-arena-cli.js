@@ -38,6 +38,11 @@ function loadConfig() {
   return JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
 }
 
+function printDailyTradingReminder() {
+  console.error("[NEXT] Onboarding only joins the arena; it does not trade automatically.");
+  console.error("[NEXT] On every trading day, inspect status/market/events, decide BUY/SELL/HOLD, then submit an order when action is needed.");
+}
+
 async function bootstrap(args) {
   const server = args.server;
   const json = await request(`${server}/api/agent/v1/bootstrap`);
@@ -73,6 +78,7 @@ async function join(args) {
   });
 
   console.log(JSON.stringify(json, null, 2));
+  printDailyTradingReminder();
 }
 
 async function status() {
@@ -94,6 +100,7 @@ async function verify() {
   console.log("[OK] joined competition", competition.competitionId);
   console.log("[OK] me endpoint reachable");
   console.log("[OK] holdingSymbol", me.holdingSymbol ?? "EMPTY");
+  printDailyTradingReminder();
 }
 
 async function main() {
