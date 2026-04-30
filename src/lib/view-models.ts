@@ -1,6 +1,6 @@
 import type { DailySettlement, Delivery, Portfolio, Position, Price, Trade } from "@/generated/prisma";
 import { toMarketSymbol } from "@/lib/market";
-import type { AgentDetail, AgentRecentAction, DeliveryItem, LeaderboardEntry, StockAgentAction, StockWatchItem } from "@/types/arena";
+import type { AgentDetail, AgentRecentAction, DeliveryItem, LeaderboardEntry, RecentActionItem, StockAgentAction, StockWatchItem } from "@/types/arena";
 
 type AgentBundle = {
   id: string;
@@ -107,6 +107,16 @@ export function buildLeaderboardEntries(params: {
     const returnPct = calculateReturnPct(totalValue, initialCash);
     const latestDelivery = [...p.agent.deliveries].sort((a, b) => b.deliveredAt.getTime() - a.deliveredAt.getTime())[0] ?? null;
     const todayOrder = p.orders[0] ?? null;
+    const recentActions: RecentActionItem[] = [...agentTrades]
+      .filter((t) => t.status === "FILLED" && !!t.filledAt)
+      .sort((a, b) => new Date(b.filledAt!).getTime() - new Date(a.filledAt!).getTime())
+      .map((t) => ({
+        symbol: t.symbol,
+        side: t.side as "BUY" | "SELL",
+        quantity: t.quantity,
+        price: t.executedPrice ?? t.price,
+        at: t.filledAt!.toISOString(),
+      }));
 
     return {
       rank: 0,
@@ -137,6 +147,7 @@ export function buildLeaderboardEntries(params: {
             status: todayOrder.status,
           }
         : null,
+      recentActions,
       todayBought: agentTrades.filter((t) => t.side === "BUY").length,
       positions,
       holdingsDays: positions[0]?.boughtAt ? Math.floor((Date.now() - new Date(positions[0].boughtAt).getTime()) / 86400000) : 0,
@@ -206,20 +217,19 @@ function pickLatestTradeAction(entry: LeaderboardEntry) {
 export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): { stocks: StockWatchItem[]; latestFlows: AgentRecentAction[] } {
   const priceBySymbol = new Map(stocks.map((p) => [p.symbol, p]));
   const latestFlows: AgentRecentAction[] = entries
-    .flatMap((entry) => {
-      const action = pickLatestTradeAction(entry);
-      if (!action) return [];
+    .flatMap((entry) => (entry.recentActions ?? []).map((action) => {
       const price = priceBySymbol.get(action.symbol);
-      return [{
+      return {
         agentId: entry.agent?.id,
         agentName: entry.agent?.name ?? "—",
+        agentModel: entry.agent?.model ?? null,
         symbol: action.symbol,
         stockName: price?.name ?? action.symbol,
         action: action.side === "BUY" ? "买入" : "卖出",
         quantity: action.quantity,
         deliveredAt: action.at,
-      }];
-    })
+      };
+    }))
     .sort((a, b) => new Date(b.deliveredAt).getTime() - new Date(a.deliveredAt).getTime())
     .slice(0, 20);
 
@@ -252,27 +262,52 @@ export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): {
 
   for (const entry of entries) {
     const touched = new Set<string>();
-    const latest = pickLatestTradeAction(entry);
-    if (latest) {
-      touched.add(latest.symbol);
-      const item = stockMap.get(latest.symbol);
-      if (item) {
-        const heldPosition = entry.positions?.find((p) => p.symbol === latest.symbol);
-        const action: StockAgentAction = {
-          agentId: entry.agent?.id,
-          agentName: entry.agent?.name ?? "—",
-          action: latest.side,
-          quantity: latest.quantity,
-          price: latest.price,
-          returnPct: entry.returnPct,
-          deliveredAt: latest.at,
-          hasPosition: !!heldPosition,
-          positionQty: heldPosition?.quantity ?? 0,
-        };
-        item.actions.push(action);
-        if (latest.side === "BUY") item.buyCount += 1;
-        if (latest.side === "SELL") item.sellCount += 1;
-        item.latestActionAt = latest.at;
+    for (const recent of entry.recentActions ?? []) {
+      touched.add(recent.symbol);
+      const item = stockMap.get(recent.symbol);
+      if (!item) continue;
+      const heldPosition = entry.positions?.find((p) => p.symbol === recent.symbol);
+      const action: StockAgentAction = {
+        agentId: entry.agent?.id,
+        agentName: entry.agent?.name ?? "—",
+        agentModel: entry.agent?.model ?? null,
+        action: recent.side,
+        quantity: recent.quantity,
+        price: recent.price,
+        returnPct: entry.returnPct,
+        deliveredAt: recent.at,
+        hasPosition: !!heldPosition,
+        positionQty: heldPosition?.quantity ?? 0,
+      };
+      item.actions.push(action);
+      if (recent.side === "BUY") item.buyCount += 1;
+      if (recent.side === "SELL") item.sellCount += 1;
+      if (!item.latestActionAt || new Date(recent.at).getTime() > new Date(item.latestActionAt).getTime()) item.latestActionAt = recent.at;
+    }
+
+    if ((entry.recentActions ?? []).length === 0) {
+      const latest = pickLatestTradeAction(entry);
+      if (latest) {
+        touched.add(latest.symbol);
+        const item = stockMap.get(latest.symbol);
+        if (item) {
+          const heldPosition = entry.positions?.find((p) => p.symbol === latest.symbol);
+          item.actions.push({
+            agentId: entry.agent?.id,
+            agentName: entry.agent?.name ?? "—",
+            agentModel: entry.agent?.model ?? null,
+            action: latest.side,
+            quantity: latest.quantity,
+            price: latest.price,
+            returnPct: entry.returnPct,
+            deliveredAt: latest.at,
+            hasPosition: !!heldPosition,
+            positionQty: heldPosition?.quantity ?? 0,
+          });
+          if (latest.side === "BUY") item.buyCount += 1;
+          if (latest.side === "SELL") item.sellCount += 1;
+          item.latestActionAt = latest.at;
+        }
       }
     }
 
@@ -283,6 +318,7 @@ export function buildStockWatch(stocks: Price[], entries: LeaderboardEntry[]): {
       item.actions.push({
         agentId: entry.agent?.id,
         agentName: entry.agent?.name ?? "—",
+        agentModel: entry.agent?.model ?? null,
         action: "HOLD",
         quantity: pos.quantity,
         price: pos.currentPrice,

@@ -43,6 +43,15 @@ export type AgentSummary = {
   model?: string | null;
 };
 
+
+export type RecentActionItem = {
+  symbol: string;
+  side: "BUY" | "SELL";
+  quantity: number;
+  price?: number | null;
+  at: string;
+};
+
 export type LeaderboardEntry = {
   rank: number;
   agent?: AgentSummary;
@@ -58,6 +67,7 @@ export type LeaderboardEntry = {
   holdingsDays?: number;
   latestDelivery?: DeliveryItem | null;
   todayOrder?: OrderItem | null;
+  recentActions?: RecentActionItem[];
   todayBought?: number;
   positions?: PositionItem[];
 };
@@ -65,6 +75,7 @@ export type LeaderboardEntry = {
 export type StockAgentAction = {
   agentId?: string;
   agentName: string;
+  agentModel?: string | null;
   action: "BUY" | "SELL" | "HOLD";
   quantity: number;
   price?: number | null;
@@ -97,6 +108,7 @@ export type StockWatchItem = {
 export type AgentRecentAction = {
   agentId?: string;
   agentName: string;
+  agentModel?: string | null;
   symbol: string;
   stockName?: string | null;
   action: string;

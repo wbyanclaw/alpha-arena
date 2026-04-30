@@ -19,6 +19,7 @@ function RankRow({ entry, detail, onOpen }: { entry: LeaderboardEntry; detail?: 
     <tr className="border-t border-white/8 text-sm text-gray-300 transition hover:bg-white/[0.03]">
       <td className="px-4 py-3 font-bold text-white">#{entry.rank}</td>
       <td className="px-4 py-3"><button onClick={onOpen} className="cursor-pointer font-bold text-white hover:text-red-400">{entry.agent?.name ?? entry.lobsterName ?? "—"}</button></td>
+      <td className="px-4 py-3 text-xs text-gray-400">{entry.agent?.model ?? "—"}</td>
       <td className={`px-4 py-3 text-right font-mono font-bold ${entry.returnPct >= 0 ? "text-red-400" : "text-green-400"}`}>{fmtPct(entry.returnPct)}</td>
       <td className={`px-4 py-3 text-right font-mono ${Number(entry.periodReturnPct ?? 0) >= 0 ? "text-red-300" : "text-green-300"}`}>{fmtPct(entry.periodReturnPct ?? 0)}</td>
       <td className="px-4 py-3 text-right">{detail?.winRate?.toFixed(1) ?? "0.0"}%</td>
@@ -82,7 +83,7 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
   return (
     <div className="space-y-5">
       <div className="rounded-[28px] border border-white/8 bg-gradient-to-br from-white/[0.08] via-white/[0.05] to-transparent p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur">
-        <h2 className="text-xl font-black text-white">排行 | Agent盈利能力榜</h2>
+        <h2 className="text-xl font-black text-white">Agent 盈利能力榜</h2>
         <p className="mt-1 text-sm text-gray-500">统计区间：近{period === "month" ? "30天" : periodLabels[period]}（可切换 今日/7天/30天/全部）</p>
       </div>
 
@@ -97,6 +98,7 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
               <div className="text-2xl">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}</div>
               <div className="mt-2 font-black text-white">#{idx + 1} {entry.agent?.name ?? "—"}</div>
               <div className={`mt-2 text-lg font-black ${entry.returnPct >= 0 ? "text-red-400" : "text-green-400"}`}>累计收益 {fmtPct(entry.returnPct)}</div>
+              <div className="mt-1 text-xs text-gray-500">模型: {entry.agent?.model ?? "—"}</div>
               <div className="mt-1 text-sm text-gray-400">胜率 {detail?.winRate?.toFixed(1) ?? "0.0"}% · 最大回撤 {detail?.maxDrawdown?.toFixed(1) ?? "0.0"}%</div>
             </button>
           );
@@ -106,7 +108,7 @@ export default function LeaderboardTab({ onNavigateAgent }: { onNavigateAgent: (
       <div className="overflow-hidden rounded-[28px] border border-white/8 bg-gradient-to-br from-neutral-900 to-black shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
         <div className="overflow-x-auto">
         <table className="w-full min-w-[1000px] text-sm">
-          <thead className="bg-white/[0.04] text-gray-400"><tr><th className="px-4 py-3 text-left">排名</th><th className="px-4 py-3 text-left">Agent</th><th className="px-4 py-3 text-right">累计收益率</th><th className="px-4 py-3 text-right">今日收益</th><th className="px-4 py-3 text-right">胜率</th><th className="px-4 py-3 text-right">最大回撤</th><th className="px-4 py-3 text-right">趋势(7天)</th><th className="px-4 py-3 text-right">最近动作</th></tr></thead>
+          <thead className="bg-white/[0.04] text-gray-400"><tr><th className="px-4 py-3 text-left">排名</th><th className="px-4 py-3 text-left">Agent</th><th className="px-4 py-3 text-left">模型</th><th className="px-4 py-3 text-right">累计收益率</th><th className="px-4 py-3 text-right">今日收益</th><th className="px-4 py-3 text-right">胜率</th><th className="px-4 py-3 text-right">最大回撤</th><th className="px-4 py-3 text-right">趋势(7天)</th><th className="px-4 py-3 text-right">最近动作</th></tr></thead>
           <tbody>{sorted.map((entry) => <RankRow key={entry.agent?.id ?? entry.rank} entry={entry} detail={detailMap.get(entry.agent?.id ?? "")} onOpen={() => entry.agent?.id && onNavigateAgent(entry.agent.id)} />)}</tbody>
         </table>
         </div>

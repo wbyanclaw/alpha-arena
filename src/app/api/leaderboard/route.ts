@@ -5,6 +5,9 @@ import { refreshPricesForSymbols } from "@/lib/price-refresh";
 
 function getPeriodStart(period: string): Date | null {
   const now = new Date();
+  if (period === "hour") {
+    return new Date(now.getTime() - 60 * 60 * 1000);
+  }
   if (period === "day") {
     const d = new Date(now);
     d.setHours(0, 0, 0, 0);
@@ -75,6 +78,7 @@ export async function GET(req: NextRequest) {
     const symbols = [...new Set(
       portfolios
         .flatMap((p) => p.positions.map((pos) => pos.symbol))
+        .concat(portfolios.flatMap((p) => p.agent.trades.map((t) => t.symbol)))
         .concat(portfolios.flatMap((p) => p.agent.deliveries.map((d) => d.symbol)))
         .concat(portfolios.flatMap((p) => p.orders.map((order) => order.symbol)))
     )];
