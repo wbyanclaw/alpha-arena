@@ -129,6 +129,8 @@ export type AgentDetail = {
   entry: LeaderboardEntry;
   deliveries: DeliveryItem[];
   dailyReturns: number[];
+  settlementDates: string[];
+  isSettlement: boolean[];
   winRate: number;
   maxDrawdown: number;
   trend7d: number;

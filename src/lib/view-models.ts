@@ -167,7 +167,32 @@ export function enrichLeaderboard(entries: LeaderboardEntry[], settlementsByAgen
 }
 
 export function buildAgentDetail(entry: LeaderboardEntry, deliveries: DeliveryItem[], settlements: DailySettlement[]): AgentDetail {
-  const dailyReturns = settlements.map((s) => round2(s.returnPct));
+  // dailyReturns: fill gaps between settlement dates with the previous value
+  // (e.g., Labor Day holiday May 1-3 creates gaps; the curve should stay flat during non-settlement days)
+  const filledReturns: number[] = [];
+  const settlementDates: string[] = [];
+  const isSettlement: boolean[] = [];
+  for (let i = 0; i < settlements.length; i++) {
+    const cur = settlements[i];
+    const prev = i > 0 ? settlements[i - 1] : null;
+    if (prev) {
+      const prevDate = new Date(prev.date + "T00:00:00+08:00");
+      const curDate = new Date(cur.date + "T00:00:00+08:00");
+      const gapDays = Math.floor((curDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+      for (let d = 1; d < gapDays; d++) {
+        const gapDate = new Date(prevDate.getTime() + d * 1000 * 60 * 60 * 24);
+        const gapDateStr = gapDate.toISOString().slice(0, 10);
+        void gapDateStr;
+        filledReturns.push(round2(prev.returnPct));
+        settlementDates.push(gapDateStr);
+        isSettlement.push(false);
+      }
+    }
+    filledReturns.push(round2(cur.returnPct));
+    settlementDates.push(cur.date);
+    isSettlement.push(true);
+  }
+  const dailyReturns = filledReturns;
   const closed = deliveries.filter((d) => d.side === "SELL" && typeof d.returnPct === "number");
   const wins = closed.filter((d) => (d.returnPct ?? 0) > 0).length;
   const winRate = closed.length ? (wins / closed.length) * 100 : 0;
@@ -176,6 +201,8 @@ export function buildAgentDetail(entry: LeaderboardEntry, deliveries: DeliveryIt
     entry,
     deliveries,
     dailyReturns,
+    settlementDates,
+    isSettlement,
     winRate: round2(winRate),
     maxDrawdown: round2(computeMaxDrawdown(dailyReturns)),
     trend7d: round2(trend7d),
